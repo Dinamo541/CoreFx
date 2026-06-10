@@ -1,0 +1,75 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "maven: compile",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-pl",
+                "core",
+                "compile"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "maven: test",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-pl",
+                "core",
+                "test"
+            ],
+            "group": "test",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "maven: package",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-pl",
+                "core",
+                "package"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "maven: clean",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "clean"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "maven: clean package",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "clean",
+                "package"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "maven: run",
+            "type": "shell",
+            "command": "mvn",
+            "args": [
+                "-pl",
+                "core",
+                "exec:java",
+                "-Dexec.mainClass=cr.ac.una.corefx.navigation.AppContext"
+            ],
+            "group": "none",
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}

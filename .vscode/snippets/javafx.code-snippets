@@ -1,0 +1,43 @@
+{
+    "JavaFX FXML Controller Initialization": {
+        "prefix": "fxcontroller",
+        "body": [
+            "public class ${TM_FILENAME_BASE} implements Initializable {",
+            "",
+            "    @Override",
+            "    public void initialize(URL url, ResourceBundle resourceBundle) {",
+            "        // TODO Auto-generated method stub",
+            "    }",
+            "",
+            "}"
+        ],
+        "description": "JavaFX FXML Controller class template"
+    },
+    "JavaFX Event Handler": {
+        "prefix": "fxevent",
+        "body": [
+            "@FXML",
+            "private void ${1:handleAction}(ActionEvent event) {",
+            "    ${2:// TODO}",
+            "}"
+        ],
+        "description": "JavaFX event handler method"
+    },
+    "JavaFX FXML Injection": {
+        "prefix": "fxinject",
+        "body": [
+            "@FXML",
+            "private ${1:type} ${2:id};"
+        ],
+        "description": "JavaFX FXML field injection"
+    },
+    "JavaFX Change Listener": {
+        "prefix": "fxchangelistener",
+        "body": [
+            "${1:property}.addListener((observable, oldValue, newValue) -> {",
+            "    ${2:// TODO}",
+            "});"
+        ],
+        "description": "JavaFX ChangeListener lambda"
+    }
+}

@@ -1,0 +1,54 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+
+    // Java Runtime Configuration
+    // Note: Update these paths to match your local JDK and JavaFX installation
+    "java.home": "C:\\Program Files\\Java\\jdk-21",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-21",
+            "path": "C:\\Program Files\\Java\\jdk-21",
+            "default": true
+        }
+    ],
+
+    // Maven Configuration
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "C:\\Program Files\\Java\\jdk-21"
+        }
+    ],
+    "java.import.enabled": true,
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+    ],
+
+    // JavaFX Configuration
+    // Update this path to match your JavaFX SDK location
+    "javafx.runtimePath": "C:\\Users\\domin\\JavaFx\\javafx-sdk-21.0.2\\lib",
+
+    // Editor Settings
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": true,
+    "editor.formatOnSave": true,
+    "[java]": {
+        "editor.formatOnSave": true
+    },
+
+    // File Associations
+    "files.associations": {
+        "*.fxml": "xml"
+    },
+
+    // Search Settings
+    "search.exclude": {
+        "**/target/**": true,
+        "**/.git/**": true,
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    }
+}

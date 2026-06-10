@@ -1,0 +1,60 @@
+{
+    "FXML Root Element": {
+        "prefix": "fxroot",
+        "body": [
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "",
+            "<?import javafx.scene.layout.*?>",
+            "<?import javafx.scene.control.*?>",
+            "",
+            "<${1:BorderPane} xmlns=\"http://javafx.com/javafx/8\" xmlns:fx=\"http://javafx.com/fxml/1\"",
+            "      fx:controller=\"${2:cr.ac.una.corefx.ui.${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}Controller}\">",
+            "    ${3:// Content}",
+            "</${1:BorderPane}>"
+        ],
+        "description": "Basic FXML file with controller reference"
+    },
+    "FXML Button": {
+        "prefix": "fxbutton",
+        "body": [
+            "<Button text=\"${1:Button}\"",
+            "       fx:id=\"${2:buttonId}\"",
+            "       onAction=\"#${3:handleAction}\" />"
+        ],
+        "description": "FXML Button with event handler"
+    },
+    "FXML Label": {
+        "prefix": "fxlabel",
+        "body": [
+            "<Label text=\"${1:Label}\"",
+            "       fx:id=\"${2:labelId}\" />"
+        ],
+        "description": "FXML Label"
+    },
+    "FXML TextField": {
+        "prefix": "fxtextfield",
+        "body": [
+            "<TextField fx:id=\"${1:textFieldId}\"",
+            "              promptText=\"${2:Enter text}\" />"
+        ],
+        "description": "FXML TextField"
+    },
+    "FXML VBox": {
+        "prefix": "fxvbox",
+        "body": [
+            "<VBox spacing=\"${1:10}\" padding=\"${2:10}\">",
+            "    ${3:// Children}",
+            "</VBox>"
+        ],
+        "description": "FXML VBox layout"
+    },
+    "FXML HBox": {
+        "prefix": "fxhbox",
+        "body": [
+            "<HBox spacing=\"${1:10}\" padding=\"${2:10}\">",
+            "    ${3:// Children}",
+            "</HBox>"
+        ],
+        "description": "FXML HBox layout"
+    }
+}

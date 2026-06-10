@@ -1,0 +1,74 @@
+{
+    "Main Method": {
+        "prefix": "main",
+        "body": [
+            "public static void main(String[] args) {",
+            "    ${1:// TODO}",
+            "}"
+        ],
+        "description": "Java main method"
+    },
+    "System.out.println": {
+        "prefix": "sout",
+        "body": [
+            "System.out.println(${1:${SELECTION}});"
+        ],
+        "description": "System.out.println"
+    },
+    "For Loop": {
+        "prefix": "fori",
+        "body": [
+            "for (int i = 0; i < ${1:length}; i++) {",
+            "    ${2:// TODO}",
+            "}"
+        ],
+        "description": "Basic for loop"
+    },
+    "Enhanced For Loop": {
+        "prefix": "foreach",
+        "body": [
+            "for (${1:type} ${2:item} : ${3:collection}) {",
+            "    ${4:// TODO}",
+            "}"
+        ],
+        "description": "Enhanced for loop"
+    },
+    "Try-Catch Block": {
+        "prefix": "try",
+        "body": [
+            "try {",
+            "    ${1:// TODO}",
+            "} catch (${2:Exception} e) {",
+            "    e.printStackTrace();",
+            "}"
+        ],
+        "description": "Try-catch block"
+    },
+    "Getter": {
+        "prefix": "get",
+        "body": [
+            "public ${1:type} get${2:/**/}() {",
+            "    return ${3:field};",
+            "}"
+        ],
+        "description": "Getter method"
+    },
+    "Setter": {
+        "prefix": "set",
+        "body": [
+            "public void set${1:/**/}(${2:type} ${3:param}) {",
+            "    this.${4:field} = ${3:param};",
+            "}"
+        ],
+        "description": "Setter method"
+    },
+    "Constructor": {
+        "prefix": "ctor",
+        "body": [
+            "public ${TM_FILENAME_BASE}(${1:params}) {",
+            "    ${2:// TODO}",
+            "}"
+        ],
+        "description": "Constructor"
+    }
+}
