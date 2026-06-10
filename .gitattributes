@@ -1,0 +1,3 @@
+# Set default our line endings to always be LF on checkout,
+# with transitions to CRLF on Windows.
+* text=auto
