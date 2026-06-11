@@ -23,7 +23,7 @@ import javafx.scene.control.Toggle;
  * @author Carranza
  * @author Dominique
  * @version 2.2
- * @since 1.0
+ * @since 2026/06/10
  */
 @SuppressWarnings("unchecked")
 public class BindingUtils {

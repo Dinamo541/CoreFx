@@ -10,6 +10,8 @@ package cr.ac.una.corefx.ui;
 /**
  *
  * @author Dominique
+ * @version 1.0
+ * @since 2026/06/10
  */
 public class TableUtils {
     
