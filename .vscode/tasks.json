@@ -7,7 +7,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "io.github.dinamo541.corefx",
+                "corefx",
                 "compile"
             ],
             "group": "build",
@@ -19,7 +19,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "io.github.dinamo541.corefx",
+                "corefx",
                 "test"
             ],
             "group": "test",
@@ -31,7 +31,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "io.github.dinamo541.corefx",
+                "corefx",
                 "package"
             ],
             "group": "build",
@@ -64,7 +64,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "io.github.dinamo541.corefx",
+                "corefx",
                 "exec:java",
                 "-Dexec.mainClass=io.github.dinamo541.corefx.navigation.AppContext"
             ],

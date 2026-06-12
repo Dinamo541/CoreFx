@@ -23,7 +23,7 @@
             "request": "launch",
             "mainClass": "io.github.dinamo541.corefx.navigation.AppContext",
             "projectName": "io.github.dinamo541.corefx",
-            "vmArgs": "--module-path \"C:\\\\Users\\\\domin\\\\JavaFx\\\\javafx-sdk-21.0.2\\\\lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base"
+            "vmArgs": "--module-path \"C:\\\\Users\\\\domin\\\\JavaFx\\\\javafx-sdk-25\\\\lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base"
         }
     ]
 }
