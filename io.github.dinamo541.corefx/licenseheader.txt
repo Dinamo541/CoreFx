@@ -1,0 +1,6 @@
+${licenseFirst!""}
+${licensePrefix}CoreFx - JavaFX utility library
+${licensePrefix}Author: ${user}
+${licensePrefix}Date: ${date}
+${licensePrefix}Package: ${package}
+${licenseLast!""}

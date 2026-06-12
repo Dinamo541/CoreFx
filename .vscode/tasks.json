@@ -7,7 +7,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "core",
+                "io.github.dinamo541.corefx",
                 "compile"
             ],
             "group": "build",
@@ -19,7 +19,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "core",
+                "io.github.dinamo541.corefx",
                 "test"
             ],
             "group": "test",
@@ -31,7 +31,7 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "core",
+                "io.github.dinamo541.corefx",
                 "package"
             ],
             "group": "build",
@@ -64,9 +64,9 @@
             "command": "mvn",
             "args": [
                 "-pl",
-                "core",
+                "io.github.dinamo541.corefx",
                 "exec:java",
-                "-Dexec.mainClass=cr.ac.una.corefx.navigation.AppContext"
+                "-Dexec.mainClass=io.github.dinamo541.corefx.navigation.AppContext"
             ],
             "group": "none",
             "problemMatcher": "$msCompile"

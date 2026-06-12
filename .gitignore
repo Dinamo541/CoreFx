@@ -1,29 +1,51 @@
-# Contributing to CoreFx
+# Build output
 target/
-!.mvn/wrapper/maven-wrapper.jar
-# If you use the Maven Wrapper, you might want to ignore the wrapper files except the jar
-# .mvn/wrapper/maven-wrapper.properties
-# .mvn/wrapper/maven-wrapper.jar
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
 
 # IntelliJ IDEA
 .idea/
 *.iws
 *.iml
 *.ipr
+out/
 
 # Eclipse
 .settings/
 .classpath
 .project
 .factorypath
+bin/
 
 # VS Code
 .vscode/
 *.code-workspace
 
+# NetBeans
+nb-configuration.xml
+nbproject/
+build/
+dist/
+nbbuild/
+nbdist/
+
 # OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # Logs
 *.log
+logs/
+
+# Misc
+*.swp
+*.swo
+*~

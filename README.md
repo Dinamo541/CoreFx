@@ -1,65 +1,65 @@
 # CoreFx
 
-CoreFx es un framework base diseñado para simplificar el desarrollo de aplicaciones JavaFX, proporcionando utilidades estandarizadas para la navegación, persistencia, gestión de UI y tematización.
+CoreFx is a base framework designed to simplify the development of JavaFX applications, providing standardized utilities for navigation, persistence, UI management, and theming.
 
-## 🚀 Características
+## 🚀 Features
 
-El proyecto se divide en varios módulos de utilidad para acelerar el desarrollo de interfaces gráficas robustas:
+The project is divided into several utility modules to accelerate the development of robust graphical interfaces:
 
-### 🗺️ Navegación y Flujo
+### 🗺️ Navigation and Flow
 
-- **AppContext**: Contexto central para el estado de la aplicación y datos compartidos.
-- **FlowController**: Lógica para gestionar las transiciones entre diferentes vistas y flujos de trabajo.
-- **StageManager**: Gestión de etapas (`Stages`) de JavaFX y operaciones de ventanas.
+- **AppContext**: Central context for application state and shared data.
+- **FlowController**: Logic for managing transitions between different views and workflows.
+- **StageManager**: Management of JavaFX stages and window operations.
 
-### 💾 Persistencia
+### 💾 Persistence
 
-- **EntityManagerHelper**: Utilidad para la gestión simplificada de `EntityManagers` de JPA/Hibernate.
+- **EntityManagerHelper**: Utility for simplified management of JPA/Hibernate `EntityManagers`.
 
-### 🎨 Utilidades de UI
+### 🎨 UI Utilities
 
-- **ThemeManager**: Control centralizado de temas y estilos CSS de la aplicación.
-- **AlertUtil**: Creación y despliegue simplificado de cuadros de diálogo de alerta.
-- **BindingUtils**: Ayudantes para el enlace (`binding`) de propiedades de JavaFX.
-- **Format**: Utilidades para el formateo de datos y texto.
-- **ImageUtil**: Ayudantes para la carga y procesamiento de imágenes.
-- **Message**: Sistema para la gestión de mensajes y notificaciones del sistema.
-- **TableUtils**: Utilidades para la configuración y gestión de tablas (`TableView`) de JavaFX.
+- **ThemeManager**: Centralized control of application themes and CSS styles.
+- **AlertUtil**: Simplified creation and display of alert dialogs.
+- **BindingUtils**: Helpers for JavaFX property binding.
+- **Format**: Utilities for formatting data and text.
+- **ImageUtil**: Helpers for loading and processing images.
+- **Message**: System for managing application messages and system notifications.
+- **TableUtils**: Utilities for configuring and managing JavaFX `TableView` controls.
 
-### 🛠️ Utilidades Generales
+### 🛠️ General Utilities
 
-- **Validator**: Conjunto de herramientas de validación para asegurar la integridad de los datos.
-- **Answer**: Envoltorio (`wrapper`) estandarizado para las respuestas de los métodos de utilidad.
+- **Validator**: Validation tools to ensure data integrity.
+- **Answer**: Standardized wrapper for utility method responses.
 
-## 🛠️ Requisitos Técnicos
+## 🛠️ Technical Requirements
 
-Para compilar y ejecutar CoreFx, se requiere:
+To compile and run CoreFx, you need:
 
-- **Java**: JDK 21
-- **JavaFX**: 21.0.2
-- **Gestor de Dependencias**: Apache Maven
+- **Java**: JDK 25
+- **JavaFX**: 25
+- **Dependency Manager**: Apache Maven
 
-## 📂 Estructura del Proyecto
+## 📂 Project Structure
 
-El proyecto sigue una estructura multi-módulo de Maven:
+The project follows a Maven multi-module structure:
 
-- `core/`: Módulo principal que contiene toda la lógica del framework.
-  - `src/main/java/cr/ac/una/corefx/`:
-    - `navigation/`: Gestión de navegación y flujo.
-    - `persistence/`: Utilidades de base de datos y entidades.
-    - `ui/`: Componentes de UI, temas y utilidades de vista.
-    - `util/`: Clases de utilidad de propósito general.
+- `io.github.dinamo541.corefx/`: Main module containing all framework logic.
+  - `src/main/java/io/github/dinamo541/corefx/`:
+    - `navigation/`: Navigation and flow management.
+    - `persistence/`: Database and entity management utilities.
+    - `ui/`: UI components, themes, and view utilities.
+    - `util/`: General-purpose utility classes.
 
-## 🤝 Contribuciones
+## 🤝 Contributions
 
-Si deseas contribuir a CoreFx, por favor revisa nuestra guía de contribución:
+If you wish to contribute to CoreFx, please check our contribution guide:
 👉 [CONTRIBUTING.md](./CONTRIBUTING.md)
 
-## 📜 Historial de Cambios
+## 📜 Changelog
 
-Para conocer las últimas actualizaciones y versiones, consulta el registro de cambios:
+To check the latest updates and versions, view the changelog:
 👉 [CHANGELOG.md](./CHANGELOG.md)
 
 ---
 
-Desarrollado por **cr.ac.una**
+Developed by [Dominique](https://github.com/Dinamo541) under the [MIT License](./LICENSE).

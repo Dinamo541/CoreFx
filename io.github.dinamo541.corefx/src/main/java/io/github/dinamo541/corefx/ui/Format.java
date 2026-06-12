@@ -1,11 +1,10 @@
 /*
- * CoreFx - Librería utilitaria JavaFX
- * Autor: Dominique Mariano Q.C.
- * Fecha: 10 jun 2026
-    // Note: Update these paths to match your local JDK and JavaFX installation
+ * CoreFx - JavaFX utility library
+ * Author: Dominique Mariano Q.C.
+ * Date: 10 jun 2026
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package cr.ac.una.corefx.ui;
+package io.github.dinamo541.corefx.ui;
 
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -24,9 +23,6 @@ import javafx.scene.control.TextInputControl;
  * Includes formatters for:
  * - Date formatting (short and medium styles)
  * - Decimal number formatting
- * "vmArgs": "--module-path
- * \"C:\\\\Users\\\\domin\\\\JavaFx\\\\javafx-sdk-21.0.2\\\\lib\" --add-modules
- * javafx.controls,javafx.fxml,javafx.graphics,javafx.base"
  * - Integer-only input validation
  * - ID/Cedula validation
  * - Letter-only input validation
@@ -144,16 +140,16 @@ public class Format {
     }
 
     /**
-     * Creates a TextFormatter that validates cedula (ID) input.
+     * Creates a TextFormatter that validates national ID input.
      * Accepts alphanumeric characters and hyphens, preventing consecutive hyphens.
      * Enforces a maximum length limit if specified.
      * Valid formats: "12345-6789", "ABC-123-DEF"
      * 
      * @param maxLength the maximum allowed length (0 or negative for unlimited)
-     * @return a TextFormatter for validating cedula input
+     * @return a TextFormatter for validating ID input
      */
-    public TextFormatter<String> cedulaFormat(Integer maxLength) {
-        TextFormatter<String> cedulaFormat = new TextFormatter<>(c -> {
+    public TextFormatter<String> idFormat(Integer maxLength) {
+        TextFormatter<String> idFormatter = new TextFormatter<>(c -> {
             if (c.getControlNewText().isEmpty()) {
                 return c;
             }
@@ -172,7 +168,7 @@ public class Format {
             return c;
 
         });
-        return cedulaFormat;
+        return idFormatter;
     }
 
     /**
@@ -180,13 +176,13 @@ public class Format {
      * spaces.
      * Rejects numbers and special characters. Prevents consecutive spaces.
      * Enforces a maximum length limit if specified.
-     * Valid formats: "John", "Jose Maria", "María José"
+     * Valid formats: "John", "Jose Maria", "Maria Jose"
      * 
      * @param maxLength the maximum allowed length (0 or negative for unlimited)
      * @return a TextFormatter for validating letter-only input
      */
-    public TextFormatter<String> letrasFormat(Integer maxLength) {
-        TextFormatter<String> letrasFormat = new TextFormatter<>(c -> {
+    public TextFormatter<String> lettersFormat(Integer maxLength) {
+        TextFormatter<String> lettersFormatter = new TextFormatter<>(c -> {
             if (c.getControlNewText().isEmpty()) {
                 return c;
             }
@@ -207,7 +203,7 @@ public class Format {
             return c;
 
         });
-        return letrasFormat;
+        return lettersFormatter;
     }
 
     /**

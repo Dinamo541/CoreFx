@@ -11,9 +11,9 @@ CoreFx is a base framework designed to simplify the development of JavaFX applic
 ### Prerequisites
 
 Before contributing, ensure you have the following installed:
-- **JDK 21** (Required)
+- **JDK 25** (Required)
 - **Apache Maven** (Latest stable version)
-- **JavaFX 21.0.2 SDK**
+- **JavaFX 25 SDK**
 
 ### Development Environment
 
@@ -29,8 +29,8 @@ Refer to the `README.md` in the root directory for detailed VS Code configuratio
 
 ### 1. Code Quality
 - **Standards**: Follow standard Java naming conventions (PascalCase for classes, camelCase for methods/variables).
-- **Java Version**: Use Java 21 features where appropriate.
-- **Consistency**: Maintain the existing project structure. New utilities should be placed in the `cr.ac.una.corefx` package hierarchy under their respective categories (`ui`, `navigation`, `util`, `persistence`).
+- **Java Version**: Use Java 25 features where appropriate.
+- **Consistency**: Maintain the existing project structure. New utilities should be placed in the `io.github.dinamo541.corefx` package hierarchy under their respective categories (`ui`, `navigation`, `util`, `persistence`).
 - **Documentation**: Document public methods and classes using Javadoc.
 
 ### 2. Workflow
@@ -48,8 +48,8 @@ We encourage clear and concise commit messages. For example:
 
 ## Project Structure
 
-- `core/`: The main module containing all framework logic.
-    - `src/main/java/cr/ac/una/corefx/`:
+- `io.github.dinamo541.corefx/`: The main module containing all framework logic.
+    - `src/main/java/io/github/dinamo541/corefx/`:
         - `navigation/`: Navigation and flow management.
         - `persistence/`: Database and entity management utilities.
         - `ui/`: UI components, themes, and view utilities.

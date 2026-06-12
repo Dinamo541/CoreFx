@@ -14,15 +14,15 @@
             "type": "java",
             "name": "Launch AppContext",
             "request": "launch",
-            "mainClass": "cr.ac.una.corefx.navigation.AppContext",
-            "projectName": "core"
+            "mainClass": "io.github.dinamo541.corefx.navigation.AppContext",
+            "projectName": "io.github.dinamo541.corefx"
         },
         {
             "type": "java",
             "name": "Launch JavaFX Application",
             "request": "launch",
-            "mainClass": "cr.ac.una.corefx.navigation.AppContext",
-            "projectName": "core",
+            "mainClass": "io.github.dinamo541.corefx.navigation.AppContext",
+            "projectName": "io.github.dinamo541.corefx",
             "vmArgs": "--module-path \"C:\\\\Users\\\\domin\\\\JavaFx\\\\javafx-sdk-21.0.2\\\\lib\" --add-modules javafx.controls,javafx.fxml,javafx.graphics,javafx.base"
         }
     ]

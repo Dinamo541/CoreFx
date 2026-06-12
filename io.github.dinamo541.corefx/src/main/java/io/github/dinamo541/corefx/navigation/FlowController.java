@@ -1,11 +1,11 @@
 /**
- * CoreFx - Librería utilitaria JavaFX
- * Autor: Dominique Mariano Q.C.
- * Fecha: 10 jun 2026
- * Paquete: cr.ac.una.corefx.navigation
+ * CoreFx - JavaFX utility library
+ * Author: Dominique Mariano Q.C.
+ * Date: 10 jun 2026
+ * Package: io.github.dinamo541.corefx.navigation
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package cr.ac.una.corefx.navigation;
+package io.github.dinamo541.corefx.navigation;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -89,13 +89,13 @@ public class FlowController {
 
     /**
      * Classpath-rooted path to the FXML view directory
-     * (e.g. {@code /cr/ac/una/app/view/}).
+     * (e.g. {@code /io/github/dinamo541/corefx/view/}).
      */
     private volatile String baseViewPath;
 
     /**
      * Classpath-rooted path to the resource directory
-     * (e.g. {@code /cr/ac/una/app/resources/}).
+     * (e.g. {@code /io/github/dinamo541/corefx/resources/}).
      */
     private volatile String baseResourcePath;
 
@@ -200,7 +200,7 @@ public class FlowController {
      * @param stage    the primary JavaFX stage
      * @param appName  the display name used as the window title
      * @param basePath the root classpath path for the application
-     *                 (e.g. {@code /cr/ac/una/soulward/})
+     *                 (e.g. {@code /io/github/dinamo541/soulward/})
      * @param appClass the main application class, used to load resources
      * @throws NullPointerException     if {@code stage} or {@code appClass} is {@code null}
      * @throws IllegalArgumentException if {@code appName} or {@code basePath} is {@code null} or blank
@@ -241,7 +241,7 @@ public class FlowController {
     public void initialize(Stage stage, String appName, String baseViewPath,
                            String baseResourcePath, String appIconPath,
                            Class<?> appClass, Consumer<Scene> themeApplier) {
-        // themeApplier se registra DESPUÉS para no quedar modificado si initialize() lanza
+        // themeApplier is registered AFTER so it is not modified if initialize() throws
         initialize(stage, appName, baseViewPath, baseResourcePath, appIconPath, appClass);
         setThemeApplier(themeApplier);
     }
@@ -348,7 +348,7 @@ public class FlowController {
     public FXMLLoader getLoader(String viewName) {
         checkInitialized();
         try {
-            synchronized (initLock) {   // ← initLock en lugar de FlowController.class
+            synchronized (initLock) {   // ← initLock instead of FlowController.class
                 FXMLLoader loader = loaders.get(viewName);
                 if (loader == null) {
                     loader = createLoaderInstance(viewName);
@@ -1076,7 +1076,7 @@ public class FlowController {
      * <p>Example with plain CSS:</p>
      * <pre>{@code
      * FlowController.getInstance().setThemeApplier(scene ->
-     *     scene.getStylesheets().add("/cr/ac/una/myapp/view/style.css")
+     *     scene.getStylesheets().add("/io/github/dinamo541/myapp/view/style.css")
      * );
      * }</pre>
      *
