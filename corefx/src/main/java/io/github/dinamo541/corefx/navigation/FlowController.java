@@ -62,6 +62,10 @@ import javafx.stage.WindowEvent;
  */
 public class FlowController {
 
+    // =========================================================================
+    // SECTION 1: SINGLETON & FIELDS
+    // =========================================================================
+
     /**
      * Holder for lazy, thread-safe singleton initialization.
      * The JVM class-loading mechanism guarantees {@code INSTANCE} is created
@@ -153,6 +157,10 @@ public class FlowController {
     public static FlowController getInstance() {
         return FlowControllerHolder.INSTANCE;
     }
+
+    // =========================================================================
+    // SECTION 2: INITIALIZATION
+    // =========================================================================
 
     /**
      * Initializes the controller using only the application class.
@@ -344,6 +352,10 @@ public class FlowController {
         }
     }
 
+    // =========================================================================
+    // SECTION 3: FXML LOADER MANAGEMENT
+    // =========================================================================
+
     /**
      * Creates and returns a new, fully loaded {@link FXMLLoader} for the named
      * view.
@@ -377,11 +389,11 @@ public class FlowController {
      * Returns a cached FXMLLoader for the specified view, creating one if
      * necessary.
      * Uses synchronization to ensure thread safety during loader caching.
-     * 
+     *
      * @param viewName the name of the view (without .fxml extension)
      * @return the cached or newly created FXMLLoader
      * @throws RuntimeException if the loader cannot be initialized
-     * 
+     *
      * @see #createLoaderInstance(String)
      */
     public FXMLLoader getLoader(String viewName) {
@@ -401,34 +413,48 @@ public class FlowController {
     }
 
     /**
+     * Returns the controller associated with the specified view.
+     * Casts the controller to the desired type.
+     *
+     * @param <T>      the type of the controller
+     * @param viewName the name of the view whose controller to retrieve
+     * @return the controller, or null if not found
+     */
+    public <T> T getController(String viewName) {
+        return getLoader(viewName).getController();
+    }
+
+    /**
+     * Removes a view loader from the cache.
+     * This forces the view to be reloaded from disk on next access.
+     *
+     * @param view the view name to remove from cache
+     */
+    public void removeLoader(String view) {
+        loaders.remove(view);
+    }
+
+    /**
+     * Clears all cached view loaders.
+     * Forces all views to be reloaded from disk on next access.
+     */
+    public void clearLoadersMap() {
+        loaders.clear();
+    }
+
+    // =========================================================================
+    // SECTION 4: RESOURCES & SCENE CREATION
+    // =========================================================================
+
+    /**
      * Loads the application icon image from the resource path.
-     * 
+     *
      * @return the application icon as an Image
      * @throws RuntimeException if the icon resource cannot be found or loaded
      */
     public Image loadAppIcon() {
         try {
             var stream = FlowController.class.getResourceAsStream(appIconPath);
-            if (stream == null)
-                return null;
-            return new Image(stream);
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    /**
-     * Loads an icon image by name from the resources directory.
-     * Icon files must be in PNG format and located in BASE_RESOURCE_PATH.
-     * 
-     * @param iconName the icon filename (without .png extension)
-     * @return the loaded icon as an Image
-     * @throws RuntimeException if the icon cannot be loaded
-     */
-    public Image loadIcon(String iconName) {
-        String iconPath = baseResourcePath + iconName + ".png";
-        try {
-            var stream = FlowController.class.getResourceAsStream(iconPath);
             if (stream == null)
                 return null;
             return new Image(stream);
@@ -456,7 +482,7 @@ public class FlowController {
     /**
      * Prepares a stage with the given scene.
      * Sets the scene, title, and application icon.
-     * 
+     *
      * @param stage the stage to prepare
      * @param scene the scene to set on the stage
      */
@@ -466,10 +492,14 @@ public class FlowController {
         stage.getIcons().add(loadAppIcon());
     }
 
+    // =========================================================================
+    // SECTION 5: NODE & CONTAINER UTILITIES
+    // =========================================================================
+
     /**
      * Resets the visual properties of a node to default values.
      * Sets opacity, visibility, scale, and translation to default states.
-     * 
+     *
      * @param node the node to normalize (may be null)
      */
     private void normalizeViewNode(Node node) {
@@ -489,7 +519,7 @@ public class FlowController {
      * Replaces the contents of a container (Pane or Group) with a new node.
      * Clears existing children and adds the new node.
      * Falls back to a custom setter if the container type is not supported.
-     * 
+     *
      * @param container      the container node (Pane, Group, or null)
      * @param node           the new node to place in the container
      * @param fallbackSetter callback for unsupported container types
@@ -516,7 +546,7 @@ public class FlowController {
      * Adds a node to a container (Pane or Group) without clearing existing
      * children.
      * Falls back to a custom setter if the container type is not supported.
-     * 
+     *
      * @param currentNode    the container node (Pane, Group, or null)
      * @param node           the node to add
      * @param fallbackSetter callback for unsupported container types
@@ -532,12 +562,34 @@ public class FlowController {
     }
 
     /**
+     * Clears all child nodes from a container (Pane or Group).
+     *
+     * @param node the container to clear
+     * @throws IllegalArgumentException if node type is not supported
+     */
+    public void clearContainer(Node node) {
+        switch (node) {
+            case null -> {
+            }
+            case Pane pane -> pane.getChildren().clear();
+            case Group group -> group.getChildren().clear();
+            default -> {
+                throw new IllegalArgumentException("Unsupported container type: " + node.getClass().getName());
+            }
+        }
+    }
+
+    // =========================================================================
+    // SECTION 6: CONTAINER NAVIGATION
+    // =========================================================================
+
+    /**
      * Replaces the contents of a container with a view loaded from FXML.
      * Uses an empty fallback setter by default.
-     * 
+     *
      * @param viewName    the name of the view to load
      * @param currentNode the container to replace contents in
-     * 
+     *
      * @see #replaceViewInContainer(String, Node, Consumer)
      */
     public void replaceViewInContainer(String viewName, Node currentNode) {
@@ -548,7 +600,7 @@ public class FlowController {
     /**
      * Replaces the contents of a container with a view loaded from FXML.
      * The container is cleared and the new view is added to it.
-     * 
+     *
      * @param viewName       the name of the view to load
      * @param currentNode    the container to replace contents in
      * @param fallbackSetter callback for handling null containers
@@ -570,10 +622,10 @@ public class FlowController {
      * Adds a view loaded from FXML to a container without clearing existing
      * children.
      * Uses an empty fallback setter by default.
-     * 
+     *
      * @param viewName    the name of the view to load
      * @param currentNode the container to add the view to
-     * 
+     *
      * @see #placeViewInContainer(String, Node, Consumer)
      */
     public void placeViewInContainer(String viewName, Node currentNode) {
@@ -584,7 +636,7 @@ public class FlowController {
     /**
      * Adds a view loaded from FXML to a container without clearing existing
      * children.
-     * 
+     *
      * @param viewName       the name of the view to load
      * @param currentNode    the container to add the view to
      * @param fallbackSetter callback for handling null containers
@@ -599,10 +651,14 @@ public class FlowController {
         }
     }
 
+    // =========================================================================
+    // SECTION 7: MAIN STAGE NAVIGATION
+    // =========================================================================
+
     /**
      * Navigates to the specified view in the main stage.
      * Uses the LoadingScreenView as default if no view name is specified.
-     * 
+     *
      * @see #goViewMain(String)
      */
     public void goViewMain() {
@@ -613,7 +669,7 @@ public class FlowController {
      * Navigates to the specified view in the main stage.
      * Creates a new scene if none exists, or replaces the scene root.
      * Shows the stage if not currently visible.
-     * 
+     *
      * @param viewName the name of the view to load
      * @throws IllegalArgumentException if viewName is null or empty
      * @throws IllegalStateException    if main stage is not initialized
@@ -645,110 +701,9 @@ public class FlowController {
     }
 
     /**
-     * Opens a view in a new resizable window.
-     * Uses default resizable setting (true).
-     * 
-     * @param viewName the name of the view to load
-     * 
-     * @see #goViewInWindow(String, Boolean)
-     */
-    public void goViewInWindow(String viewName) {
-        goViewInWindow(viewName, true);
-    }
-
-    /**
-     * Opens a view in a new window.
-     * The window is independent and can be closed without affecting the main stage.
-     * 
-     * @param viewName  the name of the view to load
-     * @param resizable whether the window can be resized by the user
-     * @throws RuntimeException if the view cannot be loaded
-     */
-    public void goViewInWindow(String viewName, Boolean resizable) {
-        try {
-            FXMLLoader loader = getLoader(viewName);
-            Stage stage = new Stage();
-            stage.setResizable(resizable);
-            stage.setOnHidden((WindowEvent event) -> {
-                stage.getScene().setRoot(new Pane());
-            });
-            prepareStage(stage, createScene(loader.getRoot()));
-            stage.show();
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    /**
-     * Opens a view in a modal dialog owned by the main stage.
-     * Uses default resizable setting (true).
-     * 
-     * @param viewName the name of the view to load
-     * 
-     * @see #goViewInModal(String, Stage, Boolean)
-     */
-    public void goViewInModal(String viewName) {
-        goViewInModal(viewName, mainStage, true);
-    }
-
-    /**
-     * Opens a view in a modal dialog owned by the specified stage.
-     * Uses default resizable setting (true).
-     * 
-     * @param viewName the name of the view to load
-     * @param owner    the owner stage for the modal dialog
-     * 
-     * @see #goViewInModal(String, Stage, Boolean)
-     */
-    public void goViewInModal(String viewName, Stage owner) {
-        goViewInModal(viewName, owner, true);
-    }
-
-    /**
-     * Opens a view in a modal dialog owned by the main stage.
-     * 
-     * @param viewName  the name of the view to load
-     * @param resizable whether the dialog can be resized by the user
-     * 
-     * @see #goViewInModal(String, Stage, Boolean)
-     */
-    public void goViewInModal(String viewName, Boolean resizable) {
-        goViewInModal(viewName, mainStage, resizable);
-    }
-
-    /**
-     * Opens a view in a modal dialog.
-     * The dialog blocks interaction with its owner window until closed.
-     * Automatically centers on screen and applies application styling.
-     * 
-     * @param viewName  the name of the view to load
-     * @param owner     the owner stage for the modal dialog
-     * @param resizable whether the dialog can be resized by the user
-     * @throws RuntimeException if the view cannot be loaded
-     */
-    public void goViewInModal(String viewName, Stage owner, Boolean resizable) {
-        try {
-            FXMLLoader loader = getLoader(viewName);
-            Stage stage = new Stage();
-
-            stage.setResizable(resizable);
-            stage.initOwner(owner);
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.setOnHidden((WindowEvent event) -> {
-                stage.getScene().setRoot(new Pane());
-            });
-            prepareStage(stage, createScene(loader.getRoot()));
-            stage.centerOnScreen();
-            stage.show();
-        } catch (RuntimeException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    /**
      * Changes the view displayed in the main stage.
      * Equivalent to {@link #goViewMain(String)}.
-     * 
+     *
      * @param viewName the name of the view to load
      * @throws IllegalArgumentException if viewName is null or empty
      * @throws IllegalStateException    if main stage is not initialized
@@ -780,9 +735,122 @@ public class FlowController {
         }
     }
 
+    // =========================================================================
+    // SECTION 8: WINDOW NAVIGATION
+    // =========================================================================
+
+    /**
+     * Opens a view in a new resizable window.
+     * Uses default resizable setting (true).
+     *
+     * @param viewName the name of the view to load
+     *
+     * @see #goViewInWindow(String, Boolean)
+     */
+    public void goViewInWindow(String viewName) {
+        goViewInWindow(viewName, true);
+    }
+
+    /**
+     * Opens a view in a new window.
+     * The window is independent and can be closed without affecting the main stage.
+     *
+     * @param viewName  the name of the view to load
+     * @param resizable whether the window can be resized by the user
+     * @throws RuntimeException if the view cannot be loaded
+     */
+    public void goViewInWindow(String viewName, Boolean resizable) {
+        try {
+            FXMLLoader loader = getLoader(viewName);
+            Stage stage = new Stage();
+            stage.setResizable(resizable);
+            stage.setOnHidden((WindowEvent event) -> {
+                stage.getScene().setRoot(new Pane());
+            });
+            prepareStage(stage, createScene(loader.getRoot()));
+            stage.show();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    // =========================================================================
+    // SECTION 9: MODAL NAVIGATION
+    // =========================================================================
+
+    /**
+     * Opens a view in a modal dialog owned by the main stage.
+     * Uses default resizable setting (true).
+     *
+     * @param viewName the name of the view to load
+     *
+     * @see #goViewInModal(String, Stage, Boolean)
+     */
+    public void goViewInModal(String viewName) {
+        goViewInModal(viewName, mainStage, true);
+    }
+
+    /**
+     * Opens a view in a modal dialog owned by the specified stage.
+     * Uses default resizable setting (true).
+     *
+     * @param viewName the name of the view to load
+     * @param owner    the owner stage for the modal dialog
+     *
+     * @see #goViewInModal(String, Stage, Boolean)
+     */
+    public void goViewInModal(String viewName, Stage owner) {
+        goViewInModal(viewName, owner, true);
+    }
+
+    /**
+     * Opens a view in a modal dialog owned by the main stage.
+     *
+     * @param viewName  the name of the view to load
+     * @param resizable whether the dialog can be resized by the user
+     *
+     * @see #goViewInModal(String, Stage, Boolean)
+     */
+    public void goViewInModal(String viewName, Boolean resizable) {
+        goViewInModal(viewName, mainStage, resizable);
+    }
+
+    /**
+     * Opens a view in a modal dialog.
+     * The dialog blocks interaction with its owner window until closed.
+     * Automatically centers on screen and applies application styling.
+     *
+     * @param viewName  the name of the view to load
+     * @param owner     the owner stage for the modal dialog
+     * @param resizable whether the dialog can be resized by the user
+     * @throws RuntimeException if the view cannot be loaded
+     */
+    public void goViewInModal(String viewName, Stage owner, Boolean resizable) {
+        try {
+            FXMLLoader loader = getLoader(viewName);
+            Stage stage = new Stage();
+
+            stage.setResizable(resizable);
+            stage.initOwner(owner);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setOnHidden((WindowEvent event) -> {
+                stage.getScene().setRoot(new Pane());
+            });
+            prepareStage(stage, createScene(loader.getRoot()));
+            stage.centerOnScreen();
+            stage.show();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    // =========================================================================
+    // SECTION 10: SCENE & STAGE NAVIGATION
+    // =========================================================================
+
     /**
      * Changes the root scene of the specified stage to the given view.
-     * 
+     *
      * @param viewName the name of the view to load
      * @param stage    the stage whose scene should be changed
      * @throws RuntimeException if stage is null or view cannot be loaded
@@ -803,7 +871,7 @@ public class FlowController {
     /**
      * Changes the root node of the main stage's scene to the specified view.
      * The scene must already be set on the main stage.
-     * 
+     *
      * @param viewName the name of the view to load
      * @throws RuntimeException if main stage's scene is null or view cannot be
      *                          loaded
@@ -815,7 +883,7 @@ public class FlowController {
     /**
      * Changes the root node of the scene to the specified view.
      * The scene must already be set on a stage.
-     * 
+     *
      * @param viewName the name of the view to load
      * @param scene    the scene whose root should be changed
      * @throws RuntimeException if scene is null or view cannot be loaded
@@ -836,16 +904,20 @@ public class FlowController {
         }
     }
 
+    // =========================================================================
+    // SECTION 11: BORDERPANE NAVIGATION
+    // =========================================================================
+
     /**
      * Changes a region within a BorderPane to display the specified view.
      * If no BorderPane is provided, attempts to use the root of the main stage's
      * scene.
      * Uses "Center" as the default region.
-     * 
+     *
      * @param viewName   the name of the view to load
      * @param borderPane the BorderPane to update (may be null to use main stage's
      *                   root)
-     * 
+     *
      * @see #changeViewInBorderPane(String, BorderPane, String)
      */
     public void changeViewInBorderPane(String viewName, BorderPane borderPane) {
@@ -863,9 +935,9 @@ public class FlowController {
      * Changes a region in the BorderPane root of the main stage to display the
      * specified view.
      * Uses "Center" as the default region.
-     * 
+     *
      * @param viewName the name of the view to load
-     * 
+     *
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName) {
@@ -876,10 +948,10 @@ public class FlowController {
      * Changes a region in the BorderPane root of the specified stage to display the
      * specified view.
      * Uses "Center" as the default region.
-     * 
+     *
      * @param viewName the name of the view to load
      * @param stage    the stage whose BorderPane root should be updated
-     * 
+     *
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName, Stage stage) {
@@ -888,10 +960,10 @@ public class FlowController {
 
     /**
      * Changes the specified region in the BorderPane root of the main stage.
-     * 
+     *
      * @param viewName the name of the view to load
      * @param region   the BorderPane region to update (default: "Center")
-     * 
+     *
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName, String region) {
@@ -901,13 +973,13 @@ public class FlowController {
     /**
      * Changes the specified region in the BorderPane root of the given stage.
      * Uses "Center" if the region is null or empty.
-     * 
+     *
      * @param viewName the name of the view to load
      * @param stage    the stage whose BorderPane root should be updated
      * @param region   the BorderPane region ("Center", "Top", "Bottom", "Left",
      *                 "Right")
      * @throws RuntimeException if the stage's scene root is not a BorderPane
-     * 
+     *
      * @see #changeViewInBorderPane(String, BorderPane, String)
      */
     public void changeViewInBorderPane(String viewName, Stage stage, String region) {
@@ -923,7 +995,7 @@ public class FlowController {
      * Changes the specified region in a BorderPane to display the given view.
      * Valid regions are: "Center", "Top", "Bottom", "Left", "Right".
      * Uses "Center" as default if region is null or empty.
-     * 
+     *
      * @param viewName   the name of the view to load
      * @param borderPane the BorderPane to update
      * @param region     the BorderPane region to change
@@ -958,7 +1030,7 @@ public class FlowController {
     /**
      * Clears all child nodes from a specific region in a BorderPane.
      * Valid regions are: "Center", "Top", "Bottom", "Left", "Right".
-     * 
+     *
      * @param region     the BorderPane region to clear
      * @param borderPane the BorderPane containing the region
      * @throws IllegalArgumentException if region is invalid
@@ -980,39 +1052,13 @@ public class FlowController {
         }
     }
 
-    /**
-     * Returns the controller associated with the specified view.
-     * Casts the controller to the desired type.
-     * 
-     * @param <T>      the type of the controller
-     * @param viewName the name of the view whose controller to retrieve
-     * @return the controller, or null if not found
-     */
-    public <T> T getController(String viewName) {
-        return getLoader(viewName).getController();
-    }
-
-    /**
-     * Removes a view loader from the cache.
-     * This forces the view to be reloaded from disk on next access.
-     * 
-     * @param view the view name to remove from cache
-     */
-    public void removeLoader(String view) {
-        loaders.remove(view);
-    }
-
-    /**
-     * Clears all cached view loaders.
-     * Forces all views to be reloaded from disk on next access.
-     */
-    public void clearLoadersMap() {
-        loaders.clear();
-    }
+    // =========================================================================
+    // SECTION 12: STAGE CONFIGURATION
+    // =========================================================================
 
     /**
      * Sets the minimum size for the main stage.
-     * 
+     *
      * @param width  the minimum width in pixels
      * @param height the minimum height in pixels
      * @throws IllegalStateException if main stage is not initialized
@@ -1028,7 +1074,7 @@ public class FlowController {
     /**
      * Sets the minimum size for the specified stage.
      * Falls back to main stage if the provided stage is null.
-     * 
+     *
      * @param stage  the stage to configure (may be null to use main stage)
      * @param width  the minimum width in pixels
      * @param height the minimum height in pixels
@@ -1048,27 +1094,9 @@ public class FlowController {
     }
 
     /**
-     * Clears all child nodes from a container (Pane or Group).
-     * 
-     * @param node the container to clear
-     * @throws IllegalArgumentException if node type is not supported
-     */
-    public void clearContainer(Node node) {
-        switch (node) {
-            case null -> {
-            }
-            case Pane pane -> pane.getChildren().clear();
-            case Group group -> group.getChildren().clear();
-            default -> {
-                throw new IllegalArgumentException("Unsupported container type: " + node.getClass().getName());
-            }
-        }
-    }
-
-    /**
      * Toggles the full screen state of the main stage.
      * Switches between full screen and windowed modes.
-     * 
+     *
      * @throws IllegalStateException if main stage is not initialized
      */
     public void toggleFullScreen() {
@@ -1080,7 +1108,7 @@ public class FlowController {
 
     /**
      * Toggles the full screen state of the specified stage.
-     * 
+     *
      * @param stage the stage to toggle
      * @throws IllegalStateException if main stage is not initialized
      */
@@ -1093,7 +1121,7 @@ public class FlowController {
 
     /**
      * Sets the full screen state of the specified stage.
-     * 
+     *
      * @param stage      the stage to configure
      * @param fullScreen true for full screen, false for windowed
      * @throws IllegalStateException if main stage is not initialized
@@ -1113,6 +1141,10 @@ public class FlowController {
         mainStage.close();
     }
 
+    // =========================================================================
+    // SECTION 13: THEME
+    // =========================================================================
+
     /**
      * Sets an optional theme applier that will be called on every new Scene created
      * by this FlowController. This allows the consuming application to apply any
@@ -1121,7 +1153,7 @@ public class FlowController {
      * <p>
      * Example with MaterialFX:
      * </p>
-     * 
+     *
      * <pre>{@code
      * FlowController.getInstance()
      *         .setThemeApplier(scene -> MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY));
@@ -1130,7 +1162,7 @@ public class FlowController {
      * <p>
      * Example with plain CSS:
      * </p>
-     * 
+     *
      * <pre>{@code
      * FlowController.getInstance()
      *         .setThemeApplier(scene -> scene.getStylesheets().add("/io/github/dinamo541/myapp/view/style.css"));
@@ -1143,6 +1175,10 @@ public class FlowController {
         this.themeApplier = themeApplier;
     }
 
+    // =========================================================================
+    // SECTION 14: STATE & ACCESSORS
+    // =========================================================================
+
     /**
      * Returns whether the FlowController has been successfully initialized.
      *
@@ -1154,7 +1190,7 @@ public class FlowController {
 
     /**
      * Returns a reference to the main application stage.
-     * 
+     *
      * @return the main stage
      * @throws IllegalStateException if main stage is not initialized
      */
@@ -1167,7 +1203,7 @@ public class FlowController {
 
     /**
      * Gets the application name constant.
-     * 
+     *
      * @return the application name
      */
     public String getAppName() {
@@ -1176,7 +1212,7 @@ public class FlowController {
 
     /**
      * Gets the base path for FXML view files.
-     * 
+     *
      * @return the base view path
      */
     public String getBaseViewPath() {
@@ -1185,7 +1221,7 @@ public class FlowController {
 
     /**
      * Gets the base path for application resources.
-     * 
+     *
      * @return the base resource path
      */
     public String getResourcePath() {
@@ -1194,16 +1230,20 @@ public class FlowController {
 
     /**
      * Gets the path to the application icon image.
-     * 
+     *
      * @return the application icon path
      */
     public String getAppIconPath() {
         return appIconPath;
     }
 
+    // =========================================================================
+    // SECTION 15: OBJECT CONTRACT
+    // =========================================================================
+
     /**
      * Returns a string representation of this FlowController.
-     * 
+     *
      * @return string representation including main stage and cached loader keys
      */
     @Override
@@ -1216,7 +1256,7 @@ public class FlowController {
 
     /**
      * Computes the hash code for this FlowController.
-     * 
+     *
      * @return hash code based on main stage and loaders
      */
     @Override
@@ -1227,7 +1267,7 @@ public class FlowController {
     /**
      * Compares this FlowController with another object for equality.
      * Two controllers are equal if their main stage and loaders are equal.
-     * 
+     *
      * @param obj the object to compare with
      * @return true if the objects are equal, false otherwise
      */
@@ -1244,7 +1284,7 @@ public class FlowController {
 
     /**
      * Prevents cloning of this singleton class.
-     * 
+     *
      * @throws CloneNotSupportedException always, to prevent cloning
      */
     @Override
