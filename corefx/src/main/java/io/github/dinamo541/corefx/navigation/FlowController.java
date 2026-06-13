@@ -17,8 +17,12 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -421,6 +425,7 @@ public class FlowController {
      * @return the controller, or null if not found
      */
     public <T> T getController(String viewName) {
+        checkInitialized();
         return getLoader(viewName).getController();
     }
 
@@ -453,6 +458,7 @@ public class FlowController {
      * @throws RuntimeException if the icon resource cannot be found or loaded
      */
     public Image loadAppIcon() {
+        checkInitialized();
         try {
             var stream = FlowController.class.getResourceAsStream(appIconPath);
             if (stream == null)
@@ -471,7 +477,12 @@ public class FlowController {
      * @param root the root node of the scene
      * @return a Scene with the optional theme applied
      */
-    public Scene createScene(Parent root) {
+    public Scene createScene(Parent view) {
+        AnchorPane root = new AnchorPane(view);
+        AnchorPane.setTopAnchor(view, 0.0);
+        AnchorPane.setBottomAnchor(view, 0.0);
+        AnchorPane.setLeftAnchor(view, 0.0);
+        AnchorPane.setRightAnchor(view, 0.0);
         Scene scene = new Scene(root);
         if (themeApplier != null) {
             themeApplier.accept(scene);
@@ -593,6 +604,7 @@ public class FlowController {
      * @see #replaceViewInContainer(String, Node, Consumer)
      */
     public void replaceViewInContainer(String viewName, Node currentNode) {
+        checkInitialized();
         replaceViewInContainer(viewName, currentNode, (fallbackNode) -> {
         });
     }
@@ -608,6 +620,7 @@ public class FlowController {
      * @throws RuntimeException         if the view cannot be loaded
      */
     public void replaceViewInContainer(String viewName, Node currentNode, Consumer<Node> fallbackSetter) {
+        checkInitialized();
         if (fallbackSetter == null)
             throw new IllegalArgumentException("Fallback setter cannot be null");
         try {
@@ -629,6 +642,7 @@ public class FlowController {
      * @see #placeViewInContainer(String, Node, Consumer)
      */
     public void placeViewInContainer(String viewName, Node currentNode) {
+        checkInitialized();
         placeViewInContainer(viewName, currentNode, (fallbackNode) -> {
         });
     }
@@ -643,6 +657,7 @@ public class FlowController {
      * @throws RuntimeException if the view cannot be loaded
      */
     public void placeViewInContainer(String viewName, Node currentNode, Consumer<Node> fallbackSetter) {
+        checkInitialized();
         try {
             Parent root = getLoader(viewName).getRoot();
             placeNodeInContainer(currentNode, root, fallbackSetter);
@@ -657,16 +672,6 @@ public class FlowController {
 
     /**
      * Navigates to the specified view in the main stage.
-     * Uses the LoadingScreenView as default if no view name is specified.
-     *
-     * @see #goViewMain(String)
-     */
-    public void goViewMain() {
-        goViewMain("LoadingScreenView");
-    }
-
-    /**
-     * Navigates to the specified view in the main stage.
      * Creates a new scene if none exists, or replaces the scene root.
      * Shows the stage if not currently visible.
      *
@@ -676,6 +681,7 @@ public class FlowController {
      * @throws RuntimeException         if the view cannot be loaded
      */
     public void goViewMain(String viewName) {
+        checkInitialized();
         try {
             if (viewName == null || viewName.isBlank()) {
                 throw new IllegalArgumentException("View name is null or empty");
@@ -692,6 +698,7 @@ public class FlowController {
             } else if (scene.getRoot() != root) {
                 scene.setRoot(root);
             }
+
             if (!mainStage.isShowing()) {
                 mainStage.show();
             }
@@ -710,6 +717,7 @@ public class FlowController {
      * @throws RuntimeException         if the view cannot be loaded
      */
     public void changeViewInMain(String viewName) {
+        checkInitialized();
         try {
             if (viewName == null || viewName.isBlank()) {
                 throw new IllegalArgumentException("View name is null or empty");
@@ -718,13 +726,15 @@ public class FlowController {
                 throw new IllegalStateException("Main stage is not initialized");
             }
 
-            Parent root = getLoader(viewName).getRoot();
+            Parent view = getLoader(viewName).getRoot();
             Scene scene = mainStage.getScene();
 
             if (scene == null) {
-                prepareStage(mainStage, createScene(root));
-            } else if (scene.getRoot() != root) {
-                scene.setRoot(root);
+                prepareStage(mainStage, createScene(view));
+            } else if (scene.getRoot() != view) {
+                replaceNodeInContainer(scene.getRoot(), view, (fallbackNode) -> {
+                    scene.setRoot(view);
+                });
             }
 
             if (!mainStage.isShowing()) {
@@ -748,6 +758,7 @@ public class FlowController {
      * @see #goViewInWindow(String, Boolean)
      */
     public void goViewInWindow(String viewName) {
+        checkInitialized();
         goViewInWindow(viewName, true);
     }
 
@@ -760,6 +771,7 @@ public class FlowController {
      * @throws RuntimeException if the view cannot be loaded
      */
     public void goViewInWindow(String viewName, Boolean resizable) {
+        checkInitialized();
         try {
             FXMLLoader loader = getLoader(viewName);
             Stage stage = new Stage();
@@ -787,6 +799,7 @@ public class FlowController {
      * @see #goViewInModal(String, Stage, Boolean)
      */
     public void goViewInModal(String viewName) {
+        checkInitialized();
         goViewInModal(viewName, mainStage, true);
     }
 
@@ -800,6 +813,7 @@ public class FlowController {
      * @see #goViewInModal(String, Stage, Boolean)
      */
     public void goViewInModal(String viewName, Stage owner) {
+        checkInitialized();
         goViewInModal(viewName, owner, true);
     }
 
@@ -812,6 +826,7 @@ public class FlowController {
      * @see #goViewInModal(String, Stage, Boolean)
      */
     public void goViewInModal(String viewName, Boolean resizable) {
+        checkInitialized();
         goViewInModal(viewName, mainStage, resizable);
     }
 
@@ -826,6 +841,7 @@ public class FlowController {
      * @throws RuntimeException if the view cannot be loaded
      */
     public void goViewInModal(String viewName, Stage owner, Boolean resizable) {
+        checkInitialized();
         try {
             FXMLLoader loader = getLoader(viewName);
             Stage stage = new Stage();
@@ -856,13 +872,16 @@ public class FlowController {
      * @throws RuntimeException if stage is null or view cannot be loaded
      */
     public void changeViewInStage(String viewName, Stage stage) {
+        checkInitialized();
         if (stage == null) {
             throw new RuntimeException("The Stage can not be null");
         }
         try {
             FXMLLoader loader = getLoader(viewName);
             prepareStage(stage, createScene(loader.getRoot()));
-            stage.show();
+            if (!stage.isShowing()) {
+                stage.show();
+            }
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
         }
@@ -877,6 +896,7 @@ public class FlowController {
      *                          loaded
      */
     public void changeViewInScene(String viewName) {
+        checkInitialized();
         changeViewInScene(viewName, mainStage.getScene());
     }
 
@@ -889,6 +909,7 @@ public class FlowController {
      * @throws RuntimeException if scene is null or view cannot be loaded
      */
     public void changeViewInScene(String viewName, Scene scene) {
+        checkInitialized();
         if (scene == null) {
             throw new RuntimeException("The Scene can not be null");
         }
@@ -921,6 +942,7 @@ public class FlowController {
      * @see #changeViewInBorderPane(String, BorderPane, String)
      */
     public void changeViewInBorderPane(String viewName, BorderPane borderPane) {
+        checkInitialized();
         if (borderPane == null) {
             try {
                 borderPane = (BorderPane) mainStage.getScene().getRoot();
@@ -941,6 +963,7 @@ public class FlowController {
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName) {
+        checkInitialized();
         changeViewInBorderPane(viewName, mainStage, "Center");
     }
 
@@ -955,6 +978,7 @@ public class FlowController {
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName, Stage stage) {
+        checkInitialized();
         changeViewInBorderPane(viewName, stage, "Center");
     }
 
@@ -967,6 +991,7 @@ public class FlowController {
      * @see #changeViewInBorderPane(String, Stage, String)
      */
     public void changeViewInBorderPane(String viewName, String region) {
+        checkInitialized();
         changeViewInBorderPane(viewName, mainStage, region);
     }
 
@@ -983,6 +1008,7 @@ public class FlowController {
      * @see #changeViewInBorderPane(String, BorderPane, String)
      */
     public void changeViewInBorderPane(String viewName, Stage stage, String region) {
+        checkInitialized();
         try {
             BorderPane borderPane = (BorderPane) stage.getScene().getRoot();
             changeViewInBorderPane(viewName, borderPane, region);
@@ -1003,6 +1029,7 @@ public class FlowController {
      * @throws RuntimeException         if the view cannot be loaded
      */
     public void changeViewInBorderPane(String viewName, BorderPane borderPane, String region) {
+        checkInitialized();
         if (borderPane == null) {
             throw new IllegalArgumentException("BorderPane is null");
         }
@@ -1064,9 +1091,7 @@ public class FlowController {
      * @throws IllegalStateException if main stage is not initialized
      */
     public void setStageMinSize(double width, double height) {
-        if (mainStage == null) {
-            throw new IllegalStateException("Main stage is not initialized");
-        }
+        checkInitialized();
         mainStage.setMinWidth(width);
         mainStage.setMinHeight(height);
     }
@@ -1082,12 +1107,9 @@ public class FlowController {
      *                               is provided
      */
     public void setStageMinSize(Stage stage, double width, double height) {
+        checkInitialized();
         if (stage == null) {
-            if (mainStage == null) {
-                throw new IllegalStateException("Main stage is not initialized");
-            } else {
-                stage = mainStage;
-            }
+            stage = mainStage;
         }
         stage.setMinWidth(width);
         stage.setMinHeight(height);
@@ -1100,9 +1122,7 @@ public class FlowController {
      * @throws IllegalStateException if main stage is not initialized
      */
     public void toggleFullScreen() {
-        if (mainStage == null) {
-            throw new IllegalStateException("Main stage is not initialized");
-        }
+        checkInitialized();
         mainStage.setFullScreen(!mainStage.isFullScreen());
     }
 
@@ -1113,9 +1133,7 @@ public class FlowController {
      * @throws IllegalStateException if main stage is not initialized
      */
     public void toggleFullScreen(Stage stage) {
-        if (mainStage == null) {
-            throw new IllegalStateException("Main stage is not initialized");
-        }
+        checkInitialized();
         stage.setFullScreen(!stage.isFullScreen());
     }
 
@@ -1127,9 +1145,7 @@ public class FlowController {
      * @throws IllegalStateException if main stage is not initialized
      */
     public void setFullScreen(Stage stage, boolean fullScreen) {
-        if (mainStage == null) {
-            throw new IllegalStateException("Main stage is not initialized");
-        }
+        checkInitialized();
         stage.setFullScreen(fullScreen);
     }
 
@@ -1138,6 +1154,7 @@ public class FlowController {
      * This typically terminates the application if it is the primary stage.
      */
     public void closeMainStage() {
+        checkInitialized();
         mainStage.close();
     }
 
