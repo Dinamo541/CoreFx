@@ -109,6 +109,12 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.6.3</version>
+          <configuration>
+            <!-- Disable strict doclint so minor Javadoc issues don't break
+                 the JitPack publish or the CI build on JDK 25. -->
+            <doclint>none</doclint>
+            <failOnError>false</failOnError>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Distribution**: Added `jitpack.yml` so the library can be consumed as a
+  dependency through [JitPack](https://jitpack.io), built with JDK 25.
+- **CI**: Added a GitHub Actions workflow (`.github/workflows/build.yml`) that
+  builds the project and runs the test suite on every push and pull request to `main`.
+- **Docs**: Added a JitPack installation section to `README.md`.
+
 ### Changed
+- **Docs**: Moved `CONTRIBUTING.md` into `.github/` to consolidate the
+  GitHub community files, and updated the `README.md` link accordingly.
 - **Environment**: Upgraded to **Java 25** and **JavaFX 25**.
 - **Group/Package**: Reorganized folder structure and migrated packages to `io.github.dinamo541.corefx` from `cr.ac.una.corefx`. The Maven `groupId` remains `io.github.dinamo541`.
 - **Build**: Added JUnit 5 (Jupiter) test dependencies and `maven-surefire-plugin` configuration.

@@ -31,6 +31,34 @@ The project is divided into several utility modules to accelerate the developmen
 - **Validator**: Validation tools to ensure data integrity.
 - **Answer**: Standardized wrapper for utility method responses.
 
+## 📦 Installation
+
+CoreFx is distributed through [JitPack](https://jitpack.io). Add the JitPack
+repository and the dependency to your `pom.xml`:
+
+```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
+<dependencies>
+  <dependency>
+    <groupId>com.github.Dinamo541.CoreFx</groupId>
+    <artifactId>io.github.dinamo541.corefx</artifactId>
+    <version>v1.1.0</version>
+  </dependency>
+</dependencies>
+```
+
+> Replace `v1.1.0` with the [release tag](https://github.com/Dinamo541/CoreFx/releases)
+> you want to use.
+
+> **Note:** JavaFX is declared with `provided` scope, so your application must
+> supply its own JavaFX runtime (the same version CoreFx targets, **JavaFX 25**).
+
 ## 🛠️ Technical Requirements
 
 To compile and run CoreFx, you need:
@@ -53,7 +81,7 @@ The project follows a Maven multi-module structure:
 ## 🤝 Contributions
 
 If you wish to contribute to CoreFx, please check our contribution guide:
-👉 [CONTRIBUTING.md](./CONTRIBUTING.md)
+👉 [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
 
 ## 📜 Changelog
 
