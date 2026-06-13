@@ -24,23 +24,36 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 /**
- * Singleton controller for managing JavaFX view navigation and stage management.
- * Provides centralized control over scene creation, view loading, window creation,
+ * Singleton controller for managing JavaFX view navigation and stage
+ * management.
+ * Provides centralized control over scene creation, view loading, window
+ * creation,
  * and navigation between different UI states in the application.
  *
- * <p>Implements the Singleton pattern using the initialization-on-demand holder idiom,
- * which provides lazy, thread-safe initialization without synchronization overhead.</p>
+ * <p>
+ * Implements the Singleton pattern using the initialization-on-demand holder
+ * idiom,
+ * which provides lazy, thread-safe initialization without synchronization
+ * overhead.
+ * </p>
  *
- * <p><b>Usage:</b> {@link #initialize} must be called exactly once before any navigation
- * or loading method. All public methods enforce this contract via {@link #checkInitialized()}.</p>
+ * <p>
+ * <b>Usage:</b> {@link #initialize} must be called exactly once before any
+ * navigation
+ * or loading method. All public methods enforce this contract via
+ * {@link #checkInitialized()}.
+ * </p>
  *
- * <p>Supports multiple navigation patterns:</p>
+ * <p>
+ * Supports multiple navigation patterns:
+ * </p>
  * <ul>
- *   <li>Main stage navigation (full-scene replacement)</li>
- *   <li>Independent windows (non-blocking top-level stages)</li>
- *   <li>Modal dialogs (owner-blocking stages)</li>
- *   <li>Container-based navigation (replacing children in {@link Pane} or {@link Group})</li>
- *   <li>BorderPane region management (Center, Top, Bottom, Left, Right)</li>
+ * <li>Main stage navigation (full-scene replacement)</li>
+ * <li>Independent windows (non-blocking top-level stages)</li>
+ * <li>Modal dialogs (owner-blocking stages)</li>
+ * <li>Container-based navigation (replacing children in {@link Pane} or
+ * {@link Group})</li>
+ * <li>BorderPane region management (Center, Top, Bottom, Left, Right)</li>
  * </ul>
  *
  * @author Dominique
@@ -51,7 +64,8 @@ public class FlowController {
 
     /**
      * Holder for lazy, thread-safe singleton initialization.
-     * The JVM class-loading mechanism guarantees {@code INSTANCE} is created exactly
+     * The JVM class-loading mechanism guarantees {@code INSTANCE} is created
+     * exactly
      * once, only when {@link FlowController#getInstance()} is first called.
      */
     private static final class FlowControllerHolder {
@@ -62,13 +76,15 @@ public class FlowController {
      * Thread-safe cache of {@link FXMLLoader} instances keyed by view name.
      * {@link ConcurrentHashMap} allows lock-free reads on cache hits, while
      * {@link ConcurrentHashMap#computeIfAbsent} guarantees atomic creation on
-     * cache misses, eliminating the need for an external lock around the loader map.
+     * cache misses, eliminating the need for an external lock around the loader
+     * map.
      */
     private final ConcurrentHashMap<String, FXMLLoader> loaders = new ConcurrentHashMap<>();
 
     /**
      * Guard for the {@link #initialize} block against concurrent first-time calls.
-     * Used together with the {@code volatile} flag {@link #initialized} to implement
+     * Used together with the {@code volatile} flag {@link #initialized} to
+     * implement
      * double-checked locking.
      */
     private final Object initLock = new Object();
@@ -111,27 +127,26 @@ public class FlowController {
      * Optional callback applied to every {@link Scene} created by this controller.
      * Allows consuming applications to inject CSS or a theming library without
      * coupling {@code FlowController} to any specific styling framework.
-     * Set via {@link #setThemeApplier(Consumer)}; {@code null} leaves scenes unstyled.
+     * Set via {@link #setThemeApplier(Consumer)}; {@code null} leaves scenes
+     * unstyled.
      */
     private volatile Consumer<Scene> themeApplier = null;
-
-    /**
-     * Default view name loaded when {@link #goViewMain()} is called without arguments.
-     */
-    private static final String DEFAULT_VIEW = "MainView";
 
     /**
      * Private constructor — use {@link #getInstance()} to obtain the singleton.
      * All initialization logic is deferred to {@link #initialize} to allow
      * flexible setup after the singleton is first referenced.
      */
-    private FlowController() {}
+    private FlowController() {
+    }
 
     /**
      * Returns the singleton instance of {@code FlowController}.
      *
-     * <p><strong>Note:</strong> {@link #initialize} must be called before invoking
-     * any navigation or loading method.</p>
+     * <p>
+     * <strong>Note:</strong> {@link #initialize} must be called before invoking
+     * any navigation or loading method.
+     * </p>
      *
      * @return the single {@code FlowController} instance
      */
@@ -144,7 +159,8 @@ public class FlowController {
      * A new {@link Stage} is created automatically.
      * Use this overload when no existing stage is available at startup.
      *
-     * @param appClass the main application class, used to derive paths and load resources
+     * @param appClass the main application class, used to derive paths and load
+     *                 resources
      * @throws NullPointerException  if {@code appClass} is {@code null}
      * @throws IllegalStateException if the controller has already been initialized
      */
@@ -155,11 +171,14 @@ public class FlowController {
 
     /**
      * Initializes the controller with a stage and application class.
-     * The application name and base paths are derived automatically from the package name.
+     * The application name and base paths are derived automatically from the
+     * package name.
      *
      * @param stage    the primary JavaFX stage
-     * @param appClass the main application class, used to derive paths and load resources
-     * @throws NullPointerException  if {@code stage} or {@code appClass} is {@code null}
+     * @param appClass the main application class, used to derive paths and load
+     *                 resources
+     * @throws NullPointerException  if {@code stage} or {@code appClass} is
+     *                               {@code null}
      * @throws IllegalStateException if the controller has already been initialized
      */
     public void initialize(Stage stage, Class<?> appClass) {
@@ -177,10 +196,13 @@ public class FlowController {
      *
      * @param stage    the primary JavaFX stage
      * @param appName  the display name used as the window title
-     * @param appClass the main application class, used to derive paths and load resources
-     * @throws NullPointerException     if {@code stage} or {@code appClass} is {@code null}
+     * @param appClass the main application class, used to derive paths and load
+     *                 resources
+     * @throws NullPointerException     if {@code stage} or {@code appClass} is
+     *                                  {@code null}
      * @throws IllegalArgumentException if {@code appName} is {@code null} or blank
-     * @throws IllegalStateException    if the controller has already been initialized
+     * @throws IllegalStateException    if the controller has already been
+     *                                  initialized
      */
     public void initialize(Stage stage, String appName, Class<?> appClass) {
         Objects.requireNonNull(stage, "stage cannot be null");
@@ -193,17 +215,22 @@ public class FlowController {
     }
 
     /**
-     * Initializes the controller with a stage, application name, a shared base path,
-     * and an application class. View and resource paths are derived from {@code basePath}.
+     * Initializes the controller with a stage, application name, a shared base
+     * path,
+     * and an application class. View and resource paths are derived from
+     * {@code basePath}.
      *
      * @param stage    the primary JavaFX stage
      * @param appName  the display name used as the window title
      * @param basePath the root classpath path for the application
      *                 (e.g. {@code /io/github/dinamo541/soulward/})
      * @param appClass the main application class, used to load resources
-     * @throws NullPointerException     if {@code stage} or {@code appClass} is {@code null}
-     * @throws IllegalArgumentException if {@code appName} or {@code basePath} is {@code null} or blank
-     * @throws IllegalStateException    if the controller has already been initialized
+     * @throws NullPointerException     if {@code stage} or {@code appClass} is
+     *                                  {@code null}
+     * @throws IllegalArgumentException if {@code appName} or {@code basePath} is
+     *                                  {@code null} or blank
+     * @throws IllegalStateException    if the controller has already been
+     *                                  initialized
      */
     public void initialize(Stage stage, String appName, String basePath, Class<?> appClass) {
         Objects.requireNonNull(stage, "stage cannot be null");
@@ -214,9 +241,9 @@ public class FlowController {
         if (basePath == null || basePath.isBlank()) {
             throw new IllegalArgumentException("basePath cannot be null or blank");
         }
-        String baseViewPath     = basePath + "view/";
+        String baseViewPath = basePath + "view/";
         String baseResourcePath = basePath + "resources/";
-        String appIconPath      = baseResourcePath + appName + ".png";
+        String appIconPath = baseResourcePath + appName + ".png";
         initialize(stage, appName, baseViewPath, baseResourcePath, appIconPath, appClass);
     }
 
@@ -233,13 +260,16 @@ public class FlowController {
      * @param appClass         the main application class, used to load resources
      * @param themeApplier     optional callback to apply theming to created scenes;
      *                         pass {@code null} to leave scenes unstyled
-     * @throws NullPointerException     if {@code stage} or {@code appClass} is {@code null}
-     * @throws IllegalArgumentException if any {@code String} parameter is {@code null} or blank
-     * @throws IllegalStateException    if the controller has already been initialized
+     * @throws NullPointerException     if {@code stage} or {@code appClass} is
+     *                                  {@code null}
+     * @throws IllegalArgumentException if any {@code String} parameter is
+     *                                  {@code null} or blank
+     * @throws IllegalStateException    if the controller has already been
+     *                                  initialized
      */
     public void initialize(Stage stage, String appName, String baseViewPath,
-                           String baseResourcePath, String appIconPath,
-                           Class<?> appClass, Consumer<Scene> themeApplier) {
+            String baseResourcePath, String appIconPath,
+            Class<?> appClass, Consumer<Scene> themeApplier) {
         // themeApplier is registered AFTER so it is not modified if initialize() throws
         initialize(stage, appName, baseViewPath, baseResourcePath, appIconPath, appClass);
         setThemeApplier(themeApplier);
@@ -247,7 +277,8 @@ public class FlowController {
 
     /**
      * Core initialization method. All other overloads ultimately delegate here.
-     * Uses double-checked locking on {@link #initLock} to guarantee that the controller
+     * Uses double-checked locking on {@link #initLock} to guarantee that the
+     * controller
      * is configured exactly once, even under concurrent access.
      *
      * @param stage            the primary JavaFX stage
@@ -256,13 +287,16 @@ public class FlowController {
      * @param baseResourcePath classpath path to the resources folder
      * @param appIconPath      classpath path to the application icon
      * @param appClass         the main application class, used to load resources
-     * @throws NullPointerException     if {@code stage} or {@code appClass} is {@code null}
-     * @throws IllegalArgumentException if any {@code String} parameter is {@code null} or blank
-     * @throws IllegalStateException    if the controller has already been initialized
+     * @throws NullPointerException     if {@code stage} or {@code appClass} is
+     *                                  {@code null}
+     * @throws IllegalArgumentException if any {@code String} parameter is
+     *                                  {@code null} or blank
+     * @throws IllegalStateException    if the controller has already been
+     *                                  initialized
      */
     public void initialize(Stage stage, String appName, String baseViewPath,
-                           String baseResourcePath, String appIconPath, Class<?> appClass) {
-        Objects.requireNonNull(stage,    "stage cannot be null");
+            String baseResourcePath, String appIconPath, Class<?> appClass) {
+        Objects.requireNonNull(stage, "stage cannot be null");
         Objects.requireNonNull(appClass, "appClass cannot be null");
 
         if (appName == null || appName.isBlank())
@@ -276,46 +310,52 @@ public class FlowController {
 
         if (initialized) {
             throw new IllegalStateException(
-                "FlowController is already initialized. Call initialize() only once.");
+                    "FlowController is already initialized. Call initialize() only once.");
         }
 
         synchronized (initLock) {
             if (initialized) {
                 throw new IllegalStateException(
-                    "FlowController is already initialized. Call initialize() only once.");
+                        "FlowController is already initialized. Call initialize() only once.");
             }
-            this.mainStage        = stage;
-            this.appName          = appName;
-            this.baseViewPath     = baseViewPath;
+            this.mainStage = stage;
+            this.appName = appName;
+            this.baseViewPath = baseViewPath;
             this.baseResourcePath = baseResourcePath;
-            this.appIconPath      = appIconPath;
-            this.appClass         = appClass;
+            this.appIconPath = appIconPath;
+            this.appClass = appClass;
             mainStage.setTitle(appName);
             this.initialized = true;
         }
     }
 
     /**
-     * Internal guard invoked at the start of every public navigation and loading method.
-     * Ensures the controller has been fully initialized before any operation is attempted.
+     * Internal guard invoked at the start of every public navigation and loading
+     * method.
+     * Ensures the controller has been fully initialized before any operation is
+     * attempted.
      *
      * @throws IllegalStateException if {@link #initialize} has not been called yet
      */
     private void checkInitialized() {
         if (!initialized) {
             throw new IllegalStateException(
-                "FlowController is not initialized. Call initialize() before using navigation methods."
-            );
+                    "FlowController is not initialized. Call initialize() before using navigation methods.");
         }
     }
 
     /**
-     * Creates and returns a new, fully loaded {@link FXMLLoader} for the named view.
-     * {@link FXMLLoader#load()} is called immediately so that both the root node and
+     * Creates and returns a new, fully loaded {@link FXMLLoader} for the named
+     * view.
+     * {@link FXMLLoader#load()} is called immediately so that both the root node
+     * and
      * its controller are accessible on the returned instance.
      *
-     * <p>This method always creates a fresh loader and does not interact with the cache.
-     * Use {@link #getLoader(String)} to obtain a cached instance instead.</p>
+     * <p>
+     * This method always creates a fresh loader and does not interact with the
+     * cache.
+     * Use {@link #getLoader(String)} to obtain a cached instance instead.
+     * </p>
      *
      * @param name the view name, without the {@code .fxml} extension
      * @return a loaded {@link FXMLLoader} for the specified view
@@ -333,9 +373,9 @@ public class FlowController {
         }
     }
 
-
     /**
-     * Returns a cached FXMLLoader for the specified view, creating one if necessary.
+     * Returns a cached FXMLLoader for the specified view, creating one if
+     * necessary.
      * Uses synchronization to ensure thread safety during loader caching.
      * 
      * @param viewName the name of the view (without .fxml extension)
@@ -347,7 +387,7 @@ public class FlowController {
     public FXMLLoader getLoader(String viewName) {
         checkInitialized();
         try {
-            synchronized (initLock) {   // ← initLock instead of FlowController.class
+            synchronized (initLock) { // ← initLock instead of FlowController.class
                 FXMLLoader loader = loaders.get(viewName);
                 if (loader == null) {
                     loader = createLoaderInstance(viewName);
@@ -369,7 +409,8 @@ public class FlowController {
     public Image loadAppIcon() {
         try {
             var stream = FlowController.class.getResourceAsStream(appIconPath);
-            if (stream == null) return null;
+            if (stream == null)
+                return null;
             return new Image(stream);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
@@ -388,7 +429,8 @@ public class FlowController {
         String iconPath = baseResourcePath + iconName + ".png";
         try {
             var stream = FlowController.class.getResourceAsStream(iconPath);
-            if (stream == null) return null;
+            if (stream == null)
+                return null;
             return new Image(stream);
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
@@ -397,7 +439,8 @@ public class FlowController {
 
     /**
      * Creates a Scene with the given root node and applies the configured theme.
-     * If no theme applier has been set via setThemeApplier(), the scene is returned unstyled.
+     * If no theme applier has been set via setThemeApplier(), the scene is returned
+     * unstyled.
      *
      * @param root the root node of the scene
      * @return a Scene with the optional theme applied
@@ -447,8 +490,8 @@ public class FlowController {
      * Clears existing children and adds the new node.
      * Falls back to a custom setter if the container type is not supported.
      * 
-     * @param container the container node (Pane, Group, or null)
-     * @param node the new node to place in the container
+     * @param container      the container node (Pane, Group, or null)
+     * @param node           the new node to place in the container
      * @param fallbackSetter callback for unsupported container types
      */
     public void replaceNodeInContainer(Node container, Parent node, Consumer<Node> fallbackSetter) {
@@ -470,11 +513,12 @@ public class FlowController {
     }
 
     /**
-     * Adds a node to a container (Pane or Group) without clearing existing children.
+     * Adds a node to a container (Pane or Group) without clearing existing
+     * children.
      * Falls back to a custom setter if the container type is not supported.
      * 
-     * @param currentNode the container node (Pane, Group, or null)
-     * @param node the node to add
+     * @param currentNode    the container node (Pane, Group, or null)
+     * @param node           the node to add
      * @param fallbackSetter callback for unsupported container types
      */
     public void placeNodeInContainer(Node currentNode, Parent node, Consumer<Node> fallbackSetter) {
@@ -491,7 +535,7 @@ public class FlowController {
      * Replaces the contents of a container with a view loaded from FXML.
      * Uses an empty fallback setter by default.
      * 
-     * @param viewName the name of the view to load
+     * @param viewName    the name of the view to load
      * @param currentNode the container to replace contents in
      * 
      * @see #replaceViewInContainer(String, Node, Consumer)
@@ -505,11 +549,11 @@ public class FlowController {
      * Replaces the contents of a container with a view loaded from FXML.
      * The container is cleared and the new view is added to it.
      * 
-     * @param viewName the name of the view to load
-     * @param currentNode the container to replace contents in
+     * @param viewName       the name of the view to load
+     * @param currentNode    the container to replace contents in
      * @param fallbackSetter callback for handling null containers
      * @throws IllegalArgumentException if fallbackSetter is null
-     * @throws RuntimeException if the view cannot be loaded
+     * @throws RuntimeException         if the view cannot be loaded
      */
     public void replaceViewInContainer(String viewName, Node currentNode, Consumer<Node> fallbackSetter) {
         if (fallbackSetter == null)
@@ -523,10 +567,11 @@ public class FlowController {
     }
 
     /**
-     * Adds a view loaded from FXML to a container without clearing existing children.
+     * Adds a view loaded from FXML to a container without clearing existing
+     * children.
      * Uses an empty fallback setter by default.
      * 
-     * @param viewName the name of the view to load
+     * @param viewName    the name of the view to load
      * @param currentNode the container to add the view to
      * 
      * @see #placeViewInContainer(String, Node, Consumer)
@@ -537,10 +582,11 @@ public class FlowController {
     }
 
     /**
-     * Adds a view loaded from FXML to a container without clearing existing children.
+     * Adds a view loaded from FXML to a container without clearing existing
+     * children.
      * 
-     * @param viewName the name of the view to load
-     * @param currentNode the container to add the view to
+     * @param viewName       the name of the view to load
+     * @param currentNode    the container to add the view to
      * @param fallbackSetter callback for handling null containers
      * @throws RuntimeException if the view cannot be loaded
      */
@@ -570,8 +616,8 @@ public class FlowController {
      * 
      * @param viewName the name of the view to load
      * @throws IllegalArgumentException if viewName is null or empty
-     * @throws IllegalStateException if main stage is not initialized
-     * @throws RuntimeException if the view cannot be loaded
+     * @throws IllegalStateException    if main stage is not initialized
+     * @throws RuntimeException         if the view cannot be loaded
      */
     public void goViewMain(String viewName) {
         try {
@@ -614,7 +660,7 @@ public class FlowController {
      * Opens a view in a new window.
      * The window is independent and can be closed without affecting the main stage.
      * 
-     * @param viewName the name of the view to load
+     * @param viewName  the name of the view to load
      * @param resizable whether the window can be resized by the user
      * @throws RuntimeException if the view cannot be loaded
      */
@@ -650,7 +696,7 @@ public class FlowController {
      * Uses default resizable setting (true).
      * 
      * @param viewName the name of the view to load
-     * @param owner the owner stage for the modal dialog
+     * @param owner    the owner stage for the modal dialog
      * 
      * @see #goViewInModal(String, Stage, Boolean)
      */
@@ -661,7 +707,7 @@ public class FlowController {
     /**
      * Opens a view in a modal dialog owned by the main stage.
      * 
-     * @param viewName the name of the view to load
+     * @param viewName  the name of the view to load
      * @param resizable whether the dialog can be resized by the user
      * 
      * @see #goViewInModal(String, Stage, Boolean)
@@ -675,8 +721,8 @@ public class FlowController {
      * The dialog blocks interaction with its owner window until closed.
      * Automatically centers on screen and applies application styling.
      * 
-     * @param viewName the name of the view to load
-     * @param owner the owner stage for the modal dialog
+     * @param viewName  the name of the view to load
+     * @param owner     the owner stage for the modal dialog
      * @param resizable whether the dialog can be resized by the user
      * @throws RuntimeException if the view cannot be loaded
      */
@@ -705,8 +751,8 @@ public class FlowController {
      * 
      * @param viewName the name of the view to load
      * @throws IllegalArgumentException if viewName is null or empty
-     * @throws IllegalStateException if main stage is not initialized
-     * @throws RuntimeException if the view cannot be loaded
+     * @throws IllegalStateException    if main stage is not initialized
+     * @throws RuntimeException         if the view cannot be loaded
      */
     public void changeViewInMain(String viewName) {
         try {
@@ -738,7 +784,7 @@ public class FlowController {
      * Changes the root scene of the specified stage to the given view.
      * 
      * @param viewName the name of the view to load
-     * @param stage the stage whose scene should be changed
+     * @param stage    the stage whose scene should be changed
      * @throws RuntimeException if stage is null or view cannot be loaded
      */
     public void changeViewInStage(String viewName, Stage stage) {
@@ -759,20 +805,21 @@ public class FlowController {
      * The scene must already be set on the main stage.
      * 
      * @param viewName the name of the view to load
-     * @throws RuntimeException if main stage's scene is null or view cannot be loaded
+     * @throws RuntimeException if main stage's scene is null or view cannot be
+     *                          loaded
      */
     public void changeViewInScene(String viewName) {
         changeViewInScene(viewName, mainStage.getScene());
     }
 
     /**
-    * Changes the root node of the scene to the specified view.
-    * The scene must already be set on a stage.
-    * 
-    * @param viewName the name of the view to load
-    * @param scene the scene whose root should be changed
-    * @throws RuntimeException if scene is null or view cannot be loaded
-    */
+     * Changes the root node of the scene to the specified view.
+     * The scene must already be set on a stage.
+     * 
+     * @param viewName the name of the view to load
+     * @param scene    the scene whose root should be changed
+     * @throws RuntimeException if scene is null or view cannot be loaded
+     */
     public void changeViewInScene(String viewName, Scene scene) {
         if (scene == null) {
             throw new RuntimeException("The Scene can not be null");
@@ -791,11 +838,13 @@ public class FlowController {
 
     /**
      * Changes a region within a BorderPane to display the specified view.
-     * If no BorderPane is provided, attempts to use the root of the main stage's scene.
+     * If no BorderPane is provided, attempts to use the root of the main stage's
+     * scene.
      * Uses "Center" as the default region.
      * 
-     * @param viewName the name of the view to load
-     * @param borderPane the BorderPane to update (may be null to use main stage's root)
+     * @param viewName   the name of the view to load
+     * @param borderPane the BorderPane to update (may be null to use main stage's
+     *                   root)
      * 
      * @see #changeViewInBorderPane(String, BorderPane, String)
      */
@@ -811,7 +860,8 @@ public class FlowController {
     }
 
     /**
-     * Changes a region in the BorderPane root of the main stage to display the specified view.
+     * Changes a region in the BorderPane root of the main stage to display the
+     * specified view.
      * Uses "Center" as the default region.
      * 
      * @param viewName the name of the view to load
@@ -823,11 +873,12 @@ public class FlowController {
     }
 
     /**
-     * Changes a region in the BorderPane root of the specified stage to display the specified view.
+     * Changes a region in the BorderPane root of the specified stage to display the
+     * specified view.
      * Uses "Center" as the default region.
      * 
      * @param viewName the name of the view to load
-     * @param stage the stage whose BorderPane root should be updated
+     * @param stage    the stage whose BorderPane root should be updated
      * 
      * @see #changeViewInBorderPane(String, Stage, String)
      */
@@ -839,7 +890,7 @@ public class FlowController {
      * Changes the specified region in the BorderPane root of the main stage.
      * 
      * @param viewName the name of the view to load
-     * @param region the BorderPane region to update (default: "Center")
+     * @param region   the BorderPane region to update (default: "Center")
      * 
      * @see #changeViewInBorderPane(String, Stage, String)
      */
@@ -852,8 +903,9 @@ public class FlowController {
      * Uses "Center" if the region is null or empty.
      * 
      * @param viewName the name of the view to load
-     * @param stage the stage whose BorderPane root should be updated
-     * @param region the BorderPane region ("Center", "Top", "Bottom", "Left", "Right")
+     * @param stage    the stage whose BorderPane root should be updated
+     * @param region   the BorderPane region ("Center", "Top", "Bottom", "Left",
+     *                 "Right")
      * @throws RuntimeException if the stage's scene root is not a BorderPane
      * 
      * @see #changeViewInBorderPane(String, BorderPane, String)
@@ -872,11 +924,11 @@ public class FlowController {
      * Valid regions are: "Center", "Top", "Bottom", "Left", "Right".
      * Uses "Center" as default if region is null or empty.
      * 
-     * @param viewName the name of the view to load
+     * @param viewName   the name of the view to load
      * @param borderPane the BorderPane to update
-     * @param region the BorderPane region to change
+     * @param region     the BorderPane region to change
      * @throws IllegalArgumentException if borderPane is null or region is invalid
-     * @throws RuntimeException if the view cannot be loaded
+     * @throws RuntimeException         if the view cannot be loaded
      */
     public void changeViewInBorderPane(String viewName, BorderPane borderPane, String region) {
         if (borderPane == null) {
@@ -907,7 +959,7 @@ public class FlowController {
      * Clears all child nodes from a specific region in a BorderPane.
      * Valid regions are: "Center", "Top", "Bottom", "Left", "Right".
      * 
-     * @param region the BorderPane region to clear
+     * @param region     the BorderPane region to clear
      * @param borderPane the BorderPane containing the region
      * @throws IllegalArgumentException if region is invalid
      */
@@ -932,7 +984,7 @@ public class FlowController {
      * Returns the controller associated with the specified view.
      * Casts the controller to the desired type.
      * 
-     * @param <T> the type of the controller
+     * @param <T>      the type of the controller
      * @param viewName the name of the view whose controller to retrieve
      * @return the controller, or null if not found
      */
@@ -961,7 +1013,7 @@ public class FlowController {
     /**
      * Sets the minimum size for the main stage.
      * 
-     * @param width the minimum width in pixels
+     * @param width  the minimum width in pixels
      * @param height the minimum height in pixels
      * @throws IllegalStateException if main stage is not initialized
      */
@@ -977,10 +1029,11 @@ public class FlowController {
      * Sets the minimum size for the specified stage.
      * Falls back to main stage if the provided stage is null.
      * 
-     * @param stage the stage to configure (may be null to use main stage)
-     * @param width the minimum width in pixels
+     * @param stage  the stage to configure (may be null to use main stage)
+     * @param width  the minimum width in pixels
      * @param height the minimum height in pixels
-     * @throws IllegalStateException if main stage is not initialized and no stage is provided
+     * @throws IllegalStateException if main stage is not initialized and no stage
+     *                               is provided
      */
     public void setStageMinSize(Stage stage, double width, double height) {
         if (stage == null) {
@@ -1041,7 +1094,7 @@ public class FlowController {
     /**
      * Sets the full screen state of the specified stage.
      * 
-     * @param stage the stage to configure
+     * @param stage      the stage to configure
      * @param fullScreen true for full screen, false for windowed
      * @throws IllegalStateException if main stage is not initialized
      */
@@ -1065,18 +1118,22 @@ public class FlowController {
      * by this FlowController. This allows the consuming application to apply any
      * CSS theme or styling framework without coupling CoreFx to a specific library.
      *
-     * <p>Example with MaterialFX:</p>
+     * <p>
+     * Example with MaterialFX:
+     * </p>
+     * 
      * <pre>{@code
-     * FlowController.getInstance().setThemeApplier(scene ->
-     *     MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY)
-     * );
+     * FlowController.getInstance()
+     *         .setThemeApplier(scene -> MFXThemeManager.addOn(scene, Themes.DEFAULT, Themes.LEGACY));
      * }</pre>
      *
-     * <p>Example with plain CSS:</p>
+     * <p>
+     * Example with plain CSS:
+     * </p>
+     * 
      * <pre>{@code
-     * FlowController.getInstance().setThemeApplier(scene ->
-     *     scene.getStylesheets().add("/io/github/dinamo541/myapp/view/style.css")
-     * );
+     * FlowController.getInstance()
+     *         .setThemeApplier(scene -> scene.getStylesheets().add("/io/github/dinamo541/myapp/view/style.css"));
      * }</pre>
      *
      * @param themeApplier a Consumer that receives each new Scene for styling,
@@ -1085,7 +1142,7 @@ public class FlowController {
     public void setThemeApplier(Consumer<Scene> themeApplier) {
         this.themeApplier = themeApplier;
     }
-    
+
     /**
      * Returns whether the FlowController has been successfully initialized.
      *
