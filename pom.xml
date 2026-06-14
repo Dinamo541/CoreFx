@@ -36,6 +36,8 @@
 
   <modules>
     <module>corefx</module>
+    <!-- Local, runnable demo. Never published; isolated from the library. -->
+    <module>corefx-demo</module>
   </modules>
 
   <properties>

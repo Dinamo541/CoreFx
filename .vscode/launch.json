@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CoreFx Demo",
+            "request": "launch",
+            "mainClass": "io.github.dinamo541.corefxdemo.Launcher",
+            "projectName": "corefx-demo"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
