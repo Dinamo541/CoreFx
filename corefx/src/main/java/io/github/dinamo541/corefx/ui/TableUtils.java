@@ -32,7 +32,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * possible: {@link #createColumn(String, Function)} derives a column's value
  * from an extractor function, avoiding the stringly-typed pitfalls of
  * {@link PropertyValueFactory} (which is still offered via
- * {@link #createPropertyColumn(String, String)} for JavaBean models). Additional
+ * {@link #createPropertyColumn(String, String)} for JavaBean models).
+ * Additional
  * helpers cover item population, selection, placeholders, and a ready-made
  * search filter that integrates with the table's own sorting.
  * </p>
@@ -41,9 +42,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
  * This is a utility class and should not be instantiated.
  * </p>
  *
- * @author Dominique
  * @author Sem
- * @version 1.0
+ * @author Dominique
+ * @version 1.2
  * @since 2026/06/10
  */
 public final class TableUtils {

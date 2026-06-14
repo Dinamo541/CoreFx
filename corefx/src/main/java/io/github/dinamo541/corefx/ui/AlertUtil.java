@@ -28,10 +28,12 @@ import javafx.stage.Window;
  * <p>
  * Plain JavaFX {@link Alert}s always render with the platform's light styling,
  * which clashes with dark or branded user interfaces. {@code AlertUtil} solves
- * this without requiring the consumer to ship any CSS file: a {@link AlertTheme}
+ * this without requiring the consumer to ship any CSS file: a
+ * {@link AlertTheme}
  * is translated into a CSS stylesheet <em>in code</em> and injected into the
  * dialog through a base64 {@code data:} URI. Because this uses the real CSS
- * cascade, it consistently restyles the dialog background, content text, header,
+ * cascade, it consistently restyles the dialog background, content text,
+ * header,
  * and buttons (including hover state).
  * </p>
  *
@@ -49,8 +51,10 @@ import javafx.stage.Window;
  * </ol>
  *
  * <p>
- * A default theme can be configured once via {@link #setDefaultTheme(AlertTheme)}
- * so that every subsequent alert adopts it automatically — ideal for an app that
+ * A default theme can be configured once via
+ * {@link #setDefaultTheme(AlertTheme)}
+ * so that every subsequent alert adopts it automatically — ideal for an app
+ * that
  * is dark-themed throughout. Per-call overloads still allow overriding the
  * default for an individual dialog.
  * </p>
@@ -59,14 +63,14 @@ import javafx.stage.Window;
  * <b>Note:</b> styling applies to the dialog's content area (the
  * {@link DialogPane}); the surrounding window title bar is drawn by the
  * operating system and is outside JavaFX's styling reach. Blocking dialogs
- * ({@code showModal}, {@code showConfirmation}, {@code askYesNo}) must be invoked
+ * ({@code showModal}, {@code showConfirmation}, {@code askYesNo}) must be
+ * invoked
  * on the JavaFX Application Thread, as required by JavaFX itself.
  * </p>
  *
- * @author Carranza
- * @author Dominique
  * @author Sem
- * @version 3.0
+ * @author Dominique
+ * @version 1.2
  * @since 2026/06/10
  */
 public final class AlertUtil {

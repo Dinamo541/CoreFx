@@ -32,14 +32,16 @@ import javafx.scene.Scene;
  * <p>
  * Applying a theme only ever touches stylesheets that belong to a registered
  * theme: the manager removes the URLs of all known themes from a scene before
- * adding the active theme's URLs, so an application's own, non-theme stylesheets
+ * adding the active theme's URLs, so an application's own, non-theme
+ * stylesheets
  * are never disturbed.
  * </p>
  *
  * <p>
  * The class intentionally does <b>not</b> depend on
  * {@link io.github.dinamo541.corefx.navigation.FlowController}. To bridge the
- * two, pass {@link #asApplier()} to {@code FlowController.setThemeApplier(...)};
+ * two, pass {@link #asApplier()} to
+ * {@code FlowController.setThemeApplier(...)};
  * every scene the controller creates will then be tracked and themed:
  * </p>
  *
@@ -57,8 +59,8 @@ import javafx.scene.Scene;
  * Application Thread via {@link Platform#runLater(Runnable)} when necessary.
  * </p>
  *
- * @author Dominique
  * @author Sem
+ * @author Dominique
  * @version 1.0
  * @since 2026/06/10
  */
@@ -82,8 +84,8 @@ public final class ThemeManager {
      * Scenes tracked for automatic re-theming, held weakly so they can be garbage
      * collected once the application stops referencing them.
      */
-    private final Set<Scene> managedScenes =
-            Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
+    private final Set<Scene> managedScenes = Collections
+            .synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
 
     /** The name of the currently active theme, or {@code null} if none. */
     private volatile String activeTheme;

@@ -6,6 +6,8 @@
  */
 package io.github.dinamo541.corefx.ui;
 
+import java.util.Objects;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.property.ObjectProperty;
@@ -14,18 +16,18 @@ import javafx.scene.control.Toggle;
 
 /**
  * Utility class for binding JavaFX ToggleGroup selections to object properties.
- * Provides methods to synchronize a ToggleGroup's selected toggle with an ObjectProperty,
+ * Provides methods to synchronize a ToggleGroup's selected toggle with an
+ * ObjectProperty,
  * enabling two-way data binding between UI controls and model properties.
- * 
+ *
  * This is a utility class and should not be instantiated.
- * 
+ *
  * @author Carranza
  * @author Dominique
- * @version 2.2
+ * @version 2.3
  * @since 2026/06/10
  */
-@SuppressWarnings("unchecked")
-public class BindingUtils {
+public final class BindingUtils {
 
     /**
      * Private constructor to prevent instantiation of this utility class.
@@ -39,16 +41,21 @@ public class BindingUtils {
      * 
      * Each toggle in the group must have non-null user data. If any toggle lacks
      * user data, an IllegalArgumentException is thrown. The listener is stored
-     * internally to enable later unbinding via {@link #unbindToggleGroupToProperty(ToggleGroup, ObjectProperty)}.
+     * internally to enable later unbinding via
+     * {@link #unbindToggleGroupToProperty(ToggleGroup, ObjectProperty)}.
      * 
-     * @param <T> the type of the property value and toggle user data
+     * @param <T>         the type of the property value and toggle user data
      * @param toggleGroup the ToggleGroup to bind
-     * @param property the ObjectProperty to bind to
-     * @throws IllegalArgumentException if any toggle in the group has null user data
+     * @param property    the ObjectProperty to bind to
+     * @throws IllegalArgumentException if any toggle in the group has null user
+     *                                  data
      * 
      * @see #unbindToggleGroupToProperty(ToggleGroup, ObjectProperty)
      */
+    @SuppressWarnings("unchecked")
     public static <T> void bindToggleGroupToProperty(final ToggleGroup toggleGroup, final ObjectProperty<T> property) {
+        Objects.requireNonNull(toggleGroup, "toggleGroup cannot be null");
+        Objects.requireNonNull(property, "property cannot be null");
         toggleGroup.getToggles().forEach(toggle -> {
             if (toggle.getUserData() == null) {
                 throw new IllegalArgumentException("The ToggleGroup contains at least one Toggle without user data!");
@@ -73,17 +80,23 @@ public class BindingUtils {
 
     /**
      * Unbinds a ToggleGroup from an ObjectProperty, removing the two-way binding.
-     * Retrieves and removes the previously stored change listener from the ToggleGroup
+     * Retrieves and removes the previously stored change listener from the
+     * ToggleGroup
      * and removes it from the selectedToggleProperty observable.
      * 
-     * @param <T> the type of the property value and toggle user data
+     * @param <T>         the type of the property value and toggle user data
      * @param toggleGroup the ToggleGroup to unbind
-     * @param property the ObjectProperty to unbind from
-     * 
+     * @param property    the ObjectProperty to unbind from (kept for API symmetry
+     *                    with {@link #bindToggleGroupToProperty}; validated as
+     *                    non-{@code null})
+     *
      * @see #bindToggleGroupToProperty(ToggleGroup, ObjectProperty)
      */
+    @SuppressWarnings("unchecked")
     public static <T> void unbindToggleGroupToProperty(final ToggleGroup toggleGroup,
             final ObjectProperty<T> property) {
+        Objects.requireNonNull(toggleGroup, "toggleGroup cannot be null");
+        Objects.requireNonNull(property, "property cannot be null");
         ChangeListener<Toggle> listener = (ChangeListener<Toggle>) toggleGroup.getProperties().remove("changeListener");
         if (listener != null) {
             toggleGroup.selectedToggleProperty().removeListener(listener);
