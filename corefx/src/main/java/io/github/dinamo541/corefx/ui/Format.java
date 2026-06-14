@@ -2,6 +2,7 @@
  * CoreFx - JavaFX utility library
  * Author: Dominique Mariano Q.C.
  * Date: 10 jun 2026
+ * Package: io.github.dinamo541.corefx.ui
  */
 package io.github.dinamo541.corefx.ui;
 
@@ -10,6 +11,7 @@ import java.text.ParsePosition;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.regex.Pattern;
+
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TextInputControl;
 
@@ -17,48 +19,67 @@ import javafx.scene.control.TextInputControl;
  * Singleton utility class for format management and text input validation in
  * JavaFX.
  * Provides pre-configured formatters for dates, decimal numbers, and custom
- * TextFormatters for validating user input in text fields.
- * 
+ * {@link TextFormatter}s for validating user input in text fields.
+ *
+ * <p>
  * Includes formatters for:
- * - Date formatting (short and medium styles)
- * - Decimal number formatting
- * - Integer-only input validation
- * - ID/Cedula validation
- * - Letter-only input validation
- * - Maximum length input validation
- * 
+ * </p>
+ * <ul>
+ * <li>Date formatting (short and medium styles)</li>
+ * <li>Decimal number formatting</li>
+ * <li>Integer-only input validation</li>
+ * <li>ID/Cedula validation</li>
+ * <li>Letter-only input validation (Unicode-aware)</li>
+ * <li>Maximum length input validation</li>
+ * </ul>
+ *
  * @author Carranza
  * @author Dominique
- * @version 2.3
+ * @version 2.4
  * @since 2026/06/10
  */
-public class Format {
+public final class Format {
 
     /**
      * Inner static class responsible for holding the singleton instance of Format.
      * This approach ensures thread-safe lazy initialization without the need for
      * synchronized blocks.
      */
-    private static class FormatHolder {
+    private static final class FormatHolder {
         private static final Format INSTANCE = new Format();
     }
 
     /**
-     * DateTimeFormatter for displaying dates in short format (e.g., "1/15/09").
+     * Validates an integer composed solely of ASCII digits. Pre-compiled once so
+     * it is not rebuilt on every keystroke.
      */
-    public DateTimeFormatter formatDateShort = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
 
     /**
-     * DateTimeFormatter for displaying dates in medium format (e.g., "Jan 15,
-     * 2009").
+     * Validates a non-negative decimal with up to two fractional digits (after
+     * removing thousands separators). Pre-compiled once for reuse.
      */
-    public DateTimeFormatter formatDateMedium = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+    private static final Pattern TWO_DECIMAL_PATTERN = Pattern.compile("^[0-9]*+(\\.[0-9]{0,2})?$");
 
     /**
-     * DecimalFormat for formatting decimal numbers with thousands separator (e.g.,
-     * "1,234,567.89").
+     * {@link DateTimeFormatter} for displaying dates in short format (e.g.,
+     * "1/15/09"). Immutable and thread-safe, so it is safe to share.
      */
-    public DecimalFormat decimalFormat = new DecimalFormat("#,###,###,##0.00");
+    public final DateTimeFormatter formatDateShort = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+
+    /**
+     * {@link DateTimeFormatter} for displaying dates in medium format (e.g., "Jan
+     * 15, 2009"). Immutable and thread-safe, so it is safe to share.
+     */
+    public final DateTimeFormatter formatDateMedium = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM);
+
+    /**
+     * {@link DecimalFormat} for formatting decimal numbers with a thousands
+     * separator (e.g., "1,234,567.89"). Kept private because {@code DecimalFormat}
+     * is mutable and not thread-safe; callers obtain a private copy through
+     * {@link #getDecimalFormat()}.
+     */
+    private final DecimalFormat decimalFormat = new DecimalFormat("#,###,###,##0.00");
 
     /**
      * Private constructor to prevent instantiation.
@@ -69,7 +90,7 @@ public class Format {
 
     /**
      * Returns the singleton instance of Format.
-     * 
+     *
      * @return the singleton instance of Format
      */
     public static Format getInstance() {
@@ -77,11 +98,24 @@ public class Format {
     }
 
     /**
+     * Returns a fresh, independent copy of the decimal formatter. A copy is
+     * returned (rather than the shared instance) because {@link DecimalFormat} is
+     * mutable and not thread-safe, so callers can configure and use it without
+     * affecting other callers.
+     *
+     * @return a new {@link DecimalFormat} configured with the thousands-separated
+     *         pattern
+     */
+    public DecimalFormat getDecimalFormat() {
+        return (DecimalFormat) decimalFormat.clone();
+    }
+
+    /**
      * Creates a TextFormatter that validates decimal numbers with up to 2 decimal
      * places.
      * Accepts input containing thousands separators (commas).
      * Valid formats: "123", "123.45", "1,234.56", "1,234,567.89"
-     * 
+     *
      * @return a TextFormatter for validating two-decimal number input
      */
     public TextFormatter<String> twoDecimalFormat() {
@@ -95,21 +129,15 @@ public class Format {
 
                 if (object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
                     return null;
-                } else {
-                    Pattern validDoubleText = Pattern.compile("^[0-9]*+(\\.[0-9]{0,2})?$");
-                    if (validDoubleText.matcher(c.getControlNewText().replace(",", "")).matches()) {
-                        return c;
-                    } else {
-                        return null;
-                    }
-                }
-            } else {
-                Pattern validDoubleText = Pattern.compile("^[0-9]*+(\\.[0-9]{0,2})?$");
-                if (validDoubleText.matcher(c.getControlNewText().replace(",", "")).matches()) {
+                } else if (TWO_DECIMAL_PATTERN.matcher(c.getControlNewText().replace(",", "")).matches()) {
                     return c;
                 } else {
                     return null;
                 }
+            } else if (TWO_DECIMAL_PATTERN.matcher(c.getControlNewText().replace(",", "")).matches()) {
+                return c;
+            } else {
+                return null;
             }
         });
         return numericFormat;
@@ -119,7 +147,7 @@ public class Format {
      * Creates a TextFormatter that validates integer-only input.
      * Rejects any non-numeric characters, decimal points, and negative signs.
      * Valid formats: "0", "123", "1234567"
-     * 
+     *
      * @return a TextFormatter for validating integer input
      */
     public TextFormatter<String> integerFormat() {
@@ -127,9 +155,7 @@ public class Format {
             if (c.getControlNewText().isEmpty()) {
                 return c;
             }
-
-            Pattern validDoubleText = Pattern.compile("\\d+");
-            if (validDoubleText.matcher(c.getControlNewText()).matches()) {
+            if (INTEGER_PATTERN.matcher(c.getControlNewText()).matches()) {
                 return c;
             } else {
                 return null;
@@ -143,11 +169,11 @@ public class Format {
      * Accepts alphanumeric characters and hyphens, preventing consecutive hyphens.
      * Enforces a maximum length limit if specified.
      * Valid formats: "12345-6789", "ABC-123-DEF"
-     * 
+     *
      * @param maxLength the maximum allowed length (0 or negative for unlimited)
      * @return a TextFormatter for validating ID input
      */
-    public TextFormatter<String> idFormat(Integer maxLength) {
+    public TextFormatter<String> idFormat(int maxLength) {
         TextFormatter<String> idFormatter = new TextFormatter<>(c -> {
             if (c.getControlNewText().isEmpty()) {
                 return c;
@@ -173,14 +199,15 @@ public class Format {
     /**
      * Creates a TextFormatter that validates letter-only input with optional
      * spaces.
-     * Rejects numbers and special characters. Prevents consecutive spaces.
+     * Accepts Unicode letters (including accents, e.g. "María", "Ñoño"), rejecting
+     * digits and special characters. Prevents consecutive spaces.
      * Enforces a maximum length limit if specified.
-     * Valid formats: "John", "Jose Maria", "Maria Jose"
-     * 
+     * Valid formats: "John", "Jose Maria", "María José"
+     *
      * @param maxLength the maximum allowed length (0 or negative for unlimited)
      * @return a TextFormatter for validating letter-only input
      */
-    public TextFormatter<String> lettersFormat(Integer maxLength) {
+    public TextFormatter<String> lettersFormat(int maxLength) {
         TextFormatter<String> lettersFormatter = new TextFormatter<>(c -> {
             if (c.getControlNewText().isEmpty()) {
                 return c;
@@ -193,7 +220,7 @@ public class Format {
                     return null;
                 }
             }
-            if (c.getControlNewText().matches(".*[^a-zA-Z ].*")) {
+            if (c.getControlNewText().matches(".*[^\\p{L} ].*")) {
                 return null;
             }
             if (c.getControlNewText().matches(".*\\s{2,}.*")) {
@@ -209,11 +236,11 @@ public class Format {
      * Creates a TextFormatter that enforces a maximum length limit on text input.
      * Prevents the user from typing beyond the specified length.
      * Allows deletion of characters.
-     * 
+     *
      * @param length the maximum allowed text length
      * @return a TextFormatter for enforcing maximum length
      */
-    public TextFormatter<String> maxLengthFormat(Integer length) {
+    public TextFormatter<String> maxLengthFormat(int length) {
         TextFormatter<String> maxLengthFormat = new TextFormatter<>(c -> {
             if (c.getControlNewText().isEmpty()) {
                 return c;
@@ -232,7 +259,7 @@ public class Format {
 
     /**
      * Returns a string representation of this Format singleton.
-     * 
+     *
      * @return string representation
      */
     @Override
@@ -242,7 +269,7 @@ public class Format {
 
     /**
      * Computes the hash code for this singleton class.
-     * 
+     *
      * @return hash code
      */
     @Override
@@ -252,7 +279,7 @@ public class Format {
 
     /**
      * Compares this Format singleton with another object for equality.
-     * 
+     *
      * @param obj the object to compare with
      * @return true if the objects are of the same class, false otherwise
      */
@@ -267,7 +294,7 @@ public class Format {
 
     /**
      * Prevents cloning of this singleton class.
-     * 
+     *
      * @throws CloneNotSupportedException always, to prevent cloning
      */
     @Override

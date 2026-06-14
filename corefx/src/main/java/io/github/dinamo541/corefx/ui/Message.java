@@ -6,7 +6,9 @@
  */
 package io.github.dinamo541.corefx.ui;
 
+import java.util.Objects;
 import java.util.Optional;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -20,35 +22,51 @@ import javafx.stage.Window;
 
 /**
  * Utility class for displaying alert dialogs and user messages in JavaFX.
- * Provides methods for showing different types of alerts (error, warning,
- * confirmation, information)
- * with customizable titles and messages. Automatically configures dialog
- * appearance,
- * content wrapping, and dimensions based on message length.
- * 
- * Supports both modal and non-modal alert displays, as well as confirmation
- * dialogs
- * with boolean return values for user response handling.
- * 
+ * Provides static methods for showing different types of alerts (error, warning,
+ * confirmation, information) with customizable titles and messages, and
+ * automatically configures dialog appearance, content wrapping, and dimensions
+ * based on message length.
+ *
+ * <p>
+ * Supports both modal and non-modal displays, as well as confirmation dialogs
+ * that return a boolean response.
+ * </p>
+ *
+ * <p>
+ * This is a utility class and should not be instantiated.
+ * </p>
+ *
+ * <p>
+ * <b>Note:</b> {@link AlertUtil} offers the same dialogs with self-contained
+ * theming and is the recommended choice for new code; {@code Message} is the
+ * lighter, theme-free equivalent.
+ * </p>
+ *
  * @author Carranza
  * @author Dominique
- * @version 2.3
- * @since 2024-06-10
+ * @version 3.0
+ * @since 2026-06-10
  */
-public class Message {
+public final class Message {
+
+    /**
+     * Private constructor to prevent instantiation of this utility class.
+     */
+    private Message() {
+    }
 
     /**
      * Displays a non-modal alert dialog of the specified type.
      * The dialog is shown without blocking the application thread.
-     * 
+     *
      * @param alertType the type of alert (ERROR, WARNING, CONFIRMATION,
      *                  INFORMATION)
      * @param title     the window title of the alert
      * @param message   the message content to display
-     * 
+     *
      * @see AlertType
      */
-    public void show(AlertType alertType, String title, String message) {
+    public static void show(AlertType alertType, String title, String message) {
         Alert alert = predefinedSets(alertType, title, message);
         alert.show();
     }
@@ -57,16 +75,16 @@ public class Message {
      * Displays a modal alert dialog that blocks user interaction with the specified
      * parent window.
      * Waits for the user to respond before continuing.
-     * 
+     *
      * @param alertType the type of alert (ERROR, WARNING, CONFIRMATION,
      *                  INFORMATION)
      * @param title     the window title of the alert
      * @param parent    the parent window that owns this alert
      * @param message   the message content to display
-     * 
+     *
      * @see AlertType
      */
-    public void showModal(AlertType alertType, String title, Window parent, String message) {
+    public static void showModal(AlertType alertType, String title, Window parent, String message) {
         Alert alert = predefinedSets(alertType, title, message);
         alert.initOwner(parent);
         alert.showAndWait();
@@ -75,14 +93,14 @@ public class Message {
     /**
      * Displays a confirmation dialog and returns whether the user clicked OK.
      * The dialog blocks user interaction with the parent window.
-     * 
+     *
      * @param title   the window title of the alert
      * @param parent  the parent window that owns this alert
      * @param message the message content to display
      * @return true if the user clicked OK, false if they clicked Cancel or closed
      *         the dialog
      */
-    public Boolean showConfirmation(String title, Window parent, String message) {
+    public static boolean showConfirmation(String title, Window parent, String message) {
         Alert alert = predefinedSets(AlertType.CONFIRMATION, title, message);
         alert.initOwner(parent);
         Optional<ButtonType> result = alert.showAndWait();
@@ -94,14 +112,14 @@ public class Message {
      * Displays a yes/no confirmation dialog and returns the user's choice.
      * The dialog blocks user interaction with the parent window.
      * Button options are "NO" and "YES" instead of "Cancel" and "OK".
-     * 
+     *
      * @param title   the window title of the alert
      * @param parent  the parent window that owns this alert
      * @param message the message content to display
      * @return true if the user clicked YES, false if they clicked NO or closed the
      *         dialog
      */
-    public Boolean askYesOrNoBoolean(String title, Window parent, String message) {
+    public static boolean askYesOrNoBoolean(String title, Window parent, String message) {
         Alert alert = predefinedSets(AlertType.CONFIRMATION, title, message);
         alert.initOwner(parent);
         alert.getButtonTypes().setAll(ButtonType.NO, ButtonType.YES);
@@ -112,22 +130,18 @@ public class Message {
 
     /**
      * Configures a new Alert with predefined settings.
-     * Sets title, removes header text, and configures message content.
-     * Does not apply stylesheets or custom graphics (commented out for optional
-     * use).
-     * 
+     * Sets the title, removes the header text, and configures the message content.
+     *
      * @param alertType the type of alert to create
      * @param title     the window title
      * @param message   the message content
      * @return a configured Alert instance
      */
-    private Alert predefinedSets(AlertType alertType, String title, String message) {
+    private static Alert predefinedSets(AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
         configureContent(alert, message);
-        // addStyleSheets(alert);
-        // alert.setOnShown(e -> applyButtonsStyles(alert));
         return alert;
     }
 
@@ -137,11 +151,11 @@ public class Message {
      * 720px).
      * Each character is approximated to be 7 pixels wide, plus 160 pixels for
      * padding.
-     * 
+     *
      * @param alert   the Alert whose content should be configured
      * @param message the message text to display
      */
-    private void configureContent(Alert alert, String message) {
+    private static void configureContent(Alert alert, String message) {
         String text = message == null ? "" : message;
 
         Label content = new Label(text);
@@ -164,15 +178,19 @@ public class Message {
     }
 
     /**
-     * Loads an icon image from the specified resource path.
-     * Resizes the icon to 32x32 pixels for display in alerts.
-     * 
-     * @param path the resource path to the icon image file
-     * @return an ImageView containing the loaded and scaled icon
+     * Loads an icon image from the specified resource path and scales it to 32x32
+     * pixels for display in alerts. Resolution is delegated to {@link ImageUtil},
+     * so classpath resources, URLs, and local files are all supported.
+     *
+     * @param path the location of the icon image (must not be {@code null} or
+     *             blank)
+     * @return an {@link ImageView} containing the loaded and scaled icon
+     * @throws IllegalArgumentException if {@code path} is {@code null}/blank or the
+     *                                  image cannot be loaded
      */
-    public ImageView loadIcon(String path) {
-        ImageView icon = new ImageView(
-                new Image(getClass().getResource(path).toExternalForm()));
+    public static ImageView loadIcon(String path) {
+        Image image = ImageUtil.load(path);
+        ImageView icon = new ImageView(image);
         icon.setFitWidth(32);
         icon.setFitHeight(32);
         return icon;
@@ -180,12 +198,15 @@ public class Message {
 
     /**
      * Applies custom CSS classes to alert buttons based on their text content.
-     * Maps "OK" and "Aceptar" buttons to "btn-accept" style class.
-     * Maps "Cancel" and "Cancelar" buttons to "btn-cancel" style class.
-     * 
-     * @param alert the Alert whose buttons should be styled
+     * Maps "OK" and "Aceptar" buttons to the "btn-accept" style class, and
+     * "Cancel" and "Cancelar" buttons to the "btn-cancel" style class.
+     *
+     * @param alert the Alert whose buttons should be styled (must not be
+     *              {@code null})
+     * @throws NullPointerException if {@code alert} is {@code null}
      */
-    public void applyButtonsStyles(Alert alert) {
+    public static void applyButtonsStyles(Alert alert) {
+        Objects.requireNonNull(alert, "alert cannot be null");
         DialogPane dialogPane = alert.getDialogPane();
 
         dialogPane.lookupAll(".button").forEach(node -> {
@@ -204,8 +225,8 @@ public class Message {
     }
 
     /**
-     * Returns a string representation of this Message utility class.
-     * 
+     * Returns a string representation of this {@code Message} singleton.
+     *
      * @return string representation
      */
     @Override
@@ -214,18 +235,18 @@ public class Message {
     }
 
     /**
-     * Computes the hash code for this utility class.
-     * 
+     * Computes the hash code for this singleton class.
+     *
      * @return hash code
      */
     @Override
     public int hashCode() {
-        return java.util.Objects.hash();
+        return Objects.hash();
     }
 
     /**
-     * Compares this Message utility class with another object for equality.
-     * 
+     * Compares this {@code Message} singleton with another object for equality.
+     *
      * @param obj the object to compare with
      * @return true if the objects are of the same class, false otherwise
      */
@@ -239,8 +260,8 @@ public class Message {
     }
 
     /**
-     * Prevents cloning of this utility class.
-     * 
+     * Prevents cloning of this singleton class.
+     *
      * @throws CloneNotSupportedException always, to prevent cloning
      */
     @Override

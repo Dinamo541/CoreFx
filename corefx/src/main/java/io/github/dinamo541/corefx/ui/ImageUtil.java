@@ -34,7 +34,8 @@ import javafx.scene.shape.Rectangle;
  * </p>
  *
  * <p>
- * Beyond loading, the class offers common view-shaping helpers (scaled, circular
+ * Beyond loading, the class offers common view-shaping helpers (scaled,
+ * circular
  * and rounded {@link ImageView}s) and lightweight, pure-Java pixel processing
  * (grayscale conversion and node snapshots) that rely only on the native JavaFX
  * platform, so the library adds no external dependencies.
@@ -44,8 +45,8 @@ import javafx.scene.shape.Rectangle;
  * This is a utility class and should not be instantiated.
  * </p>
  *
- * @author Dominique
  * @author Sem
+ * @author Dominique
  * @version 1.0
  * @since 2026/06/10
  */
@@ -88,13 +89,13 @@ public final class ImageUtil {
      * Loads and rescales an image at load time, which is more memory-efficient
      * than loading at full size and scaling afterwards.
      *
-     * @param location      the image location (must not be {@code null} or blank)
+     * @param location        the image location (must not be {@code null} or blank)
      * @param requestedWidth  the target width in pixels ({@code 0} to infer from
      *                        height while preserving ratio)
      * @param requestedHeight the target height in pixels ({@code 0} to infer from
      *                        width while preserving ratio)
-     * @param preserveRatio whether to preserve the source aspect ratio
-     * @param smooth        whether to apply higher-quality (slower) filtering
+     * @param preserveRatio   whether to preserve the source aspect ratio
+     * @param smooth          whether to apply higher-quality (slower) filtering
      * @return the loaded, rescaled {@link Image}
      * @throws IllegalArgumentException if {@code location} is {@code null}/blank
      *                                  or the image cannot be loaded
