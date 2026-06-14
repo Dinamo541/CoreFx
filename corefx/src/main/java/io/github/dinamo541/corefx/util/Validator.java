@@ -43,8 +43,8 @@ import java.util.regex.Pattern;
  * avoid catastrophic regex performance against hostile input.
  * </p>
  *
- * @author Dominique
  * @author Sem
+ * @author Dominique
  * @version 1.0
  * @since 2026/06/10
  */
@@ -65,13 +65,17 @@ public final class Validator {
     /** Matches an optionally signed integer. */
     private static final Pattern INTEGER = Pattern.compile("[+-]?\\d+");
 
-    /** Matches an optionally signed decimal number (e.g. {@code -12}, {@code 3.14}). */
+    /**
+     * Matches an optionally signed decimal number (e.g. {@code -12}, {@code 3.14}).
+     */
     private static final Pattern DECIMAL = Pattern.compile("[+-]?\\d+(\\.\\d+)?");
 
     /** Matches one or more Unicode letters. */
     private static final Pattern ALPHABETIC = Pattern.compile("\\p{L}+");
 
-    /** Matches one or more Unicode letters and spaces (no leading/trailing space). */
+    /**
+     * Matches one or more Unicode letters and spaces (no leading/trailing space).
+     */
     private static final Pattern ALPHABETIC_SPACES = Pattern.compile("\\p{L}+(\\s\\p{L}+)*");
 
     /** Matches one or more Unicode letters or digits. */
@@ -294,8 +298,8 @@ public final class Validator {
      * @param regex the regular expression (may be {@code null})
      * @return {@code true} if {@code value} fully matches {@code regex}
      */
-    public boolean matches(String value, String regex) { 
-        
+    public boolean matches(String value, String regex) {
+
         if (value == null || regex == null) {
             return false;
         }

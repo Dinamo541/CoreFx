@@ -41,9 +41,9 @@ import java.util.Objects;
  * with the fluent {@link #with(String, Object)} builder.
  * </p>
  *
+ * @author Sem
  * @author Carranza
  * @author Dominique
- * @author Sem
  * @version 2.1
  * @since 2026/06/10
  */
@@ -52,7 +52,9 @@ public class Answer implements java.io.Serializable, Cloneable {
     @java.io.Serial
     private static final long serialVersionUID = 1L;
 
-    /** Operation outcome flag; {@code true} on success, {@code false} on failure. */
+    /**
+     * Operation outcome flag; {@code true} on success, {@code false} on failure.
+     */
     private Boolean state;
 
     /** Human-readable message intended to be shown to the end user. */
@@ -345,7 +347,7 @@ public class Answer implements java.io.Serializable, Cloneable {
      */
     public Answer with(String key, Object value) {
         setResult(key, value);
-        return this; 
+        return this;
     }
 
     /**
@@ -367,7 +369,7 @@ public class Answer implements java.io.Serializable, Cloneable {
      * @return an unmodifiable view of the result map (never {@code null})
      */
     public Map<String, Object> getResults() {
-        return Collections.unmodifiableMap(result);  
+        return Collections.unmodifiableMap(result);
     }
 
     // ---------------------------------------------------------------------
@@ -396,7 +398,7 @@ public class Answer implements java.io.Serializable, Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(state, message, internalMessage, result); 
+        return Objects.hash(state, message, internalMessage, result);
     }
 
     /**
