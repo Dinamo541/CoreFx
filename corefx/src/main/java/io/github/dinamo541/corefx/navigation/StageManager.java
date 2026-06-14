@@ -40,7 +40,8 @@ import javafx.stage.Stage;
  * <p>
  * <b>Thread safety.</b> Every method that mutates the UI delegates to
  * {@link #runOnFxThread(Runnable)}, which runs the action immediately when the
- * caller is already on the JavaFX Application Thread and otherwise defers it via
+ * caller is already on the JavaFX Application Thread and otherwise defers it
+ * via
  * {@link Platform#runLater(Runnable)}. This makes the manager safe to call from
  * background threads without the caller having to reason about threading, which
  * is essential for a reusable library consumed by arbitrary applications.
@@ -381,8 +382,8 @@ public final class StageManager {
     /**
      * Sets whether the stage stays on top of other windows.
      *
-     * @param stage        the target stage (must not be {@code null})
-     * @param alwaysOnTop  {@code true} to keep the window on top
+     * @param stage       the target stage (must not be {@code null})
+     * @param alwaysOnTop {@code true} to keep the window on top
      * @throws NullPointerException if {@code stage} is {@code null}
      */
     public void setAlwaysOnTop(Stage stage, boolean alwaysOnTop) {
