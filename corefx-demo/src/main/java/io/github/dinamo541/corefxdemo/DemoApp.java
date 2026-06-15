@@ -11,6 +11,8 @@ import java.util.Map;
 
 import io.github.dinamo541.corefx.navigation.AppContext;
 import io.github.dinamo541.corefx.navigation.FlowController;
+import io.github.dinamo541.corefx.navigation.StageManager;
+import io.github.dinamo541.corefx.persistence.EntityManagerHelper;
 import io.github.dinamo541.corefx.ui.AlertUtil;
 import io.github.dinamo541.corefx.ui.AlertUtil.AlertTheme;
 import io.github.dinamo541.corefx.ui.BindingUtils;
@@ -20,6 +22,7 @@ import io.github.dinamo541.corefx.ui.Message;
 import io.github.dinamo541.corefx.ui.TableUtils;
 import io.github.dinamo541.corefx.ui.ThemeManager;
 import io.github.dinamo541.corefx.util.Answer;
+import io.github.dinamo541.corefx.util.Validator;
 
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
@@ -67,12 +70,6 @@ import javafx.stage.Stage;
  * building one tab is shown inside that tab instead of bringing the whole
  * application down.
  * </p>
- *
- * <p>
- * Classes still shipped as empty stubs in the current branch ({@code Validator},
- * {@code EntityManagerHelper}, {@code StageManager}) are listed on the Overview
- * tab as pending rather than demonstrated, because they expose no API yet.
- * </p>
  */
 public class DemoApp extends Application {
 
@@ -94,6 +91,7 @@ public class DemoApp extends Application {
         // crash the showcase.
         addTab(tabs, "Overview", this::buildOverviewTab);
         addTab(tabs, "Answer", () -> buildAnswerTab());
+        addTab(tabs, "Validator", () -> buildValidatorTab());
         addTab(tabs, "AppContext", () -> buildAppContextTab());
         addTab(tabs, "Format", () -> buildFormatTab());
         addTab(tabs, "BindingUtils", () -> buildBindingUtilsTab());
@@ -102,7 +100,9 @@ public class DemoApp extends Application {
         addTab(tabs, "ImageUtil", () -> buildImageUtilTab());
         addTab(tabs, "TableUtils", () -> buildTableUtilsTab());
         addTab(tabs, "ThemeManager", () -> buildThemeManagerTab());
+        addTab(tabs, "StageManager", () -> buildStageManagerTab());
         addTab(tabs, "FlowController", () -> buildFlowControllerTab());
+        addTab(tabs, "EntityManager", () -> buildEntityManagerTab());
 
         Scene scene = new Scene(tabs, 920, 640);
 
@@ -133,23 +133,20 @@ public class DemoApp extends Application {
         Label implementedTitle = h2("Demonstrated classes");
         VBox implemented = new VBox(4,
                 bullet("Answer — generic operation result wrapper (util)"),
+                bullet("Validator — null-safe predicates & throwing contract checks (util)"),
                 bullet("AppContext — global key/value application state (navigation)"),
                 bullet("Format — live text-input formatters & locale formatting (ui)"),
                 bullet("BindingUtils — bind a ToggleGroup to a property (ui)"),
-                bullet("Message — classic alert helper (ui)"),
+                bullet("Message — classic, theme-free alert helper (ui)"),
                 bullet("AlertUtil — self-themed alerts, dark/light/custom/raw CSS (ui)"),
                 bullet("ImageUtil — load, shape and process images (ui)"),
                 bullet("TableUtils — typed columns + live search filter (ui)"),
                 bullet("ThemeManager — live, app-wide theme switching (ui)"),
-                bullet("FlowController — scene creation + theme applier bridge (navigation)"));
+                bullet("StageManager — window registry & life-cycle control (navigation)"),
+                bullet("FlowController — scene creation + theme applier bridge (navigation)"),
+                bullet("EntityManagerHelper — provider-agnostic persistence holder (persistence)"));
 
-        Label pendingTitle = h2("Pending (empty stubs in this branch)");
-        VBox pending = new VBox(4,
-                muted("Validator — not implemented yet"),
-                muted("EntityManagerHelper — not implemented yet"),
-                muted("StageManager — not implemented yet"));
-
-        VBox box = section(title, intro, implementedTitle, implemented, pendingTitle, pending);
+        VBox box = section(title, intro, implementedTitle, implemented);
         return scroll(box);
     }
 
@@ -166,18 +163,20 @@ public class DemoApp extends Application {
 
         Button success = new Button("Build a SUCCESS answer");
         success.setOnAction(e -> {
-            Answer answer = new Answer(Boolean.TRUE, "User saved successfully", "INSERT ok, id=42");
-            answer.setResult("id", 42);
-            answer.setResult("username", "sem");
-            answer.setResult("createdAt", LocalDate.now().toString());
+            // Uses the static factories + fluent with(...) builder, exactly as a
+            // consumer would in real code.
+            Answer answer = Answer.success("User saved successfully", "INSERT ok, id=42")
+                    .with("id", 42)
+                    .with("username", "sem")
+                    .with("createdAt", LocalDate.now().toString());
             output.setText(render(answer));
         });
 
         Button failure = new Button("Build a FAILURE answer");
         failure.setOnAction(e -> {
-            Answer answer = new Answer(Boolean.FALSE, "The email is already in use",
-                    "UNIQUE constraint violated on column 'email'");
-            answer.setResult("field", "email");
+            Answer answer = Answer.failure("The email is already in use",
+                    "UNIQUE constraint violated on column 'email'")
+                    .with("field", "email");
             output.setText(render(answer));
         });
 
@@ -187,6 +186,7 @@ public class DemoApp extends Application {
     private String render(Answer answer) {
         StringBuilder sb = new StringBuilder();
         sb.append("state           = ").append(answer.getState()).append('\n');
+        sb.append("isSuccess()     = ").append(answer.isSuccess()).append('\n');
         sb.append("message         = ").append(answer.getMessage()).append('\n');
         sb.append("internalMessage = ").append(answer.getInternalMessage()).append('\n');
         sb.append("results:\n");
@@ -195,6 +195,81 @@ public class DemoApp extends Application {
         }
         sb.append('\n').append("toString(): ").append(answer);
         return sb.toString();
+    }
+
+    // =====================================================================
+    // Validator (util)
+    // =====================================================================
+
+    private Region buildValidatorTab() {
+        Label title = h1("Validator");
+        Label desc = body("A null-safe predicate suite plus throwing contract validators. "
+                + "Type below to see every predicate evaluate live; the predicates never "
+                + "throw, returning false for input that cannot satisfy them.");
+
+        Validator v = Validator.getInstance();
+
+        TextField input = field("Type anything: an e-mail, a number, a name…");
+        TextArea predicates = readOnlyArea(9);
+        Runnable evaluate = () -> {
+            String s = input.getText();
+            StringBuilder sb = new StringBuilder();
+            sb.append("isBlank             = ").append(v.isBlank(s)).append('\n');
+            sb.append("isNotBlank          = ").append(v.isNotBlank(s)).append('\n');
+            sb.append("isNumeric           = ").append(v.isNumeric(s)).append('\n');
+            sb.append("isInteger           = ").append(v.isInteger(s)).append('\n');
+            sb.append("isDecimal           = ").append(v.isDecimal(s)).append('\n');
+            sb.append("isAlphabetic        = ").append(v.isAlphabetic(s)).append('\n');
+            sb.append("isAlphabeticWSpaces = ").append(v.isAlphabeticWithSpaces(s)).append('\n');
+            sb.append("isAlphanumeric      = ").append(v.isAlphanumeric(s)).append('\n');
+            sb.append("isEmail             = ").append(v.isEmail(s)).append('\n');
+            sb.append("hasLengthBetween3-15= ").append(v.hasLengthBetween(s, 3, 15));
+            predicates.setText(sb.toString());
+        };
+        input.textProperty().addListener((obs, old, now) -> evaluate.run());
+        evaluate.run();
+
+        // Contract validators: succeed silently or throw a descriptive exception,
+        // which the demo catches and reports rather than crashing.
+        Label contractResult = new Label();
+        TextField ageField = field("Age 0–120 (try 200 to see it fail)");
+        ageField.setTextFormatter(Format.getInstance().integerFormat());
+
+        Button requireBlank = new Button("requireNotBlank(input, \"field\")");
+        requireBlank.setOnAction(e -> contractResult.setText(run(() -> {
+            v.requireNotBlank(input.getText(), "field");
+            return "OK — \"" + input.getText() + "\" is not blank";
+        })));
+
+        Button requireRange = new Button("requireInRange(age, 0, 120)");
+        requireRange.setOnAction(e -> contractResult.setText(run(() -> {
+            long age = ageField.getText().isBlank() ? -1 : Long.parseLong(ageField.getText());
+            v.requireInRange(age, 0, 120, "age");
+            return "OK — age " + age + " is in range";
+        })));
+
+        return scroll(section(title, desc,
+                labeled("Live input", input),
+                h2("Predicates"), predicates,
+                h2("Contract validators (throw on violation)"),
+                labeled("Age", ageField),
+                new HBox(10, requireBlank, requireRange),
+                contractResult));
+    }
+
+    /** Runs a throwing action, returning either its success text or the caught error. */
+    private String run(ThrowingSupplier action) {
+        try {
+            return action.get();
+        } catch (RuntimeException ex) {
+            return "Threw " + ex.getClass().getSimpleName() + ": " + ex.getMessage();
+        }
+    }
+
+    /** A supplier whose body may throw a runtime exception. */
+    @FunctionalInterface
+    private interface ThrowingSupplier {
+        String get();
     }
 
     // =====================================================================
@@ -213,7 +288,9 @@ public class DemoApp extends Application {
 
         TextArea snapshot = readOnlyArea(6);
         AppContext ctx = AppContext.getInstance();
-        Runnable refresh = () -> snapshot.setText(ctx.toString());
+        Runnable refresh = () -> snapshot.setText(ctx.toString()
+                + (key.getText().isBlank() ? "" :
+                "\nget(\"" + key.getText().trim() + "\") = " + ctx.getOrDefault(key.getText().trim(), "<absent>")));
 
         Button put = new Button("put");
         put.setOnAction(e -> {
@@ -224,8 +301,10 @@ public class DemoApp extends Application {
         });
         Button remove = new Button("remove");
         remove.setOnAction(e -> {
-            ctx.remove(key.getText().trim());
-            refresh.run();
+            if (!key.getText().isBlank()) {
+                ctx.remove(key.getText().trim());
+                refresh.run();
+            }
         });
         Button clear = new Button("clear");
         clear.setOnAction(e -> {
@@ -235,8 +314,12 @@ public class DemoApp extends Application {
 
         Label contains = new Label();
         Button check = new Button("contains?");
-        check.setOnAction(e -> contains.setText("contains(\"" + key.getText().trim() + "\") = "
-                + ctx.contains(key.getText().trim())));
+        check.setOnAction(e -> {
+            if (!key.getText().isBlank()) {
+                contains.setText("contains(\"" + key.getText().trim() + "\") = "
+                        + ctx.contains(key.getText().trim()) + "   |   size = " + ctx.size());
+            }
+        });
 
         refresh.run();
         return scroll(section(title, desc,
@@ -276,7 +359,7 @@ public class DemoApp extends Application {
         Label formatted = body(
                 "Today (medium): " + LocalDate.now().format(fmt.formatDateMedium) + "\n"
                 + "Today (short):  " + LocalDate.now().format(fmt.formatDateShort) + "\n"
-                + "Decimal format: " + fmt.decimalFormat.format(1234567.89));
+                + "Decimal format: " + fmt.getDecimalFormat().format(1234567.89));
 
         return scroll(section(title, desc,
                 labeled("Integer", integers),
@@ -313,33 +396,33 @@ public class DemoApp extends Application {
     }
 
     // =====================================================================
-    // Message (ui)
+    // Message (ui) — static utility
     // =====================================================================
 
     private Region buildMessageTab(Stage owner) {
         Label title = h1("Message");
-        Label desc = body("The classic alert helper: information, warning, error, and "
-                + "blocking confirmation / yes-no dialogs. Results are reported below.");
+        Label desc = body("The classic, theme-free alert helper, used purely through its "
+                + "static methods: information, warning, error, and blocking confirmation / "
+                + "yes-no dialogs. Results are reported below.");
 
-        Message message = new Message();
         Label result = new Label();
 
         Button info = new Button("Information");
-        info.setOnAction(e -> message.show(AlertType.INFORMATION, "Information", "A non-blocking notice."));
+        info.setOnAction(e -> Message.show(AlertType.INFORMATION, "Information", "A non-blocking notice."));
 
         Button warn = new Button("Warning");
-        warn.setOnAction(e -> message.show(AlertType.WARNING, "Warning", "Something needs attention."));
+        warn.setOnAction(e -> Message.show(AlertType.WARNING, "Warning", "Something needs attention."));
 
         Button error = new Button("Error");
-        error.setOnAction(e -> message.show(AlertType.ERROR, "Error", "An operation failed."));
+        error.setOnAction(e -> Message.show(AlertType.ERROR, "Error", "An operation failed."));
 
         Button confirm = new Button("Confirmation");
         confirm.setOnAction(e -> result.setText("showConfirmation returned: "
-                + message.showConfirmation("Confirm", owner, "Proceed with the action?")));
+                + Message.showConfirmation("Confirm", owner, "Proceed with the action?")));
 
         Button yesNo = new Button("Yes / No");
         yesNo.setOnAction(e -> result.setText("askYesOrNoBoolean returned: "
-                + message.askYesOrNoBoolean("Question", owner, "Do you like CoreFx?")));
+                + Message.askYesOrNoBoolean("Question", owner, "Do you like CoreFx?")));
 
         return scroll(section(title, desc,
                 new HBox(10, info, warn, error),
@@ -531,6 +614,88 @@ public class DemoApp extends Application {
     }
 
     // =====================================================================
+    // StageManager (navigation)
+    // =====================================================================
+
+    private Region buildStageManagerTab() {
+        Label title = h1("StageManager");
+        Label desc = body("A named registry of stages plus a thread-safe, uniform API for "
+                + "their life cycle and window state. Open a managed window below, then drive "
+                + "it through the manager — every call is marshalled onto the FX thread for you.");
+
+        StageManager stages = StageManager.getInstance();
+        final String key = "demo-secondary";
+
+        Label status = new Label();
+        Runnable refresh = () -> {
+            Stage managed = stages.getStage(key);
+            status.setText("registered keys = " + stages.getKeys()
+                    + "   |   hasStage(\"" + key + "\") = " + stages.hasStage(key)
+                    + (managed != null ? "   |   showing = " + managed.isShowing() : ""));
+        };
+
+        Button open = new Button("Register & show a window");
+        open.setOnAction(e -> {
+            if (!stages.hasStage(key)) {
+                Stage secondary = new Stage();
+                secondary.setTitle("Managed window");
+                Label content = h2("I am a StageManager-managed window");
+                content.setWrapText(true);
+                VBox root = new VBox(content);
+                root.setPadding(new Insets(24));
+                root.setAlignment(Pos.CENTER);
+                secondary.setScene(new Scene(root, 360, 200));
+                stages.register(key, secondary);
+            }
+            stages.show(key);
+            refresh.run();
+        });
+
+        Button center = new Button("Center on screen");
+        center.setOnAction(e -> withManaged(stages, key, status, s -> stages.centerOnScreen(s)));
+
+        Button maximize = new Button("Toggle maximize");
+        maximize.setOnAction(e -> withManaged(stages, key, status, stages::toggleMaximized));
+
+        Button onTop = new Button("Always-on-top ON");
+        onTop.setOnAction(e -> withManaged(stages, key, status, s -> stages.setAlwaysOnTop(s, true)));
+
+        Button half = new Button("Opacity 60%");
+        half.setOnAction(e -> withManaged(stages, key, status, s -> stages.setOpacity(s, 0.6)));
+
+        Button resize = new Button("Resize 500×320");
+        resize.setOnAction(e -> withManaged(stages, key, status, s -> stages.setSize(s, 500, 320)));
+
+        Button close = new Button("Close & unregister");
+        close.setOnAction(e -> {
+            if (stages.hasStage(key)) {
+                stages.close(key);
+            }
+            refresh.run();
+        });
+
+        refresh.run();
+        return scroll(section(title, desc,
+                new HBox(10, open, center, maximize),
+                new HBox(10, onTop, half, resize),
+                close,
+                h2("Manager state"), status));
+    }
+
+    /** Applies an action to the managed stage if present, then refreshes the status line. */
+    private void withManaged(StageManager stages, String key, Label status,
+            java.util.function.Consumer<Stage> action) {
+        Stage stage = stages.getStage(key);
+        if (stage == null) {
+            status.setText("Open the managed window first.");
+            return;
+        }
+        action.accept(stage);
+        status.setText("registered keys = " + stages.getKeys()
+                + "   |   showing = " + stage.isShowing());
+    }
+
+    // =====================================================================
     // FlowController (navigation)
     // =====================================================================
 
@@ -577,6 +742,85 @@ public class DemoApp extends Application {
         });
 
         return scroll(section(title, desc, h2("Controller state"), info, open));
+    }
+
+    // =====================================================================
+    // EntityManagerHelper (persistence)
+    // =====================================================================
+
+    private Region buildEntityManagerTab() {
+        Label title = h1("EntityManagerHelper");
+        Label desc = body("A provider-agnostic holder for a shared persistence context. The "
+                + "consuming app supplies a factory; CoreFx stores, lazily creates, caches and "
+                + "hands back the manager as an opaque object — so the library never depends on "
+                + "JPA. Here the supplier produces a tiny fake \"manager\" so the lifecycle can "
+                + "be exercised without a database.");
+
+        EntityManagerHelper helper = EntityManagerHelper.getInstance();
+        Label status = new Label();
+        Runnable refresh = () -> status.setText(
+                "isInitialized = " + helper.isInitialized()
+                + "   |   hasManager = " + helper.hasManager());
+
+        // initialize() may run only once for the whole process; guard it.
+        Button init = new Button("initialize(supplier)");
+        init.setOnAction(e -> {
+            if (helper.isInitialized()) {
+                status.setText("Already initialized — initialize() only runs once per process.");
+                return;
+            }
+            helper.initialize(FakeManager::new);
+            refresh.run();
+        });
+
+        TextArea output = readOnlyArea(5);
+
+        Button get = new Button("getManager(FakeManager.class)");
+        get.setOnAction(e -> output.setText(run(() -> {
+            FakeManager em = helper.getManager(FakeManager.class);
+            return "Got manager: " + em + "\n(repeated calls return the same cached instance)";
+        })));
+
+        Button reset = new Button("resetManager()");
+        reset.setOnAction(e -> {
+            helper.resetManager();
+            output.setText("Cached manager discarded; next getManager() rebuilds a fresh one.");
+            refresh.run();
+        });
+
+        Button close = new Button("close()");
+        close.setOnAction(e -> {
+            helper.close();
+            output.setText("close() invoked AutoCloseable.close() on the manager and cleared it.");
+            refresh.run();
+        });
+
+        refresh.run();
+        return scroll(section(title, desc,
+                new HBox(10, init, get),
+                new HBox(10, reset, close),
+                h2("Helper state"), status,
+                h2("Output"), output));
+    }
+
+    /**
+     * A stand-in for a real persistence manager (e.g. a JPA {@code EntityManager}).
+     * It implements {@link AutoCloseable} so {@link EntityManagerHelper#close()} can
+     * demonstrate best-effort shutdown without pulling in a persistence provider.
+     */
+    private static final class FakeManager implements AutoCloseable {
+        private static int counter = 0;
+        private final int id = ++counter;
+
+        @Override
+        public void close() {
+            // No-op: a real EntityManager would release its connection here.
+        }
+
+        @Override
+        public String toString() {
+            return "FakeManager#" + id;
+        }
     }
 
     // =====================================================================
@@ -636,12 +880,6 @@ public class DemoApp extends Application {
     private static Label body(String text) {
         Label label = new Label(text);
         label.setWrapText(true);
-        return label;
-    }
-
-    private static Label muted(String text) {
-        Label label = body("•  " + text);
-        label.setTextFill(Color.GRAY);
         return label;
     }
 
