@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Format — CoreFx</title>
+  <meta name="description" content="Format: TextFormatter input filters (integers, 2-decimal, IDs, Unicode letters, max-length) plus shared date/decimal formatters." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="format">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>Format</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>Format</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Input validation and formatting for JavaFX text controls. Provides
+        ready-made <code>TextFormatter</code>s that restrict what users can type —
+        integers, two-decimal numbers, national IDs, Unicode-aware letters and a
+        max-length cap — plus shared, immutable date formatters and a
+        thousands-separated decimal formatter.</span>
+        <span lang="es">Validación y formateo de entrada para controles de texto de JavaFX. Ofrece
+        <code>TextFormatter</code>s listos para usar que restringen lo que el usuario
+        puede teclear — enteros, números de dos decimales, identificaciones, letras
+        compatibles con Unicode y un tope de longitud máxima — más formateadores de
+        fecha inmutables y compartidos y un formateador decimal con separador de
+        miles.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Overview</span><span lang="es">Visión general</span></h2>
+      <p>
+        <span lang="en">Attach a formatter to any <code>TextField</code> with
+        <code>field.setTextFormatter(Format.getInstance().integerFormat())</code>.
+        Each formatter rejects invalid keystrokes as they happen, so the field can
+        never hold malformed input. Regex patterns are pre-compiled once, not
+        rebuilt per keystroke.</span>
+        <span lang="es">Asocia un formateador a cualquier <code>TextField</code> con
+        <code>field.setTextFormatter(Format.getInstance().integerFormat())</code>.
+        Cada formateador rechaza las pulsaciones inválidas a medida que ocurren, así
+        el campo nunca puede contener entrada malformada. Las regex se precompilan una
+        vez, no se reconstruyen en cada pulsación.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>Format fmt = Format.getInstance();
+
+quantityField.setTextFormatter(fmt.integerFormat());
+priceField.setTextFormatter(fmt.twoDecimalFormat());
+idField.setTextFormatter(fmt.idFormat(20));
+nameField.setTextFormatter(fmt.lettersFormat(50));   // accepts "María", "Ñoño"
+noteField.setTextFormatter(fmt.maxLengthFormat(140));
+
+// Display a formatted amount:
+String shown = fmt.getDecimalFormat().format(1234567.89);   // "1,234,567.89"</code></pre>
+
+      <h2 id="formatters"><span lang="en">Input formatters</span><span lang="es">Formateadores de entrada</span></h2>
+      <div class="api-method">
+        <div class="sig">TextFormatter&lt;String&gt; <span class="m-name">integerFormat</span>()</div>
+        <div class="desc"><p><span lang="en">Digits only — no decimals, signs or other characters. Valid: <code>"0"</code>, <code>"123"</code>, <code>"1234567"</code>.</span><span lang="es">Solo dígitos — sin decimales, signos ni otros caracteres. Válidos: <code>"0"</code>, <code>"123"</code>, <code>"1234567"</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">TextFormatter&lt;String&gt; <span class="m-name">twoDecimalFormat</span>()</div>
+        <div class="desc"><p><span lang="en">Non-negative decimals with up to two fractional digits; accepts thousands separators. Valid: <code>"123"</code>, <code>"123.45"</code>, <code>"1,234.56"</code>, <code>"1,234,567.89"</code>.</span><span lang="es">Decimales no negativos con hasta dos dígitos fraccionarios; acepta separadores de miles. Válidos: <code>"123"</code>, <code>"123.45"</code>, <code>"1,234.56"</code>, <code>"1,234,567.89"</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">TextFormatter&lt;String&gt; <span class="m-name">idFormat</span>(int maxLength)</div>
+        <div class="desc"><p><span lang="en">Alphanumerics and single hyphens (no consecutive hyphens). <code>maxLength &le; 0</code> means unlimited. Valid: <code>"12345-6789"</code>, <code>"ABC-123-DEF"</code>.</span><span lang="es">Alfanuméricos y guiones simples (sin guiones consecutivos). <code>maxLength &le; 0</code> significa ilimitado. Válidos: <code>"12345-6789"</code>, <code>"ABC-123-DEF"</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">TextFormatter&lt;String&gt; <span class="m-name">lettersFormat</span>(int maxLength)</div>
+        <div class="desc"><p><span lang="en">Unicode letters and single spaces between words (no digits/symbols, no consecutive spaces). <code>maxLength &le; 0</code> = unlimited. Valid: <code>"John"</code>, <code>"Jose Maria"</code>, <code>"María José"</code>.</span><span lang="es">Letras Unicode y espacios simples entre palabras (sin dígitos/símbolos, sin espacios consecutivos). <code>maxLength &le; 0</code> = ilimitado. Válidos: <code>"John"</code>, <code>"Jose Maria"</code>, <code>"María José"</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">TextFormatter&lt;String&gt; <span class="m-name">maxLengthFormat</span>(int length)</div>
+        <div class="desc"><p><span lang="en">Caps the field at <code>length</code> characters; deletion is always allowed.</span><span lang="es">Limita el campo a <code>length</code> caracteres; el borrado siempre se permite.</span></p></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">🌍</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Unicode-aware letters</span><span lang="es">Letras compatibles con Unicode</span></span>
+          <p><span lang="en"><code>lettersFormat</code> uses the <code>\p{L}</code> letter class, so accented and non-Latin names (María, Ñoño, José) are accepted — a common pain point with naive <code>[a-zA-Z]</code> filters.</span><span lang="es"><code>lettersFormat</code> usa la clase de letra <code>\p{L}</code>, así que se aceptan nombres acentuados y no latinos (María, Ñoño, José) — un punto de dolor habitual con filtros ingenuos <code>[a-zA-Z]</code>.</span></p>
+        </div>
+      </div>
+
+      <h2 id="formatters-shared"><span lang="en">Shared formatters</span><span lang="es">Formateadores compartidos</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Member</span><span lang="es">Miembro</span></th><th><span lang="en">Purpose</span><span lang="es">Propósito</span></th></tr>
+        <tr><td><code>formatDateShort</code> <span style="color:var(--text-faint)">(field)</span></td><td><span lang="en">A <code>DateTimeFormatter</code> for short dates (e.g. "1/15/09"). Immutable, thread-safe, safe to share.</span><span lang="es">Un <code>DateTimeFormatter</code> para fechas cortas (p. ej. "1/15/09"). Inmutable, thread-safe, seguro de compartir.</span></td></tr>
+        <tr><td><code>formatDateMedium</code> <span style="color:var(--text-faint)">(field)</span></td><td><span lang="en">Medium dates (e.g. "Jan 15, 2009"). Same guarantees.</span><span lang="es">Fechas medianas (p. ej. "Jan 15, 2009"). Las mismas garantías.</span></td></tr>
+        <tr><td><code>getDecimalFormat()</code></td><td><span lang="en">Returns a <strong>fresh copy</strong> of the thousands-separated formatter (<code>#,###,###,##0.00</code>).</span><span lang="es">Devuelve una <strong>copia nueva</strong> del formateador con separador de miles (<code>#,###,###,##0.00</code>).</span></td></tr>
+      </table>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Always use getDecimalFormat() — never cache it across threads</span><span lang="es">Usa siempre getDecimalFormat() — nunca lo caches entre hilos</span></span>
+          <p><span lang="en">The underlying <code>DecimalFormat</code> is <strong>mutable and not thread-safe</strong>, so the field is private and <code>getDecimalFormat()</code> hands back an independent clone. Call it where you need it; don't share one instance between threads.</span><span lang="es">El <code>DecimalFormat</code> subyacente es <strong>mutable y no thread-safe</strong>, por eso el campo es privado y <code>getDecimalFormat()</code> devuelve un clon independiente. Llámalo donde lo necesites; no compartas una instancia entre hilos.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> set formatters once when wiring up the view (e.g. in the controller's <code>initialize</code>).</span><span lang="es"><strong>Asigna</strong> los formateadores una vez al armar la vista (p. ej. en el <code>initialize</code> del controlador).</span></p>
+          <p><span lang="en"><strong>Combine</strong> input restriction (a formatter) with post-submit checks via <a href="../util/validator.html">Validator</a> — the formatter stops bad keystrokes, the validator confirms the final value (e.g. range, e-mail).</span><span lang="es"><strong>Combina</strong> la restricción de entrada (un formateador) con comprobaciones tras el envío vía <a href="../util/validator.html">Validator</a> — el formateador detiene pulsaciones malas, el validador confirma el valor final (p. ej. rango, e-mail).</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="table-utils.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← TableUtils</div></a>
+        <a class="next" href="binding-utils.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">BindingUtils →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

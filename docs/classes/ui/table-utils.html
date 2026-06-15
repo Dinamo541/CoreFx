@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TableUtils — CoreFx</title>
+  <meta name="description" content="TableUtils: type-safe TableView setup — lambda columns, items, selection, placeholders and a live search filter." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="table-utils">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>TableUtils</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>TableUtils</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Static utility</span><span lang="es">Utilidad estática</span></span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Type-safe, lambda-first helpers for <code>TableView</code>. Build columns
+        from extractor functions (no stringly-typed property names), populate and
+        select rows, set placeholders, and install a ready-made live search filter
+        that coexists with the table's own column sorting.</span>
+        <span lang="es">Ayudantes con tipos seguros y orientados a lambdas para <code>TableView</code>.
+        Construye columnas a partir de funciones extractoras (sin nombres de propiedad
+        como cadenas), puebla y selecciona filas, fija placeholders e instala un filtro
+        de búsqueda en vivo listo para usar que convive con el propio ordenamiento por
+        columnas de la tabla.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Why lambda columns</span><span lang="es">Por qué columnas con lambdas</span></h2>
+      <p>
+        <span lang="en">The classic <code>PropertyValueFactory("name")</code> is reflection-based
+        and fails silently at runtime if the property name is wrong.
+        <code>TableUtils.createColumn(title, Person::getName)</code> is checked at
+        compile time and refactor-safe. The <code>PropertyValueFactory</code> path
+        is still offered for JavaBean models that need it.</span>
+        <span lang="es">El clásico <code>PropertyValueFactory("name")</code> se basa en reflexión y
+        falla en silencio en tiempo de ejecución si el nombre de la propiedad es
+        incorrecto. <code>TableUtils.createColumn(title, Person::getName)</code> se
+        comprueba en tiempo de compilación y es seguro ante refactorizaciones. La vía
+        de <code>PropertyValueFactory</code> se sigue ofreciendo para modelos JavaBean
+        que la necesiten.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>// Columns from method references — type-safe:
+TableUtils.addColumn(table, "Name",  Person::getName);
+TableUtils.addColumn(table, "Email", Person::getEmail);
+
+// Populate and get the backing observable list:
+ObservableList&lt;Person&gt; data = TableUtils.setItems(table, people);
+TableUtils.setPlaceholder(table, "No people yet");
+
+// Live search bound to a text field (filtering + sorting coexist):
+TableUtils.installFilter(table, data, searchField,
+        (person, query) -&gt; person.getName().toLowerCase().contains(query.toLowerCase()));</code></pre>
+
+      <h2 id="columns"><span lang="en">Column creation</span><span lang="es">Creación de columnas</span></h2>
+      <div class="api-method">
+        <div class="sig">static &lt;S,T&gt; TableColumn&lt;S,T&gt; <span class="m-name">createColumn</span>(String title, Function&lt;S,T&gt; extractor)</div>
+        <div class="desc"><p><span lang="en">A column whose value is derived from each row by <code>extractor</code>. Type-safe, naming-independent. Both args non-null.</span><span lang="es">Una columna cuyo valor se deriva de cada fila mediante <code>extractor</code>. Con tipos seguros e independiente de nombres. Ambos argumentos no null.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static &lt;S,T&gt; TableColumn&lt;S,T&gt; <span class="m-name">createPropertyColumn</span>(String title, String propertyName)</div>
+        <div class="desc"><p><span lang="en">A column bound to a JavaBean property by name (via <code>PropertyValueFactory</code>). <code>propertyName</code> must be non-blank. Prefer <code>createColumn</code> for compile-time safety.</span><span lang="es">Una columna ligada a una propiedad JavaBean por nombre (vía <code>PropertyValueFactory</code>). <code>propertyName</code> no puede estar en blanco. Prefiere <code>createColumn</code> por la seguridad en compilación.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static &lt;S,T&gt; TableColumn&lt;S,T&gt; <span class="m-name">addColumn</span>(TableView&lt;S&gt; table, String title, Function&lt;S,T&gt; extractor)</div>
+        <div class="desc"><p><span lang="en">Creates a column with <code>createColumn</code> and appends it to the table, returning it.</span><span lang="es">Crea una columna con <code>createColumn</code> y la añade a la tabla, devolviéndola.</span></p></div>
+      </div>
+
+      <h2 id="items"><span lang="en">Items &amp; placeholder</span><span lang="es">Items y placeholder</span></h2>
+      <div class="api-method">
+        <div class="sig">static &lt;S&gt; ObservableList&lt;S&gt; <span class="m-name">setItems</span>(TableView&lt;S&gt; table, Collection&lt;S&gt; items)</div>
+        <div class="desc"><p><span lang="en">Replaces the table's items, returning the new backing <code>ObservableList</code>. A <code>null</code> collection clears the table.</span><span lang="es">Reemplaza los items de la tabla, devolviendo la nueva <code>ObservableList</code> de respaldo. Una colección <code>null</code> vacía la tabla.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static &lt;S&gt; void <span class="m-name">setPlaceholder</span>(TableView&lt;S&gt; table, String text)</div>
+        <div class="desc"><p><span lang="en">Text shown when there are no visible rows. <code>null</code> shows no placeholder.</span><span lang="es">Texto mostrado cuando no hay filas visibles. <code>null</code> no muestra placeholder.</span></p></div>
+      </div>
+
+      <h2 id="selection"><span lang="en">Selection</span><span lang="es">Selección</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Returns / behaviour</span><span lang="es">Devuelve / comportamiento</span></th></tr>
+        <tr><td><code>enableMultiSelection(table)</code></td><td><span lang="en">Switches to multiple-row selection.</span><span lang="es">Cambia a selección de múltiples filas.</span></td></tr>
+        <tr><td><code>getSelectedItem(table)</code></td><td><span lang="en">The selected row, or <code>null</code>.</span><span lang="es">La fila seleccionada, o <code>null</code>.</span></td></tr>
+        <tr><td><code>getSelectedItems(table)</code></td><td><span lang="en">An unmodifiable snapshot of all selected rows.</span><span lang="es">Una instantánea no modificable de todas las filas seleccionadas.</span></td></tr>
+        <tr><td><code>clearSelection(table)</code></td><td><span lang="en">Clears the selection.</span><span lang="es">Limpia la selección.</span></td></tr>
+        <tr><td><code>selectFirst(table)</code></td><td><span lang="en">Selects the first row if any exist.</span><span lang="es">Selecciona la primera fila si existe alguna.</span></td></tr>
+      </table>
+
+      <h2 id="filter"><span lang="en">Live search filter</span><span lang="es">Filtro de búsqueda en vivo</span></h2>
+      <div class="api-method">
+        <div class="sig">static &lt;S&gt; FilteredList&lt;S&gt; <span class="m-name">installFilter</span>(TableView&lt;S&gt; table, ObservableList&lt;S&gt; source, TextField searchField, BiPredicate&lt;S,String&gt; matcher)</div>
+        <div class="desc">
+          <p><span lang="en">Narrows the table as the user types. The source is wrapped in a <code>FilteredList</code> (for matching) and a <code>SortedList</code> whose comparator is bound to the table — so filtering and column sorting coexist. An empty query shows all rows. Returns the <code>FilteredList</code> for further tuning. All four args non-null.</span><span lang="es">Acota la tabla a medida que el usuario escribe. La fuente se envuelve en una <code>FilteredList</code> (para coincidencias) y una <code>SortedList</code> cuyo comparador se liga a la tabla — así el filtrado y el ordenamiento por columnas conviven. Una consulta vacía muestra todas las filas. Devuelve la <code>FilteredList</code> para ajustes adicionales. Los cuatro argumentos no null.</span></p>
+        </div>
+      </div>
+      <div class="callout tip">
+        <span class="c-icon">🛡️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">A faulty matcher can't break the table</span><span lang="es">Un matcher defectuoso no puede romper la tabla</span></span>
+          <p><span lang="en">The <code>matcher</code> receives each row and the <em>trimmed</em> query. Any exception it throws is treated as "no match", so a buggy predicate degrades gracefully instead of crashing the UI.</span><span lang="es">El <code>matcher</code> recibe cada fila y la consulta <em>recortada</em>. Cualquier excepción que lance se trata como "sin coincidencia", así un predicado con bugs degrada con elegancia en vez de tirar la UI.</span></p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">installFilter replaces the table's items</span><span lang="es">installFilter reemplaza los items de la tabla</span></span>
+          <p><span lang="en">It calls <code>table.setItems(sortedList)</code> internally. Keep your original <code>source</code> list to mutate the data; don't also call <code>setItems</code> with a different list afterwards, or you'll detach the filter.</span><span lang="es">Llama internamente a <code>table.setItems(sortedList)</code>. Conserva tu lista <code>source</code> original para mutar los datos; no llames además a <code>setItems</code> con otra lista después, o desacoplarás el filtro.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Prefer</strong> <code>createColumn</code>/<code>addColumn</code> with method references over property-name columns.</span><span lang="es"><strong>Prefiere</strong> <code>createColumn</code>/<code>addColumn</code> con referencias a métodos sobre las columnas por nombre de propiedad.</span></p>
+          <p><span lang="en"><strong>Keep</strong> the <code>ObservableList</code> returned by <code>setItems</code> — add/remove on it and the table (and any installed filter) update live.</span><span lang="es"><strong>Conserva</strong> la <code>ObservableList</code> que devuelve <code>setItems</code> — añade/elimina en ella y la tabla (y cualquier filtro instalado) se actualizan en vivo.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="message.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← Message</div></a>
+        <a class="next" href="format.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">Format →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

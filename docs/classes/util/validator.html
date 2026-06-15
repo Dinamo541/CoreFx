@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validator — CoreFx</title>
+  <meta name="description" content="Validator: a null-safe predicate suite and throwing contract validators, with pre-compiled linear-time regex." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="validator">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/util.html"><span lang="en">General Utilities</span><span lang="es">Utilidades generales</span></a><span class="sep">/</span>
+        <span>Validator</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.util</span>
+      <h1>Validator</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">null-safe</span>
+        <span class="tag"><span lang="en">stateless</span><span lang="es">sin estado</span></span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">A general-purpose validation suite with two complementary families:
+        <strong>predicate validators</strong> that never throw (returning
+        <code>false</code> for input that can't satisfy a rule), and
+        <strong>contract validators</strong> (<code>require*</code>) that enforce a
+        precondition and throw a descriptive exception when violated.</span>
+        <span lang="es">Una suite de validación de propósito general con dos familias complementarias:
+        <strong>validadores de predicado</strong> que nunca lanzan (devolviendo
+        <code>false</code> ante entrada que no puede satisfacer una regla), y
+        <strong>validadores de contrato</strong> (<code>require*</code>) que imponen
+        una precondición y lanzan una excepción descriptiva cuando se viola.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Two families, two intentions</span><span lang="es">Dos familias, dos intenciones</span></h2>
+      <ul>
+        <li><span lang="en"><strong>Predicates</strong> (<code>isBlank</code>, <code>isEmail</code>, <code>isInRange</code>, …) — fully null-safe, composable in UI bindings, guard clauses and business logic. They answer "is this valid?" without side effects.</span><span lang="es"><strong>Predicados</strong> (<code>isBlank</code>, <code>isEmail</code>, <code>isInRange</code>, …) — totalmente null-safe, componibles en bindings de UI, cláusulas de guarda y lógica de negocio. Responden "¿esto es válido?" sin efectos secundarios.</span></li>
+        <li><span lang="en"><strong>Contracts</strong> (<code>requireNotBlank</code>, <code>requireInRange</code>, …) — enforce a precondition and return the value when valid, throwing otherwise. They answer "this must be valid — fail loudly if not."</span><span lang="es"><strong>Contratos</strong> (<code>requireNotBlank</code>, <code>requireInRange</code>, …) — imponen una precondición y devuelven el valor cuando es válido, lanzando excepción en caso contrario. Responden "esto debe ser válido — falla ruidosamente si no lo es."</span></li>
+      </ul>
+      <div class="callout note">
+        <span class="c-icon">⚙️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Built for safety &amp; speed</span><span lang="es">Hecho para seguridad y velocidad</span></span>
+          <p><span lang="en">Every regex is a pre-compiled, immutable <code>Pattern</code> written in linear (non-backtracking) form, so even hostile input can't trigger catastrophic backtracking. All methods are stateless and thread-safe.</span><span lang="es">Cada regex es un <code>Pattern</code> inmutable y precompilado, escrito en forma lineal (sin backtracking), así que ni la entrada hostil puede provocar backtracking catastrófico. Todos los métodos son sin estado y thread-safe.</span></p>
+        </div>
+      </div>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>Validator v = Validator.getInstance();
+
+// Predicates — never throw:
+if (v.isBlank(name))        { /* show "required" */ }
+if (!v.isEmail(email))      { /* show "bad e-mail" */ }
+if (v.isInRange(age, 18, 120)) { /* ok */ }
+
+// Contracts — throw on violation, return the value on success:
+String n = v.requireNotBlank(name, "name");
+int qty  = (int) v.requireInRange(quantity, 1, 99, "quantity");</code></pre>
+
+      <h2 id="presence"><span lang="en">Null &amp; presence predicates</span><span lang="es">Predicados de null y presencia</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Returns true when…</span><span lang="es">Devuelve true cuando…</span></th></tr>
+        <tr><td><code>isNull(Object)</code> / <code>isNotNull(Object)</code></td><td><span lang="en">the reference is / isn't <code>null</code>.</span><span lang="es">la referencia es / no es <code>null</code>.</span></td></tr>
+        <tr><td><code>isEmpty(String)</code> / <code>isNotEmpty(String)</code></td><td><span lang="en">the string is null-or-empty / has ≥ 1 char.</span><span lang="es">la cadena es null-o-vacía / tiene ≥ 1 carácter.</span></td></tr>
+        <tr><td><code>isBlank(String)</code> / <code>isNotBlank(String)</code></td><td><span lang="en">the string is null/empty/whitespace / has a non-whitespace char.</span><span lang="es">la cadena es null/vacía/espacios / tiene un carácter no en blanco.</span></td></tr>
+      </table>
+
+      <h2 id="length"><span lang="en">Length predicates</span><span lang="es">Predicados de longitud</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Checks (on the <em>trimmed</em> length)</span><span lang="es">Comprueba (sobre la longitud <em>recortada</em>)</span></th></tr>
+        <tr><td><code>hasMinLength(s, min)</code></td><td><span lang="en">length ≥ <code>min</code> (false if null).</span><span lang="es">longitud ≥ <code>min</code> (false si null).</span></td></tr>
+        <tr><td><code>hasMaxLength(s, max)</code></td><td><span lang="en">length ≤ <code>max</code> (false if null).</span><span lang="es">longitud ≤ <code>max</code> (false si null).</span></td></tr>
+        <tr><td><code>hasLengthBetween(s, min, max)</code></td><td><span lang="en">length within <code>[min, max]</code> (false if null).</span><span lang="es">longitud dentro de <code>[min, max]</code> (false si null).</span></td></tr>
+      </table>
+
+      <h2 id="text"><span lang="en">Text / format predicates</span><span lang="es">Predicados de texto / formato</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Matches</span><span lang="es">Coincide con</span></th></tr>
+        <tr><td><code>isNumeric(s)</code></td><td><span lang="en">digits only (non-negative integer), trimmed.</span><span lang="es">solo dígitos (entero no negativo), recortado.</span></td></tr>
+        <tr><td><code>isInteger(s)</code></td><td><span lang="en">optionally signed integer, trimmed.</span><span lang="es">entero con signo opcional, recortado.</span></td></tr>
+        <tr><td><code>isDecimal(s)</code></td><td><span lang="en">optionally signed decimal, trimmed.</span><span lang="es">decimal con signo opcional, recortado.</span></td></tr>
+        <tr><td><code>isAlphabetic(s)</code></td><td><span lang="en">Unicode letters only.</span><span lang="es">solo letras Unicode.</span></td></tr>
+        <tr><td><code>isAlphabeticWithSpaces(s)</code></td><td><span lang="en">letters with single spaces between words (no leading/trailing/double spaces).</span><span lang="es">letras con espacios simples entre palabras (sin espacios al inicio/final/dobles).</span></td></tr>
+        <tr><td><code>isAlphanumeric(s)</code></td><td><span lang="en">Unicode letters and digits.</span><span lang="es">letras y dígitos Unicode.</span></td></tr>
+        <tr><td><code>isEmail(s)</code></td><td><span lang="en">a pragmatic, RFC-ish e-mail (trimmed, linear-time).</span><span lang="es">un e-mail pragmático, estilo RFC (recortado, tiempo lineal).</span></td></tr>
+        <tr><td><code>matches(s, String regex)</code></td><td><span lang="en">full match; returns <code>false</code> (never throws) on null args or invalid regex.</span><span lang="es">coincidencia completa; devuelve <code>false</code> (nunca lanza) ante args null o regex inválida.</span></td></tr>
+        <tr><td><code>matches(s, Pattern)</code></td><td><span lang="en">full match against a pre-compiled pattern.</span><span lang="es">coincidencia completa contra un patrón precompilado.</span></td></tr>
+      </table>
+
+      <h2 id="numeric"><span lang="en">Numeric range &amp; sign</span><span lang="es">Rango numérico y signo</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Notes</span><span lang="es">Notas</span></th></tr>
+        <tr><td><code>isInRange(long value, long min, long max)</code></td><td><span lang="en">Inclusive; bounds auto-normalized (order doesn't matter).</span><span lang="es">Inclusivo; los límites se normalizan automáticamente (el orden no importa).</span></td></tr>
+        <tr><td><code>isInRange(double value, double min, double max)</code></td><td><span lang="en">Inclusive, normalized; <code>NaN</code> is never in range.</span><span lang="es">Inclusivo, normalizado; <code>NaN</code> nunca está en rango.</span></td></tr>
+        <tr><td><code>isPositive(Number)</code> · <code>isNegative(Number)</code> · <code>isNonNegative(Number)</code></td><td><span lang="en">Strict &gt; 0, strict &lt; 0, ≥ 0; <code>false</code> for null.</span><span lang="es">Estricto &gt; 0, estricto &lt; 0, ≥ 0; <code>false</code> para null.</span></td></tr>
+      </table>
+
+      <h2 id="collections"><span lang="en">Collection / map / array predicates</span><span lang="es">Predicados de colección / mapa / array</span></h2>
+      <p><span lang="en">Overloaded <code>isEmpty</code> / <code>isNotEmpty</code> for <code>Collection&lt;?&gt;</code>, <code>Map&lt;?,?&gt;</code> and <code>Object[]</code> — all null-safe (a <code>null</code> container counts as empty).</span><span lang="es">Sobrecargas de <code>isEmpty</code> / <code>isNotEmpty</code> para <code>Collection&lt;?&gt;</code>, <code>Map&lt;?,?&gt;</code> y <code>Object[]</code> — todas null-safe (un contenedor <code>null</code> cuenta como vacío).</span></p>
+
+      <h2 id="contracts"><span lang="en">Contract validators (throwing)</span><span lang="es">Validadores de contrato (lanzan)</span></h2>
+      <div class="api-method">
+        <div class="sig">&lt;T&gt; T <span class="m-name">requireNonNull</span>(T value, String message)</div>
+        <div class="desc"><p><span lang="en">Returns <code>value</code> or throws <code>NullPointerException(message)</code>.</span><span lang="es">Devuelve <code>value</code> o lanza <code>NullPointerException(message)</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">String <span class="m-name">requireNotBlank</span>(String value, String name)</div>
+        <div class="desc"><p><span lang="en">Returns the original (untrimmed) value, or throws <code>IllegalArgumentException</code> ("<code>name</code> cannot be null or blank").</span><span lang="es">Devuelve el valor original (sin recortar), o lanza <code>IllegalArgumentException</code> ("<code>name</code> cannot be null or blank").</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">long <span class="m-name">requireInRange</span>(long value, long min, long max, String name)</div>
+        <div class="desc"><p><span lang="en">Returns <code>value</code> if within <code>[min, max]</code> (normalized), else throws <code>IllegalArgumentException</code> with a message naming the value and bounds.</span><span lang="es">Devuelve <code>value</code> si está dentro de <code>[min, max]</code> (normalizado), de lo contrario lanza <code>IllegalArgumentException</code> con un mensaje que nombra el valor y los límites.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">double <span class="m-name">requireInRange</span>(double value, double min, double max, String name)</div>
+        <div class="desc"><p><span lang="en">Same for doubles; <code>NaN</code> is never in range and always fails.</span><span lang="es">Igual para doubles; <code>NaN</code> nunca está en rango y siempre falla.</span></p></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">🤝</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Pairs naturally with Answer</span><span lang="es">Combina de forma natural con Answer</span></span>
+          <p><span lang="en">Validate with predicates, then report with <a href="answer.html">Answer</a>:</span><span lang="es">Valida con predicados y luego reporta con <a href="answer.html">Answer</a>:</span></p>
+<pre data-lang="java"><code>if (!v.isEmail(email)) return Answer.failure("Please enter a valid e-mail");
+return Answer.success("Account created").with("userId", id);</code></pre>
+        </div>
+      </div>
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Predicate vs. contract — pick on intent</span><span lang="es">Predicado vs. contrato — elige por intención</span></span>
+          <p><span lang="en">Use <strong>predicates</strong> for user-facing validation where you'll render a friendly message; use <strong>contracts</strong> at API boundaries where invalid input is a programming error that should fail fast. Don't wrap <code>require*</code> in a <code>try/catch</code> for normal UI validation — that's what the predicates are for.</span><span lang="es">Usa <strong>predicados</strong> para validación de cara al usuario donde mostrarás un mensaje amable; usa <strong>contratos</strong> en los límites de la API donde la entrada inválida es un error de programación que debe fallar rápido. No envuelvas <code>require*</code> en un <code>try/catch</code> para la validación normal de UI — para eso están los predicados.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Combine</strong> with <a href="../ui/format.html">Format</a>: the formatter restricts keystrokes; the validator confirms the final value (range, e-mail, length).</span><span lang="es"><strong>Combina</strong> con <a href="../ui/format.html">Format</a>: el formateador restringe las pulsaciones; el validador confirma el valor final (rango, e-mail, longitud).</span></p>
+          <p><span lang="en"><strong>Lean on null-safety</strong> — pass possibly-null fields straight to predicates without guarding; they handle <code>null</code> for you.</span><span lang="es"><strong>Apóyate en el null-safety</strong> — pasa campos posiblemente null directamente a los predicados sin proteger; ellos manejan <code>null</code> por ti.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="../ui/image-util.html"><div class="pn-label"><span lang="en">Previous</span><span lang="es">Anterior</span></div><div class="pn-title">← ImageUtil</div></a>
+        <a class="next" href="answer.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">Answer →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

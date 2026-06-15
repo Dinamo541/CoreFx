@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ImageUtil — CoreFx</title>
+  <meta name="description" content="ImageUtil: robust image loading from classpath/URL/file, view shaping (scaled, circular, rounded) and pure-Java pixel processing." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="image-util">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>ImageUtil</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>ImageUtil</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Static utility</span><span lang="es">Utilidad estática</span></span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Loads images from a classpath resource, a URL or a local file through one
+        predictable API, then offers common view-shaping helpers (scaled, circular,
+        rounded <code>ImageView</code>s) and lightweight pure-Java pixel processing
+        (grayscale, node snapshots) — all on the native platform, no extra deps.</span>
+        <span lang="es">Carga imágenes desde un recurso del classpath, una URL o un archivo local a
+        través de una sola API predecible, y luego ofrece ayudantes comunes de modelado
+        de vistas (<code>ImageView</code>s escaladas, circulares, redondeadas) y
+        procesamiento de píxeles ligero en Java puro (escala de grises, capturas de
+        nodos) — todo en la plataforma nativa, sin dependencias extra.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Smart location resolution</span><span lang="es">Resolución inteligente de ubicaciones</span></h2>
+      <p>
+        <span lang="en">The loader is deliberately forgiving: a location containing a URI scheme
+        (<code>https://</code>, <code>file:</code>) is used verbatim; anything else
+        is first resolved against the classpath, then handed to JavaFX as a
+        fallback. So <code>"/img/logo.png"</code>, a remote URL, and a local file
+        path all work through the same call.</span>
+        <span lang="es">El loader es deliberadamente tolerante: una ubicación que contiene un esquema
+        de URI (<code>https://</code>, <code>file:</code>) se usa tal cual; cualquier
+        otra cosa se resuelve primero contra el classpath y luego se entrega a JavaFX
+        como alternativa. Así <code>"/img/logo.png"</code>, una URL remota y una ruta de
+        archivo local funcionan todas con la misma llamada.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>Image logo   = ImageUtil.load("/img/logo.png");           // classpath
+Image remote = ImageUtil.load("https://example.com/a.png"); // URL
+Image opt    = ImageUtil.loadOrNull("/img/maybe.png");     // null if missing
+
+ImageView avatar = ImageUtil.circularView(logo, 40);       // 80×80 circle
+ImageView card   = ImageUtil.roundedView(logo, 200, 120, 16);
+ImageView gray   = ImageUtil.view(ImageUtil.toGrayscale(logo));</code></pre>
+
+      <h2 id="loading"><span lang="en">Loading</span><span lang="es">Carga</span></h2>
+      <div class="api-method">
+        <div class="sig">static Image <span class="m-name">load</span>(String location)</div>
+        <div class="desc"><p><span lang="en">Loads from classpath / URL / file. Throws <code>IllegalArgumentException</code> if the location is null/blank or the image can't be loaded.</span><span lang="es">Carga desde classpath / URL / archivo. Lanza <code>IllegalArgumentException</code> si la ubicación es null/en blanco o la imagen no se puede cargar.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static Image <span class="m-name">load</span>(String location, double reqWidth, double reqHeight, boolean preserveRatio, boolean smooth)</div>
+        <div class="desc"><p><span lang="en">Rescales <em>at load time</em> (more memory-efficient than loading full size then scaling). Pass <code>0</code> for a dimension to infer it from the other while preserving ratio.</span><span lang="es">Reescala <em>al momento de la carga</em> (más eficiente en memoria que cargar a tamaño completo y luego escalar). Pasa <code>0</code> en una dimensión para inferirla de la otra preservando la proporción.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static Image <span class="m-name">load</span>(Class&lt;?&gt; anchor, String resourcePath)</div>
+        <div class="desc"><p><span lang="en">Loads a classpath resource relative to <code>anchor</code> — handy for images packaged next to a specific class. Throws if the resource is missing/unreadable.</span><span lang="es">Carga un recurso del classpath relativo a <code>anchor</code> — útil para imágenes empaquetadas junto a una clase específica. Lanza excepción si el recurso falta o no se puede leer.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static Image <span class="m-name">loadOrNull</span>(String location)</div>
+        <div class="desc"><p><span lang="en">Returns <code>null</code> instead of throwing when the image is missing/unreadable — for optional decorations where absence is fine.</span><span lang="es">Devuelve <code>null</code> en vez de lanzar excepción cuando la imagen falta o no se puede leer — para decoraciones opcionales donde la ausencia está bien.</span></p></div>
+      </div>
+
+      <h2 id="shaping"><span lang="en">View shaping</span><span lang="es">Modelado de vistas</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Result</span><span lang="es">Resultado</span></th></tr>
+        <tr><td><code>view(image)</code></td><td><span lang="en">An <code>ImageView</code> with smoothing on.</span><span lang="es">Un <code>ImageView</code> con suavizado activado.</span></td></tr>
+        <tr><td><code>view(image, fitW, fitH)</code></td><td><span lang="en">Scaled to fit the box, aspect ratio preserved.</span><span lang="es">Escalado para encajar en la caja, preservando la proporción.</span></td></tr>
+        <tr><td><code>circularView(image, radius)</code></td><td><span lang="en">Clipped to a centered circle — perfect for avatars. <code>radius</code> must be positive.</span><span lang="es">Recortado a un círculo centrado — perfecto para avatares. <code>radius</code> debe ser positivo.</span></td></tr>
+        <tr><td><code>roundedView(image, w, h, arc)</code></td><td><span lang="en">Rounded-rectangle clip; <code>w</code>/<code>h</code> positive, <code>arc</code> clamped to ≥ 0.</span><span lang="es">Recorte de rectángulo redondeado; <code>w</code>/<code>h</code> positivos, <code>arc</code> acotado a ≥ 0.</span></td></tr>
+      </table>
+
+      <h2 id="pixels"><span lang="en">Pixel processing</span><span lang="es">Procesamiento de píxeles</span></h2>
+      <div class="api-method">
+        <div class="sig">static Image <span class="m-name">toGrayscale</span>(Image source)</div>
+        <div class="desc"><p><span lang="en">A grayscale copy using standard luminance weights (0.299/0.587/0.114), leaving the original untouched. If the image can't be read, <code>source</code> is returned as-is.</span><span lang="es">Una copia en escala de grises usando pesos de luminancia estándar (0.299/0.587/0.114), dejando intacto el original. Si la imagen no se puede leer, se devuelve <code>source</code> tal cual.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static WritableImage <span class="m-name">snapshot</span>(Node node)</div>
+        <div class="desc"><p><span lang="en">Renders any node to an image with a transparent background. <strong>Must run on the JavaFX Application Thread.</strong></span><span lang="es">Renderiza cualquier nodo a una imagen con fondo transparente. <strong>Debe ejecutarse en el JavaFX Application Thread.</strong></span></p></div>
+      </div>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">load throws, loadOrNull doesn't</span><span lang="es">load lanza, loadOrNull no</span></span>
+          <p><span lang="en">Use <code>load</code> for required assets (fail fast on a typo) and <code>loadOrNull</code> for optional ones. <code>toGrayscale</code> on small or unreadable images returns the source unchanged rather than failing.</span><span lang="es">Usa <code>load</code> para recursos obligatorios (falla rápido ante un error de tipeo) y <code>loadOrNull</code> para los opcionales. <code>toGrayscale</code> sobre imágenes pequeñas o ilegibles devuelve el origen sin cambios en vez de fallar.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Prefer</strong> the rescaling <code>load(...)</code> overload for large images you'll display small — it saves memory versus scaling an <code>ImageView</code>.</span><span lang="es"><strong>Prefiere</strong> la sobrecarga de <code>load(...)</code> con reescalado para imágenes grandes que mostrarás en pequeño — ahorra memoria frente a escalar un <code>ImageView</code>.</span></p>
+          <p><span lang="en"><strong>Note:</strong> <a href="message.html">Message.loadIcon</a> delegates here, so icon loading benefits from the same flexible resolution.</span><span lang="es"><strong>Nota:</strong> <a href="message.html">Message.loadIcon</a> delega aquí, así que la carga de iconos se beneficia de la misma resolución flexible.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="binding-utils.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← BindingUtils</div></a>
+        <a class="next" href="../util/validator.html"><div class="pn-label"><span lang="en">Next package</span><span lang="es">Siguiente paquete</span></div><div class="pn-title">Validator →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

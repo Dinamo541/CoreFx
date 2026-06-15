@@ -422,5 +422,8 @@ Released under the **MIT License**. See [LICENSE](./LICENSE) for details.
 
 <div align="center">
 <br/>
-Built with care by <a href="https://github.com/Dinamo541">Dominique</a>
+Built with care by 
+<a href="https://github.com/Dinamo541">Dominique</a>
+ & 
+<a href="https://github.com/SemMora">Sem</a>
 </div>

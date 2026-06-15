@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EntityManagerHelper — CoreFx</title>
+  <meta name="description" content="EntityManagerHelper: provider-agnostic helper that lazily creates, caches and returns a persistence manager from a Supplier you register." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="entity-manager-helper">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/persistence.html"><span lang="en">Persistence</span><span lang="es">Persistencia</span></a><span class="sep">/</span>
+        <span>EntityManagerHelper</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.persistence</span>
+      <h1>EntityManagerHelper</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">thread-safe</span>
+        <span class="tag"><span lang="en">provider-agnostic</span><span lang="es">agnóstico al proveedor</span></span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Centralizes access to a single, shared persistence context (typically a
+        JPA <code>EntityManager</code>) <strong>without coupling CoreFx to any
+        persistence provider</strong>. Your application — which already has a JPA
+        stack — registers a <code>Supplier</code> that produces the manager;
+        CoreFx stores, lazily creates, caches and hands it back as an opaque object.</span>
+        <span lang="es">Centraliza el acceso a un único contexto de persistencia compartido (típicamente
+        un <code>EntityManager</code> de JPA) <strong>sin acoplar CoreFx a ningún
+        proveedor de persistencia</strong>. Tu aplicación — que ya tiene un stack de
+        JPA — registra un <code>Supplier</code> que produce el gestor; CoreFx lo
+        almacena, crea de forma perezosa, cachea y lo devuelve como un objeto opaco.</span>
+      </p>
+
+      <h2 id="why"><span lang="en">Why a Supplier, not an EntityManager</span><span lang="es">Por qué un Supplier, no un EntityManager</span></h2>
+      <p>
+        <span lang="en">CoreFx is a reusable library and must not force a particular persistence
+        stack (Jakarta Persistence, Hibernate, EclipseLink…) onto its consumers.
+        Referencing <code>jakarta.persistence.EntityManager</code> directly would
+        drag that API onto every consumer's classpath. So — exactly like
+        <a href="../navigation/flow-controller.html">FlowController</a>'s theme
+        applier — the consuming app passes a <code>Supplier&lt;?&gt;</code>, and the
+        library depends only on the native Java platform.</span>
+        <span lang="es">CoreFx es una librería reutilizable y no debe forzar un stack de persistencia
+        concreto (Jakarta Persistence, Hibernate, EclipseLink…) sobre sus consumidores.
+        Referenciar <code>jakarta.persistence.EntityManager</code> directamente
+        arrastraría esa API al classpath de cada consumidor. Así que — exactamente como
+        el aplicador de temas de <a href="../navigation/flow-controller.html">FlowController</a> —
+        la app consumidora pasa un <code>Supplier&lt;?&gt;</code>, y la librería depende
+        únicamente de la plataforma Java nativa.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>// Once at startup, in YOUR app where jakarta.persistence is available:
+EntityManagerHelper.getInstance().initialize(() -&gt;
+        Persistence.createEntityManagerFactory("myPersistenceUnit")
+                   .createEntityManager());
+
+// Anywhere afterwards — typed retrieval, no cast:
+EntityManager em = EntityManagerHelper.getInstance().getManager(EntityManager.class);
+em.getTransaction().begin();
+em.persist(entity);
+em.getTransaction().commit();</code></pre>
+
+      <h2 id="lifecycle"><span lang="en">Lifecycle</span><span lang="es">Ciclo de vida</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Supplier&lt;?&gt; managerSupplier)</div>
+        <div class="desc">
+          <p><span lang="en">Registers the factory (called once). The supplier is invoked <em>lazily</em> — the first time a manager is actually requested, and again whenever the cached one is discarded. Throws <code>NullPointerException</code> if the supplier is null, and <code>IllegalStateException</code> if already initialized.</span><span lang="es">Registra la fábrica (se llama una vez). El supplier se invoca de forma <em>perezosa</em> — la primera vez que realmente se solicita un gestor, y de nuevo cada vez que se descarta el cacheado. Lanza <code>NullPointerException</code> si el supplier es null, y <code>IllegalStateException</code> si ya está inicializado.</span></p>
+        </div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Object <span class="m-name">getManager</span>()</div>
+        <div class="desc"><p><span lang="en">Returns the shared manager, creating it from the supplier on first access (under a lock, so concurrent first-time callers share one instance). Throws <code>IllegalStateException</code> if not initialized, if the supplier returns <code>null</code>, or if it fails.</span><span lang="es">Devuelve el gestor compartido, creándolo desde el supplier en el primer acceso (bajo un lock, para que los llamantes concurrentes de primera vez compartan una instancia). Lanza <code>IllegalStateException</code> si no está inicializado, si el supplier devuelve <code>null</code>, o si falla.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">&lt;T&gt; T <span class="m-name">getManager</span>(Class&lt;T&gt; type)</div>
+        <div class="desc"><p><span lang="en"><strong>The recommended accessor.</strong> Returns the manager cast to <code>T</code>, so you work with your own type (e.g. <code>EntityManager</code>) without a cast. Throws if not initialized, the supplier misbehaves, or the created manager isn't an instance of <code>type</code>.</span><span lang="es"><strong>El accesor recomendado.</strong> Devuelve el gestor casteado a <code>T</code>, para que trabajes con tu propio tipo (p. ej. <code>EntityManager</code>) sin cast. Lanza excepción si no está inicializado, si el supplier se comporta mal, o si el gestor creado no es una instancia de <code>type</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">resetManager</span>()</div>
+        <div class="desc"><p><span lang="en">Discards the cached manager <em>without closing it</em>, so the next access rebuilds a fresh one. Ownership of the discarded instance returns to you — close it yourself if it holds resources, or use <code>close()</code> instead.</span><span lang="es">Descarta el gestor cacheado <em>sin cerrarlo</em>, para que el siguiente acceso reconstruya uno nuevo. La propiedad de la instancia descartada vuelve a ti — ciérrala tú mismo si retiene recursos, o usa <code>close()</code> en su lugar.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">close</span>()</div>
+        <div class="desc"><p><span lang="en">Best-effort shutdown: if the cached manager is <code>AutoCloseable</code> (as JPA <code>EntityManager</code>s are), its <code>close()</code> is called; any exception is swallowed so shutdown never fails. The reference is cleared, but the supplier registration is kept — the helper stays usable.</span><span lang="es">Cierre de mejor esfuerzo: si el gestor cacheado es <code>AutoCloseable</code> (como lo son los <code>EntityManager</code> de JPA), se llama a su <code>close()</code>; cualquier excepción se traga para que el apagado nunca falle. La referencia se limpia, pero el registro del supplier se mantiene — el helper sigue siendo usable.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">hasManager</span>() &nbsp;·&nbsp; boolean <span class="m-name">isInitialized</span>()</div>
+        <div class="desc"><p><span lang="en">Whether a manager is currently cached, and whether a supplier has been registered.</span><span lang="es">Si hay un gestor cacheado actualmente, y si se ha registrado un supplier.</span></p></div>
+      </div>
+
+      <div class="callout note">
+        <span class="c-icon">🔁</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">resetManager vs. close</span><span lang="es">resetManager vs. close</span></span>
+          <p><span lang="en">Use <code>resetManager()</code> to drop a stale/closed manager and let the next call rebuild one (you own cleanup of the old one). Use <code>close()</code> when you want the helper to close the manager for you. Both leave the supplier in place, so the helper keeps working afterward.</span><span lang="es">Usa <code>resetManager()</code> para soltar un gestor obsoleto/cerrado y dejar que la siguiente llamada reconstruya uno (tú te encargas de limpiar el viejo). Usa <code>close()</code> cuando quieras que el helper cierre el gestor por ti. Ambos dejan el supplier en su lugar, así que el helper sigue funcionando después.</span></p>
+        </div>
+      </div>
+
+      <h2 id="lazy"><span lang="en">Lazy, thread-safe creation</span><span lang="es">Creación perezosa y thread-safe</span></h2>
+      <p>
+        <span lang="en">Initialization is guarded by double-checked locking and a
+        <code>volatile</code> flag, mirroring <code>FlowController</code>. The
+        manager is created lazily on first access under the same lock, so racing
+        callers never build several instances. Reads after creation are lock-free.</span>
+        <span lang="es">La inicialización está protegida por double-checked locking y un indicador
+        <code>volatile</code>, reflejando a <code>FlowController</code>. El gestor se
+        crea de forma perezosa en el primer acceso bajo el mismo lock, así los llamantes
+        en carrera nunca construyen varias instancias. Las lecturas tras la creación son
+        lock-free.</span>
+      </p>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">A single shared manager — mind concurrency</span><span lang="es">Un único gestor compartido — cuida la concurrencia</span></span>
+          <p><span lang="en">By default this caches <em>one</em> manager for the whole process. A JPA <code>EntityManager</code> is not thread-safe, so a single shared instance suits a typical desktop app with one persistence context. If you need isolation (e.g. per task), call <code>resetManager()</code> between units of work, or manage separate managers outside this helper.</span><span lang="es">Por defecto esto cachea <em>un</em> gestor para todo el proceso. Un <code>EntityManager</code> de JPA no es thread-safe, así que una única instancia compartida encaja con una app de escritorio típica con un solo contexto de persistencia. Si necesitas aislamiento (p. ej. por tarea), llama a <code>resetManager()</code> entre unidades de trabajo, o gestiona managers separados fuera de este helper.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> call <code>initialize</code> exactly once at startup, then always retrieve via <code>getManager(EntityManager.class)</code> for a cast-free, type-checked handle.</span><span lang="es"><strong>Llama</strong> a <code>initialize</code> exactamente una vez al inicio, y luego recupera siempre vía <code>getManager(EntityManager.class)</code> para un handle sin cast y con tipo comprobado.</span></p>
+          <p><span lang="en"><strong>Do</strong> call <code>close()</code> on application shutdown for a clean, best-effort release.</span><span lang="es"><strong>Llama</strong> a <code>close()</code> al apagar la aplicación para una liberación limpia y de mejor esfuerzo.</span></p>
+          <p><span lang="en"><strong>Do</strong> recover from a closed/stale context with <code>resetManager()</code> rather than re-initializing (which would throw).</span><span lang="es"><strong>Recupérate</strong> de un contexto cerrado/obsoleto con <code>resetManager()</code> en vez de reinicializar (lo que lanzaría excepción).</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="../util/answer.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← Answer</div></a>
+        <a class="next" href="../../index.html"><div class="pn-label"><span lang="en">Done</span><span lang="es">Listo</span></div><div class="pn-title"><span lang="en">Back to Home →</span><span lang="es">Volver al inicio →</span></div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowController — CoreFx</title>
+  <meta name="description" content="FlowController: load and cache FXML views, swap scenes, open windows and modals, drive BorderPane regions, and carry i18n + a typed transfer value." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="flow-controller">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/navigation.html"><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></a><span class="sep">/</span>
+        <span>FlowController</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
+      <h1>FlowController</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">thread-safe</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">The heart of the library. A single, lazily-initialized controller that
+        loads and caches FXML views, builds and swaps scenes, opens independent
+        windows and modal dialogs (blocking and non-blocking), replaces regions
+        of containers and <code>BorderPane</code>s, manages full-screen and
+        minimum size, and carries internationalization plus a typed value passed
+        between controllers.</span>
+        <span lang="es">El corazón de la librería. Un único controlador, inicializado de forma perezosa,
+        que carga y cachea vistas FXML, construye e intercambia escenas, abre ventanas
+        independientes y diálogos modales (bloqueantes y no bloqueantes), reemplaza
+        regiones de contenedores y <code>BorderPane</code>s, gestiona pantalla completa
+        y tamaño mínimo, y transporta internacionalización más un valor tipado que se
+        pasa entre controladores.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Overview</span><span lang="es">Visión general</span></h2>
+      <p>
+        <span lang="en">Almost every JavaFX app writes the same navigation glue: build an
+        <code>FXMLLoader</code>, call <code>load()</code>, grab the controller,
+        wrap the root in a <code>Scene</code>, set it on a <code>Stage</code>.
+        <code>FlowController</code> does this once. You initialize it with where
+        your views and resources live, then navigate by <strong>view name</strong>
+        — the loader is created, cached and reused, so the controller for any view
+        stays reachable.</span>
+        <span lang="es">Casi toda app JavaFX escribe el mismo pegamento de navegación: construir un
+        <code>FXMLLoader</code>, llamar a <code>load()</code>, obtener el controlador,
+        envolver la raíz en una <code>Scene</code> y asignarla a un <code>Stage</code>.
+        <code>FlowController</code> hace esto una sola vez. Lo inicializas indicando
+        dónde viven tus vistas y recursos, y luego navegas por <strong>nombre de
+        vista</strong> — el loader se crea, cachea y reutiliza, así que el controlador
+        de cualquier vista permanece accesible.</span>
+      </p>
+
+      <div class="callout note">
+        <span class="c-icon">🧠</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Initialization-on-demand singleton</span><span lang="es">Singleton de inicialización bajo demanda</span></span>
+          <p><span lang="en">Obtain the instance with <code>FlowController.getInstance()</code>. The instance is created lazily and thread-safely by the JVM class loader — no synchronization cost on the hot path.</span><span lang="es">Obtén la instancia con <code>FlowController.getInstance()</code>. La instancia se crea de forma perezosa y thread-safe por el cargador de clases de la JVM — sin coste de sincronización en la ruta caliente.</span></p>
+        </div>
+      </div>
+
+      <h3 id="contract"><span lang="en">The one rule: initialize first</span><span lang="es">La única regla: inicializa primero</span></h3>
+      <p>
+        <span lang="en">You must call one <code>initialize(...)</code> overload <strong>exactly
+        once</strong> before any navigation or loading method. Every public method
+        guards this with an internal <code>checkInitialized()</code> and throws
+        <code>IllegalStateException</code> if you forget. Calling
+        <code>initialize</code> twice also throws — the configuration is locked in
+        with double-checked locking.</span>
+        <span lang="es">Debes llamar a una sobrecarga de <code>initialize(...)</code> <strong>exactamente
+        una vez</strong> antes de cualquier método de navegación o carga. Cada método
+        público lo protege con un <code>checkInitialized()</code> interno y lanza
+        <code>IllegalStateException</code> si lo olvidas. Llamar a <code>initialize</code>
+        dos veces también lanza excepción — la configuración queda bloqueada mediante
+        double-checked locking.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>public class MyApp extends Application {
+    @Override
+    public void start(Stage stage) {
+        FlowController flow = FlowController.getInstance();
+        flow.initialize(
+            stage,
+            "My Application",
+            "/com/example/views/",      // .fxml live here
+            "/com/example/resources/",  // other resources
+            "/com/example/icon.png",    // window icon
+            MyApp.class                 // resolves classpath resources
+        );
+        flow.goViewMain("Home");        // loads Home.fxml and shows the stage
+    }
+}</code></pre>
+
+      <p><span lang="en">From any controller afterwards, navigate without touching <code>FXMLLoader</code> again:</span><span lang="es">Después, desde cualquier controlador, navega sin volver a tocar <code>FXMLLoader</code>:</span></p>
+<pre data-lang="java"><code>FlowController flow = FlowController.getInstance();
+
+flow.goViewMain("Dashboard");         // swap the main scene's root
+flow.goViewInModal("EditUser");       // open a non-blocking modal
+flow.goViewInModalAndWait("Confirm"); // open a blocking modal, wait for close</code></pre>
+
+      <h2 id="init"><span lang="en">Initialization overloads</span><span lang="es">Sobrecargas de inicialización</span></h2>
+      <p>
+        <span lang="en">Six overloads progressively fill in defaults so simple apps stay terse
+        while complex ones keep full control. They all delegate to the core
+        six-argument method.</span>
+        <span lang="es">Seis sobrecargas van completando valores por defecto para que las apps simples
+        queden concisas mientras las complejas conservan el control total. Todas
+        delegan en el método central de seis argumentos.</span>
+      </p>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Class&lt;?&gt; appClass)</div>
+        <div class="desc"><p><span lang="en">Creates a fresh <code>Stage</code> for you and derives the app name and base paths from the package of <code>appClass</code>. The leanest startup.</span><span lang="es">Crea un <code>Stage</code> nuevo por ti y deriva el nombre de la app y las rutas base del paquete de <code>appClass</code>. El arranque más escueto.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Stage stage, Class&lt;?&gt; appClass)</div>
+        <div class="desc"><p><span lang="en">Uses your stage; derives name (last package segment) and paths from <code>appClass</code>.</span><span lang="es">Usa tu stage; deriva el nombre (último segmento del paquete) y las rutas de <code>appClass</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Stage stage, String appName, Class&lt;?&gt; appClass)</div>
+        <div class="desc"><p><span lang="en">Custom window title; base path derived from the package.</span><span lang="es">Título de ventana personalizado; ruta base derivada del paquete.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Stage stage, String appName, String basePath, Class&lt;?&gt; appClass)</div>
+        <div class="desc"><p><span lang="en">Views resolve to <code>basePath + "view/"</code>, resources to <code>basePath + "resources/"</code>, and the icon to <code>resources/appName.png</code>.</span><span lang="es">Las vistas se resuelven en <code>basePath + "view/"</code>, los recursos en <code>basePath + "resources/"</code> y el icono en <code>resources/appName.png</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(Stage, String appName, String baseViewPath, String baseResourcePath, String appIconPath, Class&lt;?&gt; appClass)</div>
+        <div class="desc"><p><span lang="en">The core method. Every <code>String</code> argument must be non-blank; <code>stage</code> and <code>appClass</code> must be non-null. Sets the window title and locks the configuration.</span><span lang="es">El método central. Cada argumento <code>String</code> no puede estar en blanco; <code>stage</code> y <code>appClass</code> no pueden ser null. Fija el título de la ventana y bloquea la configuración.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">initialize</span>(… , Consumer&lt;Scene&gt; themeApplier[, ResourceBundle idioma])</div>
+        <div class="desc"><p><span lang="en">Full setup plus a theme applier and (optionally) an i18n bundle. Both are registered only <em>after</em> core init succeeds, so a failed init never leaves partial state. Pass <code>null</code> for either to skip it.</span><span lang="es">Configuración completa más un aplicador de temas y (opcionalmente) un bundle de i18n. Ambos se registran solo <em>después</em> de que la init central tenga éxito, así una init fallida nunca deja estado parcial. Pasa <code>null</code> en cualquiera para omitirlo.</span></p></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">🎨</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Recommendation — wire theming at init</span><span lang="es">Recomendación — conecta el theming en la init</span></span>
+          <p><span lang="en">Pair this with <a href="../ui/theme-manager.html">ThemeManager</a>: pass <code>themes.asApplier()</code> as the <code>themeApplier</code> so every scene the controller builds is themed and tracked automatically.</span><span lang="es">Combínalo con <a href="../ui/theme-manager.html">ThemeManager</a>: pasa <code>themes.asApplier()</code> como el <code>themeApplier</code> para que cada escena que construya el controlador quede con tema y rastreada automáticamente.</span></p>
+        </div>
+      </div>
+
+      <h2 id="loaders"><span lang="en">FXML loader management</span><span lang="es">Gestión de loaders FXML</span></h2>
+      <p>
+        <span lang="en">Loaders are cached per view name in a <code>ConcurrentHashMap</code>, so
+        a view's controller stays reachable across navigations.</span>
+        <span lang="es">Los loaders se cachean por nombre de vista en un <code>ConcurrentHashMap</code>,
+        así el controlador de una vista permanece accesible entre navegaciones.</span>
+      </p>
+      <div class="method-list">
+        <a href="#loaders">getLoader</a><a href="#loaders">createLoaderInstance</a>
+        <a href="#loaders">getController</a><a href="#loaders">removeLoader</a>
+        <a href="#loaders">clearLoadersMap</a>
+      </div>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Purpose</span><span lang="es">Propósito</span></th></tr>
+        <tr><td><code>getLoader(String)</code></td><td><span lang="en">Returns the cached loader, creating &amp; caching it on a miss.</span><span lang="es">Devuelve el loader cacheado, creándolo y cacheándolo si no existe.</span></td></tr>
+        <tr><td><code>createLoaderInstance(String)</code></td><td><span lang="en">Always builds a <em>fresh</em>, already-<code>load()</code>ed loader (bypasses the cache). Throws <code>IOException</code> if the FXML is missing/unparsable.</span><span lang="es">Siempre construye un loader <em>nuevo</em>, ya con <code>load()</code> ejecutado (ignora la caché). Lanza <code>IOException</code> si el FXML falta o no se puede parsear.</span></td></tr>
+        <tr><td><code>&lt;T&gt; getController(String)</code></td><td><span lang="en">Convenience: the controller of a cached view, cast to <code>T</code>.</span><span lang="es">Conveniencia: el controlador de una vista cacheada, casteado a <code>T</code>.</span></td></tr>
+        <tr><td><code>removeLoader(String)</code></td><td><span lang="en">Evicts one view so it reloads from disk next time.</span><span lang="es">Expulsa una vista para que se recargue desde disco la próxima vez.</span></td></tr>
+        <tr><td><code>clearLoadersMap()</code></td><td><span lang="en">Evicts all views.</span><span lang="es">Expulsa todas las vistas.</span></td></tr>
+      </table>
+
+<pre data-lang="java"><code>// Reach a freshly-loaded view's controller to pass it data:
+HomeController c = flow.getController("Home");
+c.setUser(currentUser);</code></pre>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Cached controllers keep state</span><span lang="es">Los controladores cacheados conservan estado</span></span>
+          <p><span lang="en">Because loaders are cached, a view's controller is reused across visits — its fields are not reset for you. If a screen must start clean every time, call <code>removeLoader(name)</code> before navigating, or reset state in the controller.</span><span lang="es">Como los loaders se cachean, el controlador de una vista se reutiliza entre visitas — sus campos no se reinician por ti. Si una pantalla debe empezar limpia cada vez, llama a <code>removeLoader(name)</code> antes de navegar, o reinicia el estado en el controlador.</span></p>
+        </div>
+      </div>
+
+      <h2 id="main-nav"><span lang="en">Main-stage navigation</span><span lang="es">Navegación en el stage principal</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">goViewMain</span>(String viewName)</div>
+        <div class="desc"><p><span lang="en">The workhorse. Builds a scene on first use (wrapping the root in an anchored <code>AnchorPane</code> and applying the theme), or swaps the existing scene's root, then shows the stage if hidden. Throws <code>IllegalArgumentException</code> for a blank name.</span><span lang="es">El caballo de batalla. Construye una escena en el primer uso (envolviendo la raíz en un <code>AnchorPane</code> anclado y aplicando el tema), o intercambia la raíz de la escena existente, y luego muestra el stage si estaba oculto. Lanza <code>IllegalArgumentException</code> ante un nombre en blanco.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">changeViewInMain</span>(String viewName)</div>
+        <div class="desc"><p><span lang="en">Like <code>goViewMain</code> but replaces the root <em>inside its current container</em> when possible, falling back to <code>scene.setRoot</code>.</span><span lang="es">Como <code>goViewMain</code> pero reemplaza la raíz <em>dentro de su contenedor actual</em> cuando es posible, recurriendo a <code>scene.setRoot</code> si no lo es.</span></p></div>
+      </div>
+
+      <h2 id="windows"><span lang="en">Windows &amp; modals</span><span lang="es">Ventanas y modales</span></h2>
+      <p><span lang="en">Independent windows don't block; modals block their owner; <em>and-wait</em> modals block the calling code until dismissed.</span><span lang="es">Las ventanas independientes no bloquean; los modales bloquean a su owner; los modales <em>and-wait</em> bloquean el código llamante hasta que se cierran.</span></p>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Behaviour</span><span lang="es">Comportamiento</span></th></tr>
+        <tr><td><code>goViewInWindow(name[, resizable])</code></td><td><span lang="en">New top-level, independent window. Closing it doesn't affect the main stage.</span><span lang="es">Nueva ventana de nivel superior e independiente. Cerrarla no afecta al stage principal.</span></td></tr>
+        <tr><td><code>goViewInModal(name[, owner][, resizable])</code></td><td><span lang="en"><code>WINDOW_MODAL</code> dialog, centered, blocks its owner.</span><span lang="es">Diálogo <code>WINDOW_MODAL</code>, centrado, bloquea a su owner.</span></td></tr>
+        <tr><td><code>goViewInModalAndWait(name[, owner][, resizable])</code></td><td><span lang="en">Same, but uses <code>showAndWait()</code> — returns only after the dialog closes.</span><span lang="es">Igual, pero usa <code>showAndWait()</code> — retorna solo después de que el diálogo se cierra.</span></td></tr>
+      </table>
+<pre data-lang="java"><code>// Confirmation flow: open, wait, then read the result the dialog left behind.
+flow.setTransferValue(invoice);
+flow.goViewInModalAndWait("ConfirmDelete");
+Boolean confirmed = flow.getTransferValue(Boolean.class);</code></pre>
+      <div class="callout danger">
+        <span class="c-icon">🧵</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">FX thread only</span><span lang="es">Solo en el hilo de FX</span></span>
+          <p><span lang="en"><code>goViewInModalAndWait</code> uses <code>showAndWait()</code> and must run on the JavaFX Application Thread. Calling it off-thread throws. On hidden, modals/windows swap in an empty <code>Pane</code> so the cached view detaches cleanly.</span><span lang="es"><code>goViewInModalAndWait</code> usa <code>showAndWait()</code> y debe ejecutarse en el JavaFX Application Thread. Llamarlo fuera de ese hilo lanza excepción. Al ocultarse, los modales/ventanas colocan un <code>Pane</code> vacío para que la vista cacheada se desacople limpiamente.</span></p>
+        </div>
+      </div>
+
+      <h2 id="containers"><span lang="en">Containers &amp; BorderPane regions</span><span lang="es">Contenedores y regiones de BorderPane</span></h2>
+      <p>
+        <span lang="en">For shell layouts (sidebar + content), swap only a region instead of the
+        whole scene. Containers may be a <code>Pane</code> or <code>Group</code>;
+        unsupported types fall back to a setter you provide.</span>
+        <span lang="es">Para layouts tipo shell (barra lateral + contenido), intercambia solo una región
+        en vez de la escena completa. Los contenedores pueden ser un <code>Pane</code>
+        o un <code>Group</code>; los tipos no soportados recurren a un setter que tú
+        proporcionas.</span>
+      </p>
+      <div class="method-list">
+        <a href="#containers">replaceViewInContainer</a><a href="#containers">placeViewInContainer</a>
+        <a href="#containers">changeViewInBorderPane</a><a href="#containers">clearRegion</a>
+        <a href="#containers">replaceNodeInContainer</a><a href="#containers">placeNodeInContainer</a>
+        <a href="#containers">clearContainer</a>
+      </div>
+<pre data-lang="java"><code>// Swap the center region of the shell's BorderPane:
+flow.changeViewInBorderPane("Reports");                 // defaults to "Center"
+flow.changeViewInBorderPane("Menu", shell, "Left");     // a specific region
+flow.clearRegion("Right", shell);                        // empty a region</code></pre>
+      <p><span lang="en">Valid <code>BorderPane</code> regions are <code>"Center"</code>, <code>"Top"</code>, <code>"Bottom"</code>, <code>"Left"</code>, <code>"Right"</code> (a blank region defaults to <code>"Center"</code>; anything else throws <code>IllegalArgumentException</code>).</span><span lang="es">Las regiones válidas de <code>BorderPane</code> son <code>"Center"</code>, <code>"Top"</code>, <code>"Bottom"</code>, <code>"Left"</code>, <code>"Right"</code> (una región en blanco usa <code>"Center"</code> por defecto; cualquier otra lanza <code>IllegalArgumentException</code>).</span></p>
+
+      <h2 id="i18n"><span lang="en">Internationalization</span><span lang="es">Internacionalización</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">setIdioma</span>(ResourceBundle idioma)</div>
+        <div class="desc"><p><span lang="en">Registers the bundle passed to every future loader, so FXML <code>%key</code> references resolve. Because cached loaders capture the bundle at creation, this <strong>clears the loader cache</strong> — which is exactly what makes runtime language switching work. Pass <code>null</code> to disable localization.</span><span lang="es">Registra el bundle que se pasa a todo loader futuro, de modo que las referencias <code>%key</code> de FXML se resuelvan. Como los loaders cacheados capturan el bundle al crearse, esto <strong>limpia la caché de loaders</strong> — que es justo lo que permite cambiar de idioma en tiempo de ejecución. Pasa <code>null</code> para desactivar la localización.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">ResourceBundle <span class="m-name">getIdioma</span>()</div>
+        <div class="desc"><p><span lang="en">The active bundle, or <code>null</code>.</span><span lang="es">El bundle activo, o <code>null</code>.</span></p></div>
+      </div>
+<pre data-lang="java"><code>flow.setIdioma(ResourceBundle.getBundle("i18n.messages", Locale.forLanguageTag("es")));
+// ...later, switch language at runtime (cache is cleared for you):
+flow.setIdioma(ResourceBundle.getBundle("i18n.messages", Locale.ENGLISH));
+flow.goViewMain("Home"); // re-rendered in the new language</code></pre>
+
+      <h2 id="transfer"><span lang="en">Typed data transfer</span><span lang="es">Transferencia de datos tipada</span></h2>
+      <p><span lang="en">Hand a value to the next controller without the two referencing each other.</span><span lang="es">Entrega un valor al siguiente controlador sin que ambos se referencien entre sí.</span></p>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Returns / throws</span><span lang="es">Devuelve / lanza</span></th></tr>
+        <tr><td><code>setTransferValue(Object)</code></td><td><span lang="en">Stores (or, with <code>null</code>, clears) the pending value.</span><span lang="es">Almacena (o, con <code>null</code>, limpia) el valor pendiente.</span></td></tr>
+        <tr><td><code>getTransferValue()</code></td><td><span lang="en">The value as an opaque <code>Object</code> (not consumed by reading).</span><span lang="es">El valor como un <code>Object</code> opaco (leerlo no lo consume).</span></td></tr>
+        <tr><td><code>&lt;T&gt; getTransferValue(Class&lt;T&gt;)</code></td><td><span lang="en">Cast to <code>T</code>; <code>null</code> if unset; throws <code>IllegalStateException</code> on a type mismatch and <code>NullPointerException</code> if <code>type</code> is null.</span><span lang="es">Casteado a <code>T</code>; <code>null</code> si no está asignado; lanza <code>IllegalStateException</code> ante un tipo incompatible y <code>NullPointerException</code> si <code>type</code> es null.</span></td></tr>
+      </table>
+      <div class="callout tip">
+        <span class="c-icon">💡</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Transfer value vs. AppContext</span><span lang="es">Valor de transferencia vs. AppContext</span></span>
+          <p><span lang="en">Use the transfer value for a <em>one-hop hand-off</em> to the very next view. For state many screens read (the logged-in user, a selection), prefer <a href="app-context.html">AppContext</a>.</span><span lang="es">Usa el valor de transferencia para una <em>entrega de un solo salto</em> a la vista inmediatamente siguiente. Para estado que muchas pantallas leen (el usuario conectado, una selección), prefiere <a href="app-context.html">AppContext</a>.</span></p>
+        </div>
+      </div>
+
+      <h2 id="stage"><span lang="en">Stage configuration &amp; accessors</span><span lang="es">Configuración del stage y accesores</span></h2>
+      <div class="method-list">
+        <a href="#stage">setStageMinSize</a><a href="#stage">toggleFullScreen</a>
+        <a href="#stage">setFullScreen</a><a href="#stage">closeMainStage</a>
+        <a href="#stage">setThemeApplier</a><a href="#stage">getMainStage</a>
+        <a href="#stage">isInitialized</a><a href="#stage">loadAppIcon</a>
+        <a href="#stage">getAppName</a><a href="#stage">getBaseViewPath</a>
+        <a href="#stage">getResourcePath</a><a href="#stage">getAppIconPath</a>
+      </div>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Purpose</span><span lang="es">Propósito</span></th></tr>
+        <tr><td><code>setStageMinSize(w, h)</code> / <code>(stage, w, h)</code></td><td><span lang="en">Minimum window size (null stage → main stage).</span><span lang="es">Tamaño mínimo de ventana (stage null → stage principal).</span></td></tr>
+        <tr><td><code>toggleFullScreen()</code> / <code>(stage)</code></td><td><span lang="en">Flip full-screen on the main or a given stage.</span><span lang="es">Alterna pantalla completa en el stage principal o uno dado.</span></td></tr>
+        <tr><td><code>setFullScreen(stage, boolean)</code></td><td><span lang="en">Set full-screen explicitly.</span><span lang="es">Establece pantalla completa explícitamente.</span></td></tr>
+        <tr><td><code>setThemeApplier(Consumer&lt;Scene&gt;)</code></td><td><span lang="en">Callback applied to every scene the controller builds (CSS/theming hook).</span><span lang="es">Callback aplicado a cada escena que construye el controlador (hook de CSS/theming).</span></td></tr>
+        <tr><td><code>getMainStage()</code></td><td><span lang="en">The primary stage (throws if not initialized).</span><span lang="es">El stage principal (lanza excepción si no está inicializado).</span></td></tr>
+        <tr><td><code>isInitialized()</code></td><td><span lang="en"><code>true</code> once <code>initialize</code> has run.</span><span lang="es"><code>true</code> una vez que <code>initialize</code> se ha ejecutado.</span></td></tr>
+        <tr><td><code>closeMainStage()</code></td><td><span lang="en">Closes the main stage (usually exits the app).</span><span lang="es">Cierra el stage principal (normalmente termina la app).</span></td></tr>
+      </table>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> initialize once in <code>Application.start</code>, then navigate everywhere by view name.</span><span lang="es"><strong>Haz</strong> la inicialización una vez en <code>Application.start</code> y luego navega en todas partes por nombre de vista.</span></p>
+          <p><span lang="en"><strong>Do</strong> use <code>getController(name)</code> to push data into a screen right before showing it.</span><span lang="es"><strong>Usa</strong> <code>getController(name)</code> para inyectar datos en una pantalla justo antes de mostrarla.</span></p>
+          <p><span lang="en"><strong>Avoid</strong> calling navigation methods off the FX thread; modals especially require it.</span><span lang="es"><strong>Evita</strong> llamar a métodos de navegación fuera del hilo de FX; los modales en especial lo exigen.</span></p>
+          <p><span lang="en"><strong>Remember</strong> cached controllers retain state — evict with <code>removeLoader</code> when a screen must be pristine.</span><span lang="es"><strong>Recuerda</strong> que los controladores cacheados conservan estado — expúlsalos con <code>removeLoader</code> cuando una pantalla deba estar impecable.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="../../packages/navigation.html"><div class="pn-label"><span lang="en">Package</span><span lang="es">Paquete</span></div><div class="pn-title"><span lang="en">← Navigation &amp; Flow</span><span lang="es">← Navegación y flujo</span></div></a>
+        <a class="next" href="app-context.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">AppContext →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

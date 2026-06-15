@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Message — CoreFx</title>
+  <meta name="description" content="Message: lightweight, theme-free alert and confirmation dialogs — a pure static utility." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="message">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>Message</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>Message</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Static utility</span><span lang="es">Utilidad estática</span></span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">The lightweight, theme-free counterpart to <a href="alert-util.html">AlertUtil</a>.
+        A pure static utility for showing error / warning / confirmation /
+        information dialogs, with automatic content wrapping and smart width
+        sizing based on message length.</span>
+        <span lang="es">La contraparte ligera y sin tema de <a href="alert-util.html">AlertUtil</a>.
+        Una utilidad puramente estática para mostrar diálogos de error / advertencia /
+        confirmación / información, con ajuste automático del contenido y dimensionado
+        inteligente del ancho según la longitud del mensaje.</span>
+      </p>
+
+      <div class="callout warning">
+        <span class="c-icon">🧰</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">All methods are static — do not instantiate</span><span lang="es">Todos los métodos son estáticos — no instanciar</span></span>
+          <p><span lang="en"><code>Message</code> has a private constructor. Call its methods directly: <code>Message.show(...)</code>. (It was a singleton in earlier versions; v1.2.0 made it a pure static utility, consistent with the other UI helpers.)</span><span lang="es"><code>Message</code> tiene un constructor privado. Llama a sus métodos directamente: <code>Message.show(...)</code>. (Era un singleton en versiones anteriores; la v1.2.0 lo convirtió en una utilidad puramente estática, en consonancia con los demás ayudantes de UI.)</span></p>
+        </div>
+      </div>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>// Non-blocking notice:
+Message.show(AlertType.INFORMATION, "Welcome", "Signed in successfully.");
+
+// Blocking, owned by a window:
+Message.showModal(AlertType.ERROR, "Failed", owner, "Could not reach the server.");
+
+// Confirmations returning a boolean:
+boolean ok  = Message.showConfirmation("Delete?", owner, "Remove this record?");
+boolean yes = Message.askYesOrNoBoolean("Quit", owner, "Exit the application?");</code></pre>
+
+      <h2 id="api"><span lang="en">Dialog methods</span><span lang="es">Métodos de diálogo</span></h2>
+      <div class="api-method">
+        <div class="sig">static void <span class="m-name">show</span>(AlertType alertType, String title, String message)</div>
+        <div class="desc"><p><span lang="en">Non-modal alert; does not block. <code>alertType</code> is one of <code>ERROR</code>, <code>WARNING</code>, <code>CONFIRMATION</code>, <code>INFORMATION</code>.</span><span lang="es">Alerta no modal; no bloquea. <code>alertType</code> es uno de <code>ERROR</code>, <code>WARNING</code>, <code>CONFIRMATION</code>, <code>INFORMATION</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static void <span class="m-name">showModal</span>(AlertType alertType, String title, Window parent, String message)</div>
+        <div class="desc"><p><span lang="en">Modal alert owned by <code>parent</code>; waits for the user to respond.</span><span lang="es">Alerta modal con owner <code>parent</code>; espera a que el usuario responda.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static boolean <span class="m-name">showConfirmation</span>(String title, Window parent, String message)</div>
+        <div class="desc"><p><span lang="en">OK / Cancel. Returns <code>true</code> only if the user clicked OK.</span><span lang="es">Aceptar / Cancelar. Devuelve <code>true</code> solo si el usuario pulsó Aceptar.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static boolean <span class="m-name">askYesOrNoBoolean</span>(String title, Window parent, String message)</div>
+        <div class="desc"><p><span lang="en">Yes / No (instead of Cancel / OK). Returns <code>true</code> only if Yes was clicked.</span><span lang="es">Sí / No (en vez de Cancelar / Aceptar). Devuelve <code>true</code> solo si se pulsó Sí.</span></p></div>
+      </div>
+
+      <h2 id="helpers"><span lang="en">Helpers</span><span lang="es">Ayudantes</span></h2>
+      <div class="api-method">
+        <div class="sig">static ImageView <span class="m-name">loadIcon</span>(String path)</div>
+        <div class="desc"><p><span lang="en">Loads an icon and scales it to 32×32. Resolution is delegated to <a href="image-util.html">ImageUtil</a>, so classpath resources, URLs and local files all work. Throws <code>IllegalArgumentException</code> if <code>path</code> is null/blank or unloadable.</span><span lang="es">Carga un icono y lo escala a 32×32. La resolución se delega en <a href="image-util.html">ImageUtil</a>, así que funcionan recursos del classpath, URLs y archivos locales. Lanza <code>IllegalArgumentException</code> si <code>path</code> es null/en blanco o no se puede cargar.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static void <span class="m-name">applyButtonsStyles</span>(Alert alert)</div>
+        <div class="desc"><p><span lang="en">Adds the <code>btn-accept</code> style class to OK / "Aceptar" buttons and <code>btn-cancel</code> to Cancel / "Cancelar" buttons, so your stylesheet can target them. Rejects a null alert.</span><span lang="es">Añade la clase de estilo <code>btn-accept</code> a los botones OK / "Aceptar" y <code>btn-cancel</code> a los botones Cancel / "Cancelar", para que tu hoja de estilo pueda apuntarlos. Rechaza una alerta null.</span></p></div>
+      </div>
+
+      <h2 id="sizing"><span lang="en">Automatic content sizing</span><span lang="es">Dimensionado automático del contenido</span></h2>
+      <p>
+        <span lang="en">Every dialog wraps its text and computes a preferred width from the
+        longest line — roughly <code>7px × longest line + 160</code>, clamped to
+        <strong>[380, 720]</strong> pixels. Long messages wrap instead of stretching
+        off-screen. (This is the same sizing <code>AlertUtil</code> uses.)</span>
+        <span lang="es">Cada diálogo ajusta su texto y calcula un ancho preferido a partir de la línea
+        más larga — aproximadamente <code>7px × línea más larga + 160</code>, acotado a
+        <strong>[380, 720]</strong> píxeles. Los mensajes largos se ajustan en vez de
+        estirarse fuera de la pantalla. (Es el mismo dimensionado que usa
+        <code>AlertUtil</code>.)</span>
+      </p>
+
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">When to choose Message</span><span lang="es">Cuándo elegir Message</span></span>
+          <p><span lang="en">Reach for <code>Message</code> when you want the lightest, theme-free dialog and don't need CSS theming. If you do want dark/branded dialogs, use <a href="alert-util.html">AlertUtil</a> instead — the two are otherwise interchangeable.</span><span lang="es">Usa <code>Message</code> cuando quieras el diálogo más ligero y sin tema y no necesites theming con CSS. Si sí quieres diálogos oscuros/de marca, usa <a href="alert-util.html">AlertUtil</a> en su lugar — por lo demás son intercambiables.</span></p>
+        </div>
+      </div>
+      <div class="callout danger">
+        <span class="c-icon">🧵</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">FX thread for blocking calls</span><span lang="es">Hilo de FX para llamadas bloqueantes</span></span>
+          <p><span lang="en"><code>showModal</code>, <code>showConfirmation</code> and <code>askYesOrNoBoolean</code> block via <code>showAndWait()</code> and must run on the JavaFX Application Thread.</span><span lang="es"><code>showModal</code>, <code>showConfirmation</code> y <code>askYesOrNoBoolean</code> bloquean vía <code>showAndWait()</code> y deben ejecutarse en el JavaFX Application Thread.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="alert-util.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← AlertUtil</div></a>
+        <a class="next" href="table-utils.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">TableUtils →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

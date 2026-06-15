@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AppContext — CoreFx</title>
+  <meta name="description" content="AppContext: a thread-safe, process-wide key-value store for shared application state." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="app-context">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/navigation.html"><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></a><span class="sep">/</span>
+        <span>AppContext</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
+      <h1>AppContext</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">thread-safe</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">A process-wide key-value store for the shared, cross-cutting data your
+        flows need — the current user, a selected record, feature flags — without
+        coupling unrelated screens to one another. Backed by a
+        <code>ConcurrentHashMap</code>, so reads and writes are lock-free on the
+        common path and safe from any thread.</span>
+        <span lang="es">Un almacén clave-valor a nivel de proceso para los datos compartidos y
+        transversales que tus flujos necesitan — el usuario actual, un registro
+        seleccionado, feature flags — sin acoplar entre sí pantallas que no se
+        relacionan. Respaldado por un <code>ConcurrentHashMap</code>, así que las
+        lecturas y escrituras son lock-free en la ruta común y seguras desde
+        cualquier hilo.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Overview</span><span lang="es">Visión general</span></h2>
+      <p>
+        <span lang="en">Where <a href="flow-controller.html">FlowController</a> handles navigation
+        and <a href="stage-manager.html">StageManager</a> handles windows,
+        <code>AppContext</code> holds the data both lean on. It is the singleton
+        you reach for whenever two screens need to agree on something but
+        shouldn't know about each other.</span>
+        <span lang="es">Mientras <a href="flow-controller.html">FlowController</a> se encarga de la
+        navegación y <a href="stage-manager.html">StageManager</a> de las ventanas,
+        <code>AppContext</code> guarda los datos en los que ambos se apoyan. Es el
+        singleton al que recurres cuando dos pantallas necesitan ponerse de acuerdo
+        en algo pero no deberían conocerse entre sí.</span>
+      </p>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Strict null-safety contract</span><span lang="es">Contrato estricto de null-safety</span></span>
+          <p><span lang="en">Keys must never be <code>null</code> <em>or blank</em>, and values must never be <code>null</code> — both are rejected with descriptive exceptions (matching <code>ConcurrentHashMap</code>, which forbids null keys/values). Lookups for a missing key never throw; they return <code>null</code> or your default.</span><span lang="es">Las claves nunca pueden ser <code>null</code> <em>ni estar en blanco</em>, y los valores nunca pueden ser <code>null</code> — ambos se rechazan con excepciones descriptivas (acorde a <code>ConcurrentHashMap</code>, que prohíbe claves/valores null). Buscar una clave inexistente nunca lanza excepción; devuelve <code>null</code> o tu valor por defecto.</span></p>
+        </div>
+      </div>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>AppContext ctx = AppContext.getInstance();
+
+// After login:
+ctx.put("currentUser", user);
+
+// Anywhere else — the type is inferred from the assignment:
+User current = ctx.get("currentUser");
+String role  = ctx.getOrDefault("role", "guest").toString();
+
+if (ctx.contains("currentUser")) { /* ... */ }</code></pre>
+
+      <h2 id="write"><span lang="en">Write operations</span><span lang="es">Operaciones de escritura</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">put</span>(String key, Object value)</div>
+        <div class="desc"><p><span lang="en">Stores <code>value</code> under <code>key</code>, replacing any previous value. Throws <code>IllegalArgumentException</code> for a null/blank key and <code>NullPointerException</code> for a null value.</span><span lang="es">Almacena <code>value</code> bajo <code>key</code>, reemplazando cualquier valor previo. Lanza <code>IllegalArgumentException</code> ante una clave null/en blanco y <code>NullPointerException</code> ante un valor null.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Object <span class="m-name">putIfAbsent</span>(String key, Object value)</div>
+        <div class="desc"><p><span lang="en">Stores only if the key is currently unset. Returns the existing value (or <code>null</code> if none, meaning the new value was stored). Same validation as <code>put</code>.</span><span lang="es">Almacena solo si la clave no está asignada actualmente. Devuelve el valor existente (o <code>null</code> si no había, lo que significa que el nuevo valor se almacenó). Misma validación que <code>put</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">remove</span>(String key)</div>
+        <div class="desc"><p><span lang="en">Removes the entry under <code>key</code>, if any. Validates the key.</span><span lang="es">Elimina la entrada bajo <code>key</code>, si existe. Valida la clave.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">clear</span>()</div>
+        <div class="desc"><p><span lang="en">Removes every entry.</span><span lang="es">Elimina todas las entradas.</span></p></div>
+      </div>
+
+      <h2 id="read"><span lang="en">Read operations</span><span lang="es">Operaciones de lectura</span></h2>
+      <div class="api-method">
+        <div class="sig">&lt;T&gt; T <span class="m-name">get</span>(String key)</div>
+        <div class="desc">
+          <p><span lang="en">Returns the value, cast to the type inferred from the call site. Returns <code>null</code> if absent. Validates the key.</span><span lang="es">Devuelve el valor, casteado al tipo inferido en el sitio de llamada. Devuelve <code>null</code> si no existe. Valida la clave.</span></p>
+          <p><span lang="en"><strong>Note:</strong> the cast is unchecked — a wrong target type surfaces as a <code>ClassCastException</code> at the use site, not here.</span><span lang="es"><strong>Nota:</strong> el cast no está comprobado — un tipo destino equivocado aflora como <code>ClassCastException</code> en el sitio de uso, no aquí.</span></p>
+        </div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Object <span class="m-name">getOrDefault</span>(String key, Object defaultValue)</div>
+        <div class="desc"><p><span lang="en">The stored value, or <code>defaultValue</code> (which may be <code>null</code>) when the key is absent.</span><span lang="es">El valor almacenado, o <code>defaultValue</code> (que puede ser <code>null</code>) cuando la clave no existe.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">contains</span>(String key)</div>
+        <div class="desc"><p><span lang="en"><code>true</code> if a value is stored under <code>key</code>.</span><span lang="es"><code>true</code> si hay un valor almacenado bajo <code>key</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">isEmpty</span>() &nbsp;·&nbsp; int <span class="m-name">size</span>()</div>
+        <div class="desc"><p><span lang="en">Whether the store holds no entries, and the entry count.</span><span lang="es">Si el almacén no contiene entradas, y el número de entradas.</span></p></div>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">💡</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Type-inferring get</span><span lang="es">get con inferencia de tipo</span></span>
+          <p><span lang="en">Because <code>get</code> is generic, <code>User u = ctx.get("user");</code> needs no cast. When there's no target type, <code>T</code> infers to <code>Object</code>.</span><span lang="es">Como <code>get</code> es genérico, <code>User u = ctx.get("user");</code> no necesita cast. Cuando no hay tipo destino, <code>T</code> se infiere como <code>Object</code>.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations &amp; pitfalls</span><span lang="es">Recomendaciones y trampas</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> centralize your key names as constants (<code>public static final String CURRENT_USER = "currentUser";</code>) to avoid typos — blank keys are rejected, but misspelled ones silently miss.</span><span lang="es"><strong>Centraliza</strong> los nombres de tus claves como constantes (<code>public static final String CURRENT_USER = "currentUser";</code>) para evitar errores de tipeo — las claves en blanco se rechazan, pero las mal escritas fallan en silencio.</span></p>
+          <p><span lang="en"><strong>Do</strong> store domain objects, not UI nodes — this is application state, not a scene graph.</span><span lang="es"><strong>Almacena</strong> objetos de dominio, no nodos de UI — esto es estado de aplicación, no un grafo de escena.</span></p>
+          <p><span lang="en"><strong>Avoid</strong> leaving stale entries on logout: call <code>remove</code> or <code>clear</code> to prevent the next user from seeing the previous session's data.</span><span lang="es"><strong>Evita</strong> dejar entradas obsoletas al cerrar sesión: llama a <code>remove</code> o <code>clear</code> para impedir que el siguiente usuario vea los datos de la sesión anterior.</span></p>
+        </div>
+      </div>
+      <div class="callout warning">
+        <span class="c-icon">🔒</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Thread-safe map, not atomic transactions</span><span lang="es">Mapa thread-safe, no transacciones atómicas</span></span>
+          <p><span lang="en">Each operation is individually thread-safe, but a <code>contains</code>-then-<code>put</code> sequence is not atomic. Use <code>putIfAbsent</code> when you need check-and-set in one step.</span><span lang="es">Cada operación es individualmente thread-safe, pero una secuencia <code>contains</code>-luego-<code>put</code> no es atómica. Usa <code>putIfAbsent</code> cuando necesites comprobar-y-asignar en un solo paso.</span></p>
+        </div>
+      </div>
+      <p><span lang="en">For diagnostics, <code>toString()</code> reports only the entry count — never the values — so application state can't leak into logs.</span><span lang="es">Para diagnóstico, <code>toString()</code> reporta solo el número de entradas — nunca los valores — para que el estado de la aplicación no se filtre a los logs.</span></p>
+
+      <div class="page-nav">
+        <a class="prev" href="flow-controller.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← FlowController</div></a>
+        <a class="next" href="stage-manager.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">StageManager →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

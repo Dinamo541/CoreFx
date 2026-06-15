@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>General Utilities — CoreFx</title>
+  <meta name="description" content="The util package: Validator and Answer." />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body data-depth="1" data-active="util">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <span><span lang="en">General Utilities</span><span lang="es">Utilidades generales</span></span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.util</span>
+      <h1><span lang="en">🛠️ General Utilities</span><span lang="es">🛠️ Utilidades generales</span></h1>
+      <p class="lead">
+        <span lang="en">Two runtime-free building blocks used throughout an application's logic:
+        a validation suite and a standardized response wrapper. Both are fully
+        covered by the JUnit test suite and depend only on the Java platform.</span>
+        <span lang="es">Dos bloques de construcción sin dependencia del runtime, usados a lo largo de
+        la lógica de una aplicación: una suite de validación y un envoltorio de
+        respuesta estandarizado. Ambos están cubiertos por completo por la suite de
+        pruebas JUnit y dependen únicamente de la plataforma Java.</span>
+      </p>
+
+      <h2><span lang="en">Classes</span><span lang="es">Clases</span></h2>
+      <div class="card-grid">
+        <a class="card" href="../classes/util/validator.html">
+          <div class="card-title"><code>Validator</code></div>
+          <div class="card-desc"><span lang="en">A null-safe predicate suite (isBlank, isEmail, isInRange, …) and throwing contract validators (requireNotBlank, requireInRange, …). Regex pre-compiled and linear-time.</span><span lang="es">Una suite de predicados null-safe (isBlank, isEmail, isInRange, …) y validadores de contrato que lanzan excepciones (requireNotBlank, requireInRange, …). Regex precompiladas y de tiempo lineal.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/util/answer.html">
+          <div class="card-title"><code>Answer</code></div>
+          <div class="card-desc"><span lang="en">An immutable-friendly response wrapper: success/failure state, user + internal messages, and a keyed result payload with a fluent builder.</span><span lang="es">Un envoltorio de respuesta amigable con la inmutabilidad: estado de éxito/fallo, mensajes para el usuario + internos, y una carga de resultados indexada con un builder fluido.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">🤝</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Designed to work together</span><span lang="es">Diseñados para trabajar juntos</span></span>
+          <p><span lang="en">Validate input with <code>Validator</code>'s predicates, then return the outcome as an <code>Answer</code>: <code>return Answer.failure("Invalid e-mail")</code> or <code>Answer.success("Saved").with("id", id)</code>.</span><span lang="es">Valida la entrada con los predicados de <code>Validator</code> y luego devuelve el resultado como un <code>Answer</code>: <code>return Answer.failure("Invalid e-mail")</code> o <code>Answer.success("Saved").with("id", id)</code>.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="ui.html"><div class="pn-label"><span lang="en">Previous package</span><span lang="es">Paquete anterior</span></div><div class="pn-title"><span lang="en">← UI Utilities</span><span lang="es">← Utilidades de UI</span></div></a>
+        <a class="next" href="../classes/util/validator.html"><div class="pn-label"><span lang="en">First class</span><span lang="es">Primera clase</span></div><div class="pn-title">Validator →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

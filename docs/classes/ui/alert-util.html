@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AlertUtil — CoreFx</title>
+  <meta name="description" content="AlertUtil: themed alert and confirmation dialogs with self-contained CSS injected via a data: URI." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="alert-util">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>AlertUtil</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>AlertUtil</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+        <span class="tag green"><span lang="en">recommended</span><span lang="es">recomendado</span></span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Alert dialogs with fully self-contained, dependency-free theming. Plain
+        JavaFX <code>Alert</code>s always render light, which clashes with dark or
+        branded UIs. <code>AlertUtil</code> fixes this without shipping any CSS
+        file: an <code>AlertTheme</code> is rendered to CSS <em>in code</em> and
+        injected through a base64 <code>data:</code> URI, restyling background,
+        text, header and buttons (including hover).</span>
+        <span lang="es">Diálogos de alerta con theming totalmente autónomo y sin dependencias. Los
+        <code>Alert</code> de JavaFX siempre se renderizan en claro, lo que choca con
+        interfaces oscuras o de marca. <code>AlertUtil</code> lo resuelve sin enviar
+        ningún archivo CSS: un <code>AlertTheme</code> se renderiza a CSS <em>en
+        código</em> y se inyecta mediante un <code>data:</code> URI en base64,
+        reestilizando fondo, texto, cabecera y botones (incluido el hover).</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Three levels of customization</span><span lang="es">Tres niveles de personalización</span></h2>
+      <ol>
+        <li><span lang="en"><strong>Built-in presets</strong> — <code>AlertTheme.light()</code> and <code>AlertTheme.dark()</code>, zero config.</span><span lang="es"><strong>Presets integrados</strong> — <code>AlertTheme.light()</code> y <code>AlertTheme.dark()</code>, sin configuración.</span></li>
+        <li><span lang="en"><strong>Custom colors</strong> — <code>AlertTheme.builder()</code> sets any colors, font family and size with native <code>Color</code>s.</span><span lang="es"><strong>Colores personalizados</strong> — <code>AlertTheme.builder()</code> fija cualquier color, familia y tamaño de fuente con <code>Color</code>s nativos.</span></li>
+        <li><span lang="en"><strong>Raw CSS</strong> — <code>showStyled(...)</code> takes an arbitrary stylesheet string for total control.</span><span lang="es"><strong>CSS en crudo</strong> — <code>showStyled(...)</code> acepta una cadena de hoja de estilo arbitraria para control total.</span></li>
+      </ol>
+      <p>
+        <span lang="en">Set a default once via <code>setDefaultTheme(...)</code> and every alert
+        adopts it; per-call overloads still let you override for a single dialog.</span>
+        <span lang="es">Fija un valor por defecto una vez con <code>setDefaultTheme(...)</code> y cada
+        alerta lo adopta; las sobrecargas por llamada te siguen permitiendo
+        sobreescribirlo para un solo diálogo.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>AlertUtil alerts = AlertUtil.getInstance();
+alerts.setDefaultTheme(AlertUtil.AlertTheme.dark());   // whole app goes dark
+
+alerts.show(AlertType.INFORMATION, "Saved", "Your changes were saved.");
+
+boolean ok = alerts.showConfirmation("Delete?", owner, "This cannot be undone.");
+if (ok) { /* proceed */ }
+
+boolean yes = alerts.askYesNo("Quit", owner, "Exit the application?");</code></pre>
+
+      <h2 id="default"><span lang="en">Default theme</span><span lang="es">Tema por defecto</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Purpose</span><span lang="es">Propósito</span></th></tr>
+        <tr><td><code>setDefaultTheme(AlertTheme)</code></td><td><span lang="en">Theme applied to alerts shown without an explicit one (<code>null</code> → native look).</span><span lang="es">Tema aplicado a las alertas mostradas sin uno explícito (<code>null</code> → aspecto nativo).</span></td></tr>
+        <tr><td><code>getDefaultTheme()</code></td><td><span lang="en">The current default, or <code>null</code>.</span><span lang="es">El valor por defecto actual, o <code>null</code>.</span></td></tr>
+        <tr><td><code>clearDefaultTheme()</code></td><td><span lang="en">Reverts un-themed alerts to the native look.</span><span lang="es">Revierte las alertas sin tema al aspecto nativo.</span></td></tr>
+      </table>
+
+      <h2 id="nonblocking"><span lang="en">Non-blocking alerts</span><span lang="es">Alertas no bloqueantes</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">show</span>(AlertType type, String title, String message[, AlertTheme theme])</div>
+        <div class="desc"><p><span lang="en">Shows a non-blocking alert (uses the default theme when none is given). <code>type</code> must be non-null.</span><span lang="es">Muestra una alerta no bloqueante (usa el tema por defecto cuando no se da uno). <code>type</code> no puede ser null.</span></p></div>
+      </div>
+
+      <h2 id="blocking"><span lang="en">Blocking (modal) alerts</span><span lang="es">Alertas bloqueantes (modales)</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">showModal</span>(AlertType type, String title, Window owner, String message[, AlertTheme theme])</div>
+        <div class="desc"><p><span lang="en">Owned, modal, waits for close (<code>showAndWait</code>).</span><span lang="es">Con owner, modal, espera el cierre (<code>showAndWait</code>).</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">showConfirmation</span>(String title, Window owner, String message[, AlertTheme theme])</div>
+        <div class="desc"><p><span lang="en">OK / Cancel dialog. Returns <code>true</code> only if OK was clicked.</span><span lang="es">Diálogo Aceptar / Cancelar. Devuelve <code>true</code> solo si se pulsó Aceptar.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">askYesNo</span>(String title, Window owner, String message[, AlertTheme theme])</div>
+        <div class="desc"><p><span lang="en">Yes / No dialog. Returns <code>true</code> only if Yes was clicked.</span><span lang="es">Diálogo Sí / No. Devuelve <code>true</code> solo si se pulsó Sí.</span></p></div>
+      </div>
+
+      <h2 id="rawcss"><span lang="en">Raw-CSS escape hatch</span><span lang="es">Vía de escape con CSS en crudo</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">showStyled</span>(AlertType type, String title, String message, String css)</div>
+        <div class="desc"><p><span lang="en">Non-blocking alert styled with an arbitrary CSS string (injected via base64 data URI). <code>css</code> must be non-blank.</span><span lang="es">Alerta no bloqueante estilizada con una cadena de CSS arbitraria (inyectada vía data URI en base64). <code>css</code> no puede estar en blanco.</span></p></div>
+      </div>
+
+      <h2 id="theme"><span lang="en">Building a custom AlertTheme</span><span lang="es">Construir un AlertTheme personalizado</span></h2>
+      <p>
+        <span lang="en"><code>AlertUtil.AlertTheme</code> is an immutable theme built with a
+        fluent <code>Builder</code>. Every field defaults to the light theme, so
+        you only set what you want to change.</span>
+        <span lang="es"><code>AlertUtil.AlertTheme</code> es un tema inmutable construido con un
+        <code>Builder</code> fluido. Cada campo usa por defecto el tema claro, así que
+        solo defines lo que quieres cambiar.</span>
+      </p>
+<pre data-lang="java"><code>AlertUtil.AlertTheme brand = AlertUtil.AlertTheme.builder()
+        .background(Color.web("#1b1e2b"))
+        .text(Color.web("#e6e6e6"))
+        .buttonBackground(Color.web("#2370ed"))
+        .buttonText(Color.WHITE)
+        .buttonHover(Color.web("#1f9bcf"))
+        .fontFamily("Segoe UI")
+        .fontSize(14)
+        .build();
+
+alerts.show(AlertType.WARNING, "Heads up", "Low disk space.", brand);</code></pre>
+      <table class="tbl">
+        <tr><th><span lang="en">Builder setter</span><span lang="es">Setter del builder</span></th><th><span lang="en">Affects</span><span lang="es">Afecta a</span></th></tr>
+        <tr><td><code>background</code> / <code>border</code></td><td><span lang="en">Dialog pane fill and 1px border.</span><span lang="es">Relleno del panel del diálogo y borde de 1px.</span></td></tr>
+        <tr><td><code>text</code></td><td><span lang="en">Content text color.</span><span lang="es">Color del texto del contenido.</span></td></tr>
+        <tr><td><code>headerBackground</code> / <code>headerText</code></td><td><span lang="en">Header panel (when present).</span><span lang="es">Panel de cabecera (cuando está presente).</span></td></tr>
+        <tr><td><code>buttonBackground</code> / <code>buttonText</code> / <code>buttonHover</code></td><td><span lang="en">Buttons and their hover state.</span><span lang="es">Botones y su estado hover.</span></td></tr>
+        <tr><td><code>fontFamily</code> (null/blank = inherit) · <code>fontSize</code> (&gt; 0)</td><td><span lang="en">Typography.</span><span lang="es">Tipografía.</span></td></tr>
+      </table>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">The OS title bar is not themable</span><span lang="es">La barra de título del SO no es tematizable</span></span>
+          <p><span lang="en">Styling applies to the dialog's content area (the <code>DialogPane</code>). The surrounding window title bar is drawn by the operating system and is outside JavaFX's reach.</span><span lang="es">El estilo se aplica al área de contenido del diálogo (el <code>DialogPane</code>). La barra de título de la ventana que lo rodea la dibuja el sistema operativo y está fuera del alcance de JavaFX.</span></p>
+        </div>
+      </div>
+      <div class="callout danger">
+        <span class="c-icon">🧵</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">FX thread for blocking dialogs</span><span lang="es">Hilo de FX para diálogos bloqueantes</span></span>
+          <p><span lang="en"><code>showModal</code>, <code>showConfirmation</code> and <code>askYesNo</code> block and must be invoked on the JavaFX Application Thread, as JavaFX requires.</span><span lang="es"><code>showModal</code>, <code>showConfirmation</code> y <code>askYesNo</code> bloquean y deben invocarse en el JavaFX Application Thread, como exige JavaFX.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Prefer AlertUtil over <a href="message.html">Message</a></strong> for new code when you want theming. Set a default theme once at startup so the whole app is consistent.</span><span lang="es"><strong>Prefiere AlertUtil sobre <a href="message.html">Message</a></strong> en código nuevo cuando quieras theming. Fija un tema por defecto una vez al inicio para que toda la app sea consistente.</span></p>
+          <p><span lang="en"><strong>Use</strong> <code>askYesNo</code> for destructive confirmations (clearer than OK/Cancel), and pass the owning <code>Window</code> so the dialog centers over it.</span><span lang="es"><strong>Usa</strong> <code>askYesNo</code> para confirmaciones destructivas (más claro que Aceptar/Cancelar), y pasa la <code>Window</code> propietaria para que el diálogo se centre sobre ella.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="theme-manager.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← ThemeManager</div></a>
+        <a class="next" href="message.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">Message →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

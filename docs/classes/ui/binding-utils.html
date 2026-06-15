@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BindingUtils — CoreFx</title>
+  <meta name="description" content="BindingUtils: two-way binding between a ToggleGroup and an ObjectProperty, keyed on each toggle's user data." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="binding-utils">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>BindingUtils</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>BindingUtils</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Static utility</span><span lang="es">Utilidad estática</span></span>
+        <span class="tag">final</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">Synchronizes a <code>ToggleGroup</code>'s selection with an
+        <code>ObjectProperty</code>: each toggle carries a domain value in its
+        <em>user data</em>, and selecting a toggle writes that value into the
+        property. Ideal for radio-button groups backing an enum or model field.</span>
+        <span lang="es">Sincroniza la selección de un <code>ToggleGroup</code> con un
+        <code>ObjectProperty</code>: cada toggle lleva un valor de dominio en su
+        <em>user data</em>, y seleccionar un toggle escribe ese valor en la propiedad.
+        Ideal para grupos de radio buttons que respaldan un enum o campo del modelo.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">How it works</span><span lang="es">Cómo funciona</span></h2>
+      <p>
+        <span lang="en">Every toggle's <code>userData</code> holds the value it represents. On
+        bind, the manager selects the toggle whose user data equals the property's
+        current value, then installs a listener that pushes the selected toggle's
+        user data into the property on every change. The listener is stashed in the
+        group's property map so it can be removed later by
+        <code>unbindToggleGroupToProperty</code>.</span>
+        <span lang="es">El <code>userData</code> de cada toggle guarda el valor que representa. Al hacer
+        el bind, el manager selecciona el toggle cuyo user data es igual al valor
+        actual de la propiedad, y luego instala un listener que empuja el user data del
+        toggle seleccionado a la propiedad en cada cambio. El listener se guarda en el
+        mapa de propiedades del grupo para poder eliminarlo después con
+        <code>unbindToggleGroupToProperty</code>.</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>ToggleGroup roleGroup = new ToggleGroup();
+adminRadio.setToggleGroup(roleGroup);  adminRadio.setUserData(Role.ADMIN);
+userRadio.setToggleGroup(roleGroup);   userRadio.setUserData(Role.USER);
+
+ObjectProperty&lt;Role&gt; selectedRole = new SimpleObjectProperty&lt;&gt;(Role.USER);
+
+// Two-way: picking a radio updates the property; the matching radio is
+// pre-selected from the property's initial value.
+BindingUtils.bindToggleGroupToProperty(roleGroup, selectedRole);
+
+// Later, when tearing the screen down:
+BindingUtils.unbindToggleGroupToProperty(roleGroup, selectedRole);</code></pre>
+
+      <h2 id="api"><span lang="en">API reference</span><span lang="es">Referencia de API</span></h2>
+      <div class="api-method">
+        <div class="sig">static &lt;T&gt; void <span class="m-name">bindToggleGroupToProperty</span>(ToggleGroup toggleGroup, ObjectProperty&lt;T&gt; property)</div>
+        <div class="desc">
+          <p><span lang="en">Creates the two-way binding. Pre-selects the toggle matching the property's current value, then keeps the property in sync with selection.</span><span lang="es">Crea el binding bidireccional. Preselecciona el toggle que coincide con el valor actual de la propiedad y luego mantiene la propiedad sincronizada con la selección.</span></p>
+          <p><span lang="en"><strong>Throws</strong> <code>NullPointerException</code> if either argument is null, and <code>IllegalArgumentException</code> if <em>any</em> toggle in the group has <code>null</code> user data.</span><span lang="es"><strong>Lanza</strong> <code>NullPointerException</code> si cualquiera de los argumentos es null, y <code>IllegalArgumentException</code> si <em>algún</em> toggle del grupo tiene user data <code>null</code>.</span></p>
+        </div>
+      </div>
+      <div class="api-method">
+        <div class="sig">static &lt;T&gt; void <span class="m-name">unbindToggleGroupToProperty</span>(ToggleGroup toggleGroup, ObjectProperty&lt;T&gt; property)</div>
+        <div class="desc"><p><span lang="en">Removes the previously-installed listener from the group. Both arguments are validated as non-null (<code>property</code> is kept for API symmetry).</span><span lang="es">Elimina del grupo el listener instalado previamente. Ambos argumentos se validan como no null (<code>property</code> se mantiene por simetría de la API).</span></p></div>
+      </div>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Every toggle needs user data</span><span lang="es">Cada toggle necesita user data</span></span>
+          <p><span lang="en">If even one toggle lacks user data, <code>bind</code> throws immediately — set <code>setUserData(...)</code> on all of them first. The user-data type must match the property's type parameter <code>T</code>.</span><span lang="es">Si aunque sea un toggle carece de user data, <code>bind</code> lanza excepción de inmediato — fija <code>setUserData(...)</code> en todos ellos primero. El tipo del user data debe coincidir con el parámetro de tipo <code>T</code> de la propiedad.</span></p>
+        </div>
+      </div>
+      <div class="callout note">
+        <span class="c-icon">↔️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Selection → property</span><span lang="es">Selección → propiedad</span></span>
+          <p><span lang="en">The listener pushes <em>toggle selection into the property</em>, and the initial sync pulls the property's starting value into the selection. Programmatic property changes after binding won't move the selection — drive the UI through the toggles, or re-select manually.</span><span lang="es">El listener empuja <em>la selección del toggle hacia la propiedad</em>, y la sincronización inicial lleva el valor de partida de la propiedad a la selección. Los cambios programáticos de la propiedad después del bind no moverán la selección — controla la UI a través de los toggles, o reselecciona manualmente.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> always pair a <code>bind</code> with an <code>unbind</code> when the view is disposed, to avoid leaking the listener on a long-lived <code>ToggleGroup</code>.</span><span lang="es"><strong>Empareja</strong> siempre un <code>bind</code> con un <code>unbind</code> cuando la vista se descarte, para no fugar el listener en un <code>ToggleGroup</code> de larga vida.</span></p>
+          <p><span lang="en"><strong>Do</strong> use enum constants as user data for clean, type-safe radio groups.</span><span lang="es"><strong>Usa</strong> constantes de enum como user data para grupos de radio limpios y con tipos seguros.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="format.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← Format</div></a>
+        <a class="next" href="image-util.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">ImageUtil →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

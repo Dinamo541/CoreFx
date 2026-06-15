@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Persistence — CoreFx</title>
+  <meta name="description" content="The persistence package: EntityManagerHelper." />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body data-depth="1" data-active="persistence">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <span><span lang="en">Persistence</span><span lang="es">Persistencia</span></span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.persistence</span>
+      <h1><span lang="en">💾 Persistence</span><span lang="es">💾 Persistencia</span></h1>
+      <p class="lead">
+        <span lang="en">A single helper that centralizes access to a shared persistence context
+        (typically a JPA <code>EntityManager</code>) <strong>without</strong>
+        coupling CoreFx to any persistence provider. Your application supplies a
+        factory; CoreFx stores, lazily creates, caches and hands back the manager
+        as an opaque object.</span>
+        <span lang="es">Un único ayudante que centraliza el acceso a un contexto de persistencia
+        compartido (típicamente un <code>EntityManager</code> de JPA) <strong>sin</strong>
+        acoplar CoreFx a ningún proveedor de persistencia. Tu aplicación provee una
+        fábrica; CoreFx la almacena, crea de forma perezosa, cachea y devuelve el
+        gestor como un objeto opaco.</span>
+      </p>
+
+      <h2><span lang="en">Classes</span><span lang="es">Clases</span></h2>
+      <div class="card-grid">
+        <a class="card" href="../classes/persistence/entity-manager-helper.html">
+          <div class="card-title"><code>EntityManagerHelper</code></div>
+          <div class="card-desc"><span lang="en">Lazily creates, caches and returns a persistence manager from a Supplier you register at startup. Provider-agnostic, thread-safe, with reset and best-effort close.</span><span lang="es">Crea de forma perezosa, cachea y devuelve un gestor de persistencia a partir de un Supplier que registras al inicio. Agnóstico al proveedor, thread-safe, con reinicio y cierre de mejor esfuerzo.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+      </div>
+
+      <div class="callout note">
+        <span class="c-icon">🧩</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Why a Supplier?</span><span lang="es">¿Por qué un Supplier?</span></span>
+          <p><span lang="en">Referencing <code>jakarta.persistence.EntityManager</code> directly would drag that API onto every consumer's classpath. Instead — like <code>FlowController</code>'s theme applier — the <em>consuming app</em> (which already has a JPA provider) passes a <code>Supplier&lt;?&gt;</code>, so the library depends only on the Java platform.</span><span lang="es">Referenciar <code>jakarta.persistence.EntityManager</code> directamente arrastraría esa API al classpath de cada consumidor. En su lugar — igual que el aplicador de temas de <code>FlowController</code> — la <em>app consumidora</em> (que ya tiene un proveedor JPA) pasa un <code>Supplier&lt;?&gt;</code>, de modo que la librería depende únicamente de la plataforma Java.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="util.html"><div class="pn-label"><span lang="en">Previous package</span><span lang="es">Paquete anterior</span></div><div class="pn-title"><span lang="en">← General Utilities</span><span lang="es">← Utilidades generales</span></div></a>
+        <a class="next" href="../classes/persistence/entity-manager-helper.html"><div class="pn-label"><span lang="en">Class</span><span lang="es">Clase</span></div><div class="pn-title">EntityManagerHelper →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

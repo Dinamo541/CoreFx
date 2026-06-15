@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ThemeManager — CoreFx</title>
+  <meta name="description" content="ThemeManager: register named CSS theme sets and live-switch them across scenes, tracked with weak references." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="theme-manager">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/ui.html"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></a><span class="sep">/</span>
+        <span>ThemeManager</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1>ThemeManager</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">thread-safe</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">A centralized controller for application themes. A <em>theme</em> is a
+        named set of stylesheet URLs. Register your themes once, choose an active
+        one, and let the manager apply it to any number of scenes — managed scenes
+        re-style automatically when the active theme changes, enabling live theme
+        switching without leaking memory.</span>
+        <span lang="es">Un controlador centralizado para los temas de la aplicación. Un <em>tema</em> es
+        un conjunto con nombre de URLs de hojas de estilo. Registra tus temas una vez,
+        elige uno activo y deja que el manager lo aplique a cualquier número de escenas
+        — las escenas gestionadas se reestilizan automáticamente cuando cambia el tema
+        activo, habilitando el cambio de tema en vivo sin fugas de memoria.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Overview &amp; key concepts</span><span lang="es">Visión general y conceptos clave</span></h2>
+      <ul>
+        <li><span lang="en"><strong>Surgical stylesheet handling.</strong> Applying a theme removes the URLs of <em>all</em> known themes from a scene before adding the active theme's URLs — so your app's own, non-theme stylesheets are never disturbed.</span><span lang="es"><strong>Manejo quirúrgico de hojas de estilo.</strong> Aplicar un tema elimina las URLs de <em>todos</em> los temas conocidos de una escena antes de añadir las URLs del tema activo — así las hojas de estilo propias de tu app (no temáticas) nunca se ven afectadas.</span></li>
+        <li><span lang="en"><strong>Weak scene tracking.</strong> Managed scenes are held with weak references (a <code>WeakHashMap</code>-backed set), so managing a scene never prevents it from being garbage-collected.</span><span lang="es"><strong>Rastreo débil de escenas.</strong> Las escenas gestionadas se sostienen con referencias débiles (un conjunto respaldado por <code>WeakHashMap</code>), así que gestionar una escena nunca impide que sea recolectada por el GC.</span></li>
+        <li><span lang="en"><strong>Decoupled from navigation.</strong> It deliberately does not depend on <code>FlowController</code>; bridge the two with <code>asApplier()</code>.</span><span lang="es"><strong>Desacoplado de la navegación.</strong> Deliberadamente no depende de <code>FlowController</code>; conecta ambos con <code>asApplier()</code>.</span></li>
+        <li><span lang="en"><strong>Thread-safe.</strong> The registry is a <code>ConcurrentHashMap</code>; scene mutations are marshalled onto the FX thread when needed.</span><span lang="es"><strong>Thread-safe.</strong> El registro es un <code>ConcurrentHashMap</code>; las mutaciones de escena se redirigen al hilo de FX cuando es necesario.</span></li>
+      </ul>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>ThemeManager themes = ThemeManager.getInstance();
+themes.registerTheme("dark",  "/app/css/dark.css");
+themes.registerTheme("light", "/app/css/light.css");
+themes.setActiveTheme("dark");
+
+// Let every scene FlowController builds be themed automatically:
+FlowController.getInstance().setThemeApplier(themes.asApplier());
+
+// Flip the theme at runtime — all managed scenes update instantly:
+themes.setActiveTheme("light");</code></pre>
+
+      <h2 id="registry"><span lang="en">Theme registry</span><span lang="es">Registro de temas</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">registerTheme</span>(String name, String... urls) <span style="color:var(--text-faint)">/ (String name, List&lt;String&gt; urls)</span></div>
+        <div class="desc"><p><span lang="en">Registers (or replaces) a theme. The name must be non-blank; the URL list and its entries must be non-null.</span><span lang="es">Registra (o reemplaza) un tema. El nombre no puede estar en blanco; la lista de URLs y sus entradas no pueden ser null.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">unregisterTheme</span>(String name)</div>
+        <div class="desc"><p><span lang="en">Removes a theme. If it was active, the active selection is cleared.</span><span lang="es">Elimina un tema. Si estaba activo, la selección activa se limpia.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">boolean <span class="m-name">hasTheme</span>(String name) &nbsp;·&nbsp; Set&lt;String&gt; <span class="m-name">getThemeNames</span>()</div>
+        <div class="desc"><p><span lang="en">Existence check and an unmodifiable snapshot of registered names.</span><span lang="es">Comprobación de existencia y una instantánea no modificable de los nombres registrados.</span></p></div>
+      </div>
+
+      <h2 id="active"><span lang="en">Active theme</span><span lang="es">Tema activo</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">setActiveTheme</span>(String name)</div>
+        <div class="desc"><p><span lang="en">Activates a registered theme and immediately re-applies it to every managed scene. Throws <code>IllegalArgumentException</code> if the name is null/blank or not registered.</span><span lang="es">Activa un tema registrado y lo reaplica de inmediato a cada escena gestionada. Lanza <code>IllegalArgumentException</code> si el nombre es null/en blanco o no está registrado.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">String <span class="m-name">getActiveTheme</span>() &nbsp;·&nbsp; void <span class="m-name">clearActiveTheme</span>()</div>
+        <div class="desc"><p><span lang="en">The active name (or <code>null</code>), and a way to clear it — which strips theme stylesheets from managed scenes, returning them to an unstyled state.</span><span lang="es">El nombre activo (o <code>null</code>), y una forma de limpiarlo — que quita las hojas de estilo de tema de las escenas gestionadas, devolviéndolas a un estado sin estilo.</span></p></div>
+      </div>
+
+      <h2 id="scenes"><span lang="en">Scene application</span><span lang="es">Aplicación a escenas</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Behaviour</span><span lang="es">Comportamiento</span></th></tr>
+        <tr><td><code>applyTheme(scene)</code></td><td><span lang="en">Applies the active theme once, <em>without</em> tracking the scene for future updates.</span><span lang="es">Aplica el tema activo una vez, <em>sin</em> rastrear la escena para futuras actualizaciones.</span></td></tr>
+        <tr><td><code>manage(scene)</code></td><td><span lang="en">Applies now <em>and</em> tracks (weakly) for automatic re-theming on every change.</span><span lang="es">Aplica ahora <em>y</em> rastrea (débilmente) para reaplicar el tema automáticamente en cada cambio.</span></td></tr>
+        <tr><td><code>forget(scene)</code></td><td><span lang="en">Stops tracking a scene; its current stylesheets are left as-is.</span><span lang="es">Deja de rastrear una escena; sus hojas de estilo actuales se mantienen como están.</span></td></tr>
+        <tr><td><code>asApplier()</code></td><td><span lang="en">Returns a <code>Consumer&lt;Scene&gt;</code> that calls <code>manage</code> — ready for <code>FlowController.setThemeApplier(...)</code>.</span><span lang="es">Devuelve un <code>Consumer&lt;Scene&gt;</code> que llama a <code>manage</code> — listo para <code>FlowController.setThemeApplier(...)</code>.</span></td></tr>
+      </table>
+
+      <div class="callout tip">
+        <span class="c-icon">🔗</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">The FlowController bridge</span><span lang="es">El puente con FlowController</span></span>
+          <p><span lang="en"><code>asApplier()</code> is the intended integration point: pass it to <code>FlowController</code> (directly or via an <code>initialize</code> overload) and every scene the controller creates is tracked and themed — so a single <code>setActiveTheme</code> call restyles the entire app.</span><span lang="es"><code>asApplier()</code> es el punto de integración previsto: pásalo a <code>FlowController</code> (directamente o vía una sobrecarga de <code>initialize</code>) y cada escena que cree el controlador queda rastreada y con tema — así una sola llamada a <code>setActiveTheme</code> reestiliza toda la app.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations &amp; pitfalls</span><span lang="es">Recomendaciones y trampas</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> register all themes at startup, then switch freely — switching is instant across every managed scene.</span><span lang="es"><strong>Registra</strong> todos los temas al inicio y luego cambia libremente — el cambio es instantáneo en cada escena gestionada.</span></p>
+          <p><span lang="en"><strong>Do</strong> use <code>manage</code> (not <code>applyTheme</code>) for any scene that should follow runtime theme changes.</span><span lang="es"><strong>Usa</strong> <code>manage</code> (no <code>applyTheme</code>) para cualquier escena que deba seguir los cambios de tema en tiempo de ejecución.</span></p>
+        </div>
+      </div>
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Only registered URLs are managed</span><span lang="es">Solo se gestionan las URLs registradas</span></span>
+          <p><span lang="en">Switching themes removes the URLs of <em>registered</em> themes before adding the active set. A stylesheet you add to a scene by hand (not part of any registered theme) is preserved — but also won't be swapped out. Keep theme stylesheets inside registered themes if you want them managed.</span><span lang="es">Cambiar de tema elimina las URLs de los temas <em>registrados</em> antes de añadir el conjunto activo. Una hoja de estilo que añadas a mano a una escena (que no forme parte de ningún tema registrado) se conserva — pero tampoco se intercambiará. Mantén las hojas de estilo de tema dentro de temas registrados si quieres que se gestionen.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="../navigation/stage-manager.html"><div class="pn-label"><span lang="en">Previous</span><span lang="es">Anterior</span></div><div class="pn-title">← StageManager</div></a>
+        <a class="next" href="alert-util.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">AlertUtil →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

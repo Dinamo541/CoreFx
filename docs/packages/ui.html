@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Utilities — CoreFx</title>
+  <meta name="description" content="The ui package: ThemeManager, AlertUtil, Message, TableUtils, Format, BindingUtils and ImageUtil." />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body data-depth="1" data-active="ui">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <span><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.ui</span>
+      <h1><span lang="en">🎨 UI Utilities</span><span lang="es">🎨 Utilidades de UI</span></h1>
+      <p class="lead">
+        <span lang="en">Seven helpers for the day-to-day of building JavaFX screens: theming,
+        dialogs, tables, input formatting, two-way binding and image handling.
+        Each is self-contained and adds no external dependency.</span>
+        <span lang="es">Siete ayudantes para el día a día de construir pantallas JavaFX: theming,
+        diálogos, tablas, formateo de entrada, binding bidireccional y manejo de
+        imágenes. Cada uno es autónomo y no agrega ninguna dependencia externa.</span>
+      </p>
+
+      <h2><span lang="en">Classes</span><span lang="es">Clases</span></h2>
+      <div class="card-grid">
+        <a class="card" href="../classes/ui/theme-manager.html">
+          <div class="card-title"><code>ThemeManager</code></div>
+          <div class="card-desc"><span lang="en">Register named CSS theme sets, activate one, and apply it to scenes. Live-switches all managed scenes; tracks them with weak references.</span><span lang="es">Registra conjuntos de temas CSS con nombre, activa uno y aplícalo a las escenas. Cambia en vivo todas las escenas gestionadas; las rastrea con referencias débiles.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/alert-util.html">
+          <div class="card-title"><code>AlertUtil</code></div>
+          <div class="card-desc"><span lang="en">Themed alert/confirmation dialogs with self-contained CSS injected via a data: URI. Presets, a color builder, or raw CSS. Recommended for new code.</span><span lang="es">Diálogos de alerta/confirmación con tema y CSS autónomo inyectado mediante un data: URI. Presets, un builder de colores o CSS en crudo. Recomendado para código nuevo.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/message.html">
+          <div class="card-title"><code>Message</code></div>
+          <div class="card-desc"><span lang="en">Lightweight, theme-free alert and confirmation dialogs — a pure static utility with smart content sizing.</span><span lang="es">Diálogos de alerta y confirmación ligeros y sin tema — una utilidad puramente estática con dimensionado inteligente del contenido.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/table-utils.html">
+          <div class="card-title"><code>TableUtils</code></div>
+          <div class="card-desc"><span lang="en">Type-safe TableView setup: lambda-based columns, items, selection, placeholders and a ready-made live search filter.</span><span lang="es">Configuración de TableView con tipos seguros: columnas basadas en lambdas, items, selección, placeholders y un filtro de búsqueda en vivo listo para usar.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/format.html">
+          <div class="card-title"><code>Format</code></div>
+          <div class="card-desc"><span lang="en">TextFormatter input filters (integers, 2-decimal, IDs, Unicode-aware letters, max-length) plus shared date/decimal formatters.</span><span lang="es">Filtros de entrada para TextFormatter (enteros, 2 decimales, IDs, letras Unicode, longitud máxima) más formateadores de fecha/decimales compartidos.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/binding-utils.html">
+          <div class="card-title"><code>BindingUtils</code></div>
+          <div class="card-desc"><span lang="en">Two-way binding between a ToggleGroup and an ObjectProperty, keyed on each toggle's user data.</span><span lang="es">Binding bidireccional entre un ToggleGroup y un ObjectProperty, indexado por el user data de cada toggle.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/ui/image-util.html">
+          <div class="card-title"><code>ImageUtil</code></div>
+          <div class="card-desc"><span lang="en">Robust image loading from classpath/URL/file, view shaping (scaled, circular, rounded) and pure-Java pixel processing.</span><span lang="es">Carga robusta de imágenes desde classpath/URL/archivo, modelado de vistas (escalada, circular, redondeada) y procesamiento de píxeles en Java puro.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+      </div>
+
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">AlertUtil vs. Message</span><span lang="es">AlertUtil vs. Message</span></span>
+          <p><span lang="en">Both show the same dialogs. Reach for <code>AlertUtil</code> when you want theming (dark UIs, branded colors); reach for <code>Message</code> when you want the lightest, theme-free option. They share identical content sizing.</span><span lang="es">Ambos muestran los mismos diálogos. Usa <code>AlertUtil</code> cuando quieras theming (interfaces oscuras, colores de marca); usa <code>Message</code> cuando quieras la opción más ligera y sin tema. Comparten el mismo dimensionado de contenido.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="navigation.html"><div class="pn-label"><span lang="en">Previous package</span><span lang="es">Paquete anterior</span></div><div class="pn-title"><span lang="en">← Navigation &amp; Flow</span><span lang="es">← Navegación y flujo</span></div></a>
+        <a class="next" href="../classes/ui/theme-manager.html"><div class="pn-label"><span lang="en">First class</span><span lang="es">Primera clase</span></div><div class="pn-title">ThemeManager →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

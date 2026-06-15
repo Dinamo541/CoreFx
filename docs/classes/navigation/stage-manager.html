@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StageManager — CoreFx</title>
+  <meta name="description" content="StageManager: a named registry and thread-safe API for JavaFX window lifecycle, state, geometry, icons and dragging." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="stage-manager">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/navigation.html"><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></a><span class="sep">/</span>
+        <span>StageManager</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
+      <h1>StageManager</h1>
+      <div class="tags">
+        <span class="tag accent">Singleton</span>
+        <span class="tag">final</span>
+        <span class="tag green">thread-safe</span>
+        <span class="tag java">JavaFX</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">A named registry of <code>Stage</code>s plus a uniform, defensive API for
+        their whole life: show / hide / close, window state (maximize, iconify,
+        full-screen, always-on-top, opacity), geometry (size, position, centering,
+        fitting to a screen), icons, and dragging of undecorated windows.</span>
+        <span lang="es">Un registro con nombre de <code>Stage</code>s más una API uniforme y defensiva
+        para toda su vida: mostrar / ocultar / cerrar, estado de ventana (maximizar,
+        minimizar, pantalla completa, siempre al frente, opacidad), geometría (tamaño,
+        posición, centrado, ajuste a una pantalla), iconos y arrastre de ventanas sin
+        decoración.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Overview</span><span lang="es">Visión general</span></h2>
+      <p>
+        <span lang="en">Where <a href="flow-controller.html">FlowController</a> concentrates on
+        loading views and swapping scene content, <code>StageManager</code>
+        concentrates on the <em>windows themselves</em>. Register a stage under a
+        key once and address it from anywhere — no need to thread <code>Stage</code>
+        references through your controllers.</span>
+        <span lang="es">Mientras <a href="flow-controller.html">FlowController</a> se concentra en
+        cargar vistas e intercambiar el contenido de las escenas, <code>StageManager</code>
+        se concentra en las <em>ventanas en sí</em>. Registra un stage bajo una clave
+        una vez y diríjete a él desde cualquier lugar — sin tener que pasar referencias
+        de <code>Stage</code> por tus controladores.</span>
+      </p>
+
+      <div class="callout danger">
+        <span class="c-icon">🧵</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Thread-safe by design — the standout feature</span><span lang="es">Thread-safe por diseño — la característica estrella</span></span>
+          <p><span lang="en">Every UI-mutating method routes through <code>runOnFxThread(...)</code>: it runs immediately if you're already on the JavaFX Application Thread, otherwise it defers via <code>Platform.runLater</code>. So you can call <code>StageManager</code> from a background worker without reasoning about threading yourself.</span><span lang="es">Cada método que muta la UI pasa por <code>runOnFxThread(...)</code>: se ejecuta de inmediato si ya estás en el JavaFX Application Thread, y si no, lo difiere vía <code>Platform.runLater</code>. Así puedes llamar a <code>StageManager</code> desde un worker en segundo plano sin razonar tú mismo sobre los hilos.</span></p>
+        </div>
+      </div>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>StageManager stages = StageManager.getInstance();
+
+Stage report = new Stage();
+stages.register("report", report);   // name it once
+
+stages.show("report");               // address it by name anywhere
+stages.centerOnCurrentScreen(report);
+stages.setAlwaysOnTop(report, true);
+
+// On shutdown:
+stages.closeAll();</code></pre>
+
+      <h2 id="registry"><span lang="en">Registry</span><span lang="es">Registro</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Returns / behaviour</span><span lang="es">Devuelve / comportamiento</span></th></tr>
+        <tr><td><code>register(key, stage)</code></td><td><span lang="en">Registers (replacing any prior). Returns the previous stage or <code>null</code>. Rejects null/blank key and null stage.</span><span lang="es">Registra (reemplazando cualquier anterior). Devuelve el stage previo o <code>null</code>. Rechaza clave null/en blanco y stage null.</span></td></tr>
+        <tr><td><code>unregister(key)</code></td><td><span lang="en">Removes from the registry (does <em>not</em> close it). Returns the removed stage or <code>null</code>.</span><span lang="es">Elimina del registro (<em>no</em> lo cierra). Devuelve el stage eliminado o <code>null</code>.</span></td></tr>
+        <tr><td><code>getStage(key)</code></td><td><span lang="en">The stage or <code>null</code> — never throws for a missing key.</span><span lang="es">El stage o <code>null</code> — nunca lanza excepción ante una clave inexistente.</span></td></tr>
+        <tr><td><code>hasStage(key)</code></td><td><span lang="en">Whether a stage is registered.</span><span lang="es">Si hay un stage registrado.</span></td></tr>
+        <tr><td><code>getKeys()</code></td><td><span lang="en">An unmodifiable snapshot of the keys.</span><span lang="es">Una instantánea no modificable de las claves.</span></td></tr>
+        <tr><td><code>clear()</code></td><td><span lang="en">Empties the registry without closing the stages.</span><span lang="es">Vacía el registro sin cerrar los stages.</span></td></tr>
+      </table>
+      <div class="callout note">
+        <span class="c-icon">🔑</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Key-addressed operations fail loudly</span><span lang="es">Las operaciones por clave fallan de forma visible</span></span>
+          <p><span lang="en">The lifecycle/by-key methods (<code>show(key)</code>, <code>close(key)</code>, …) throw <code>IllegalArgumentException</code> when nothing is registered under that key — surfacing the mistake instead of silently doing nothing. Plain lookups (<code>getStage</code>, <code>hasStage</code>) never throw.</span><span lang="es">Los métodos de ciclo de vida/por clave (<code>show(key)</code>, <code>close(key)</code>, …) lanzan <code>IllegalArgumentException</code> cuando no hay nada registrado bajo esa clave — exponiendo el error en vez de no hacer nada en silencio. Las búsquedas simples (<code>getStage</code>, <code>hasStage</code>) nunca lanzan.</span></p>
+        </div>
+      </div>
+
+      <h2 id="lifecycle"><span lang="en">Lifecycle</span><span lang="es">Ciclo de vida</span></h2>
+      <div class="method-list">
+        <a href="#lifecycle">show</a><a href="#lifecycle">hide</a>
+        <a href="#lifecycle">close</a><a href="#lifecycle">closeAll</a>
+        <a href="#lifecycle">hideAll</a><a href="#lifecycle">bringToFront</a>
+      </div>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Behaviour</span><span lang="es">Comportamiento</span></th></tr>
+        <tr><td><code>show(stage)</code> / <code>show(key)</code></td><td><span lang="en">Shows (if hidden) and brings to front.</span><span lang="es">Muestra (si está oculto) y trae al frente.</span></td></tr>
+        <tr><td><code>hide(stage)</code> / <code>hide(key)</code></td><td><span lang="en">Hides without closing.</span><span lang="es">Oculta sin cerrar.</span></td></tr>
+        <tr><td><code>close(stage)</code></td><td><span lang="en">Closes; leaves the registry untouched.</span><span lang="es">Cierra; deja el registro intacto.</span></td></tr>
+        <tr><td><code>close(key)</code></td><td><span lang="en">Closes <em>and</em> unregisters in one step.</span><span lang="es">Cierra <em>y</em> desregistra en un solo paso.</span></td></tr>
+        <tr><td><code>closeAll()</code></td><td><span lang="en">Closes every registered stage and clears the registry.</span><span lang="es">Cierra todos los stages registrados y vacía el registro.</span></td></tr>
+        <tr><td><code>hideAll()</code></td><td><span lang="en">Hides all without closing or clearing.</span><span lang="es">Oculta todos sin cerrarlos ni vaciar el registro.</span></td></tr>
+        <tr><td><code>bringToFront(stage)</code></td><td><span lang="en">Shows if needed, then raises to the top of the stack.</span><span lang="es">Muestra si hace falta y luego lo eleva a la cima de la pila.</span></td></tr>
+      </table>
+
+      <h2 id="state"><span lang="en">Window state</span><span lang="es">Estado de la ventana</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Notes</span><span lang="es">Notas</span></th></tr>
+        <tr><td><code>setMaximized(stage, bool)</code> · <code>toggleMaximized(stage)</code></td><td><span lang="en">Maximize / restore.</span><span lang="es">Maximizar / restaurar.</span></td></tr>
+        <tr><td><code>setIconified(stage, bool)</code></td><td><span lang="en">Minimize / restore.</span><span lang="es">Minimizar / restaurar.</span></td></tr>
+        <tr><td><code>setFullScreen(stage, bool)</code> · <code>toggleFullScreen(stage)</code></td><td><span lang="en">Full-screen control.</span><span lang="es">Control de pantalla completa.</span></td></tr>
+        <tr><td><code>setAlwaysOnTop(stage, bool)</code></td><td><span lang="en">Keep above other windows.</span><span lang="es">Mantener por encima de otras ventanas.</span></td></tr>
+        <tr><td><code>setResizable(stage, bool)</code></td><td><span lang="en">Allow / forbid user resizing.</span><span lang="es">Permitir / prohibir el redimensionado por el usuario.</span></td></tr>
+        <tr><td><code>setOpacity(stage, double)</code></td><td><span lang="en">Clamped to <code>[0.0, 1.0]</code>; <code>NaN</code> → <code>1.0</code>, so bad input never yields an invalid window.</span><span lang="es">Acotado a <code>[0.0, 1.0]</code>; <code>NaN</code> → <code>1.0</code>, así una entrada mala nunca produce una ventana inválida.</span></td></tr>
+        <tr><td><code>setTitle(stage, String)</code></td><td><span lang="en">A <code>null</code> title is normalized to <code>""</code>.</span><span lang="es">Un título <code>null</code> se normaliza a <code>""</code>.</span></td></tr>
+      </table>
+
+      <h2 id="geometry"><span lang="en">Geometry</span><span lang="es">Geometría</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Notes</span><span lang="es">Notas</span></th></tr>
+        <tr><td><code>setSize</code> / <code>setMinSize</code> / <code>setMaxSize</code> <code>(stage, w, h)</code></td><td><span lang="en">Dimensions must be finite and non-negative, else <code>IllegalArgumentException</code>.</span><span lang="es">Las dimensiones deben ser finitas y no negativas, de lo contrario <code>IllegalArgumentException</code>.</span></td></tr>
+        <tr><td><code>setPosition(stage, x, y)</code></td><td><span lang="en">Negative coords allowed (valid on multi-monitor); must be finite.</span><span lang="es">Se permiten coordenadas negativas (válidas en multimonitor); deben ser finitas.</span></td></tr>
+        <tr><td><code>centerOnScreen(stage)</code></td><td><span lang="en">Platform centering.</span><span lang="es">Centrado de la plataforma.</span></td></tr>
+        <tr><td><code>centerOnCurrentScreen(stage)</code></td><td><span lang="en">Centers within the screen that currently holds most of the window — better on multi-monitor.</span><span lang="es">Centra dentro de la pantalla que actualmente contiene la mayor parte de la ventana — mejor en multimonitor.</span></td></tr>
+        <tr><td><code>fitToScreen(stage)</code></td><td><span lang="en">Fills the current screen's visual bounds (excluding taskbar) <em>without</em> entering OS maximized/full-screen mode.</span><span lang="es">Llena los límites visuales de la pantalla actual (excluyendo la barra de tareas) <em>sin</em> entrar al modo maximizado/pantalla completa del SO.</span></td></tr>
+      </table>
+
+      <h2 id="icons"><span lang="en">Icons &amp; dragging</span><span lang="es">Iconos y arrastre</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">setIcon</span>(Stage, Image) &nbsp;·&nbsp; void <span class="m-name">addIcon</span>(Stage, Image)</div>
+        <div class="desc"><p><span lang="en"><code>setIcon</code> replaces all icons with one; <code>addIcon</code> appends. Both reject null arguments.</span><span lang="es"><code>setIcon</code> reemplaza todos los iconos por uno; <code>addIcon</code> añade. Ambos rechazan argumentos null.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">makeDraggable</span>(Stage stage, Node handle)</div>
+        <div class="desc"><p><span lang="en">Makes an undecorated window draggable by pressing on <code>handle</code> (typically a custom title bar). It preserves the cursor-to-origin offset so the window follows the pointer without jumping. Re-registering replaces prior handlers.</span><span lang="es">Hace que una ventana sin decoración se pueda arrastrar pulsando sobre <code>handle</code> (típicamente una barra de título personalizada). Preserva el desplazamiento cursor-a-origen para que la ventana siga al puntero sin saltos. Re-registrar reemplaza los manejadores previos.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">removeDraggable</span>(Node handle)</div>
+        <div class="desc"><p><span lang="en">Removes the drag handlers previously installed on <code>handle</code>.</span><span lang="es">Elimina los manejadores de arrastre instalados previamente en <code>handle</code>.</span></p></div>
+      </div>
+<pre data-lang="java"><code>// Custom chrome: a borderless window you can drag by its header bar.
+Stage win = new Stage(StageStyle.UNDECORATED);
+stages.register("editor", win);
+stages.makeDraggable(win, titleBar);   // titleBar is a Node in the scene
+stages.fitToScreen(win);</code></pre>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> register every secondary window you'll touch again, and use <code>close(key)</code> to close + unregister together (avoids leaking stale registry entries).</span><span lang="es"><strong>Registra</strong> toda ventana secundaria que vayas a volver a tocar, y usa <code>close(key)</code> para cerrar + desregistrar a la vez (evita dejar entradas obsoletas en el registro).</span></p>
+          <p><span lang="en"><strong>Do</strong> lean on the automatic FX-thread marshalling — call straight from background tasks.</span><span lang="es"><strong>Apóyate</strong> en el marshalling automático al hilo de FX — llama directamente desde tareas en segundo plano.</span></p>
+          <p><span lang="en"><strong>Prefer</strong> <code>fitToScreen</code> over OS-maximize when you want a full-bleed window that still behaves like a normal, movable window.</span><span lang="es"><strong>Prefiere</strong> <code>fitToScreen</code> sobre el maximizado del SO cuando quieras una ventana a sangre completa que siga comportándose como una ventana normal y movible.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="app-context.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← AppContext</div></a>
+        <a class="next" href="../ui/theme-manager.html"><div class="pn-label"><span lang="en">Next package</span><span lang="es">Siguiente paquete</span></div><div class="pn-title">ThemeManager →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Navigation &amp; Flow — CoreFx</title>
+  <meta name="description" content="The navigation package: FlowController, AppContext and StageManager." />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <script src="../assets/js/theme.js"></script>
+</head>
+<body data-depth="1" data-active="navigation">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <span><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
+      <h1><span lang="en">🗺️ Navigation &amp; Flow</span><span lang="es">🗺️ Navegación y flujo</span></h1>
+      <p class="lead">
+        <span lang="en">The three classes that move users through your app and carry shared
+        state between screens. They are complementary and commonly used together:
+        <code>FlowController</code> loads views and swaps scenes,
+        <code>StageManager</code> owns the windows, and <code>AppContext</code>
+        holds the cross-cutting data both need.</span>
+        <span lang="es">Las tres clases que mueven a los usuarios por tu app y transportan estado
+        compartido entre pantallas. Son complementarias y se usan habitualmente juntas:
+        <code>FlowController</code> carga vistas y cambia escenas,
+        <code>StageManager</code> administra las ventanas y <code>AppContext</code>
+        guarda los datos transversales que ambas necesitan.</span>
+      </p>
+
+      <h2><span lang="en">Classes</span><span lang="es">Clases</span></h2>
+      <div class="card-grid">
+        <a class="card" href="../classes/navigation/flow-controller.html">
+          <div class="card-title"><code>FlowController</code></div>
+          <div class="card-desc"><span lang="en">The heart of the library. Loads &amp; caches FXML views, swaps scenes, opens windows and modals (blocking &amp; non-blocking), drives BorderPane regions, and carries i18n + a typed transfer value.</span><span lang="es">El corazón de la librería. Carga y cachea vistas FXML, cambia escenas, abre ventanas y modales (bloqueantes y no bloqueantes), gobierna regiones de BorderPane y transporta i18n + un valor de transferencia tipado.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/navigation/app-context.html">
+          <div class="card-title"><code>AppContext</code></div>
+          <div class="card-desc"><span lang="en">Thread-safe, process-wide key-value store for shared application state. Backed by a ConcurrentHashMap; keys must be non-blank, values non-null.</span><span lang="es">Almacén clave-valor thread-safe y a nivel de proceso para el estado compartido de la aplicación. Respaldado por un ConcurrentHashMap; las claves no pueden estar en blanco y los valores no pueden ser null.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/navigation/stage-manager.html">
+          <div class="card-title"><code>StageManager</code></div>
+          <div class="card-desc"><span lang="en">A named registry plus a safe, thread-marshalled API for window lifecycle, state, geometry, icons and undecorated-window dragging.</span><span lang="es">Un registro con nombre más una API segura y ordenada por hilos para el ciclo de vida de ventanas, estado, geometría, iconos y arrastre de ventanas sin decoración.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+      </div>
+
+      <div class="callout note">
+        <span class="c-icon">💡</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">How they fit together</span><span lang="es">Cómo encajan entre sí</span></span>
+          <p><span lang="en">A typical flow: <code>FlowController.goViewMain("Login")</code> shows the first screen; after login you stash the user with <code>AppContext.put("user", u)</code>; later you open a tool window and register it with <code>StageManager.register("report", stage)</code> so any controller can bring it to front.</span><span lang="es">Un flujo típico: <code>FlowController.goViewMain("Login")</code> muestra la primera pantalla; tras el login guardas el usuario con <code>AppContext.put("user", u)</code>; más tarde abres una ventana de herramienta y la registras con <code>StageManager.register("report", stage)</code> para que cualquier controlador pueda traerla al frente.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="../index.html"><div class="pn-label"><span lang="en">Back</span><span lang="es">Volver</span></div><div class="pn-title"><span lang="en">← Home</span><span lang="es">← Inicio</span></div></a>
+        <a class="next" href="../classes/navigation/flow-controller.html"><div class="pn-label"><span lang="en">First class</span><span lang="es">Primera clase</span></div><div class="pn-title">FlowController →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../assets/js/site.js"></script>
+</body>
+</html>

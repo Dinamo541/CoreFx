@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Answer — CoreFx</title>
+  <meta name="description" content="Answer: a standardized response wrapper with state, user + internal messages, and a keyed result payload with a fluent builder." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="answer">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/util.html"><span lang="en">General Utilities</span><span lang="es">Utilidades generales</span></a><span class="sep">/</span>
+        <span>Answer</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.util</span>
+      <h1>Answer</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Value type</span><span lang="es">Tipo valor</span></span>
+        <span class="tag">final</span>
+        <span class="tag">Serializable</span>
+        <span class="tag">Cloneable</span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">A standardized, immutable-friendly response object for operations. It
+        bundles an outcome <strong>state</strong> (success/failure), a user-facing
+        <strong>message</strong>, a technical <strong>internal message</strong> for
+        logs, and an arbitrary keyed <strong>result payload</strong> — so every
+        service method can return one consistent shape.</span>
+        <span lang="es">Un objeto de respuesta estandarizado y amigable con la inmutabilidad para
+        operaciones. Reúne un <strong>estado</strong> de resultado (éxito/fallo), un
+        <strong>mensaje</strong> de cara al usuario, un <strong>mensaje interno</strong>
+        técnico para los logs y una <strong>carga de resultados</strong> arbitraria e
+        indexada — para que cada método de servicio pueda devolver una forma
+        consistente.</span>
+      </p>
+
+      <h2 id="overview"><span lang="en">Why a response wrapper</span><span lang="es">Por qué un envoltorio de respuesta</span></h2>
+      <p>
+        <span lang="en">Instead of throwing for expected failures or returning bare booleans,
+        return an <code>Answer</code>: the caller checks <code>isSuccess()</code>,
+        shows <code>getMessage()</code> to the user, logs
+        <code>getInternalMessage()</code>, and reads typed results by key. The
+        result map is a <code>LinkedHashMap</code>, so keys keep insertion order
+        for deterministic <code>toString()</code>.</span>
+        <span lang="es">En vez de lanzar excepciones ante fallos esperados o devolver booleanos
+        pelados, devuelve un <code>Answer</code>: el llamante comprueba
+        <code>isSuccess()</code>, muestra <code>getMessage()</code> al usuario, registra
+        <code>getInternalMessage()</code> y lee resultados tipados por clave. El mapa de
+        resultados es un <code>LinkedHashMap</code>, así las claves conservan el orden
+        de inserción para un <code>toString()</code> determinista.</span>
+      </p>
+      <div class="callout note">
+        <span class="c-icon">🛡️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Resilience guarantees</span><span lang="es">Garantías de resiliencia</span></span>
+          <p><span lang="en">The result map is <code>final</code> and never <code>null</code>. <code>getResults()</code> returns an <em>unmodifiable view</em>, so the only mutation path is <code>setResult</code>/<code>with</code> — external code can't corrupt the payload. Result keys may never be null; values may be.</span><span lang="es">El mapa de resultados es <code>final</code> y nunca <code>null</code>. <code>getResults()</code> devuelve una <em>vista no modificable</em>, así que la única vía de mutación es <code>setResult</code>/<code>with</code> — el código externo no puede corromper la carga. Las claves de resultado nunca pueden ser null; los valores sí.</span></p>
+        </div>
+      </div>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>// Build with static factories + the fluent builder:
+return Answer.success("Account created")
+             .with("userId", user.getId())
+             .with("user", user);
+
+// Failure:
+return Answer.failure("E-mail already in use");
+
+// Consume:
+Answer a = service.register(form);
+if (a.isSuccess()) {
+    Long id = a.getResult("userId", Long.class);   // type-safe, null on mismatch
+} else {
+    Message.show(AlertType.ERROR, "Error", a.getMessage());
+}</code></pre>
+
+      <h2 id="factories"><span lang="en">Static factories</span><span lang="es">Fábricas estáticas</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Factory</span><span lang="es">Fábrica</span></th><th><span lang="en">Produces</span><span lang="es">Produce</span></th></tr>
+        <tr><td><code>Answer.ok()</code></td><td><span lang="en">Success, no messages.</span><span lang="es">Éxito, sin mensajes.</span></td></tr>
+        <tr><td><code>Answer.success(message)</code></td><td><span lang="en">Success with a user message.</span><span lang="es">Éxito con un mensaje para el usuario.</span></td></tr>
+        <tr><td><code>Answer.success(message, internal)</code></td><td><span lang="en">Success with user + internal messages.</span><span lang="es">Éxito con mensajes para el usuario + internos.</span></td></tr>
+        <tr><td><code>Answer.failure(message)</code></td><td><span lang="en">Failure with a user message.</span><span lang="es">Fallo con un mensaje para el usuario.</span></td></tr>
+        <tr><td><code>Answer.failure(message, internal)</code></td><td><span lang="en">Failure with user + internal messages.</span><span lang="es">Fallo con mensajes para el usuario + internos.</span></td></tr>
+      </table>
+      <p><span lang="en">Constructors are also available: no-arg, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, and a copy constructor <code>Answer(Answer)</code>.</span><span lang="es">También hay constructores disponibles: sin argumentos, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, y un constructor de copia <code>Answer(Answer)</code>.</span></p>
+
+      <h2 id="state"><span lang="en">State</span><span lang="es">Estado</span></h2>
+      <table class="tbl">
+        <tr><th><span lang="en">Method</span><span lang="es">Método</span></th><th><span lang="en">Meaning</span><span lang="es">Significado</span></th></tr>
+        <tr><td><code>getState()</code> / <code>setState(Boolean)</code></td><td><span lang="en">The raw flag — <code>true</code>, <code>false</code>, or <code>null</code> (never set).</span><span lang="es">El indicador crudo — <code>true</code>, <code>false</code> o <code>null</code> (nunca asignado).</span></td></tr>
+        <tr><td><code>isSuccess()</code></td><td><span lang="en"><code>true</code> only when state is non-null and <code>true</code>.</span><span lang="es"><code>true</code> solo cuando el estado no es null y es <code>true</code>.</span></td></tr>
+        <tr><td><code>isFailure()</code></td><td><span lang="en"><code>true</code> only when state is non-null and <code>false</code>.</span><span lang="es"><code>true</code> solo cuando el estado no es null y es <code>false</code>.</span></td></tr>
+      </table>
+      <div class="callout tip">
+        <span class="c-icon">💡</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Tri-state on purpose</span><span lang="es">Tri-estado a propósito</span></span>
+          <p><span lang="en">Because state is a <code>Boolean</code>, an <code>Answer</code> can be "neither confirmed success nor failure" (<code>null</code>). Use <code>isSuccess()</code>/<code>isFailure()</code> rather than truth-testing <code>getState()</code> to handle that cleanly.</span><span lang="es">Como el estado es un <code>Boolean</code>, un <code>Answer</code> puede ser "ni éxito ni fallo confirmados" (<code>null</code>). Usa <code>isSuccess()</code>/<code>isFailure()</code> en vez de evaluar la verdad de <code>getState()</code> para manejar eso con limpieza.</span></p>
+        </div>
+      </div>
+
+      <h2 id="messages"><span lang="en">Messages</span><span lang="es">Mensajes</span></h2>
+      <p><span lang="en"><code>getMessage()</code> / <code>setMessage()</code> for the end-user text, and <code>getInternalMessage()</code> / <code>setInternalMessage()</code> for technical detail meant for logs and debugging. Both may be <code>null</code>.</span><span lang="es"><code>getMessage()</code> / <code>setMessage()</code> para el texto del usuario final, y <code>getInternalMessage()</code> / <code>setInternalMessage()</code> para el detalle técnico destinado a logs y depuración. Ambos pueden ser <code>null</code>.</span></p>
+
+      <h2 id="payload"><span lang="en">Result payload</span><span lang="es">Carga de resultados</span></h2>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">setResult</span>(String key, Object value) &nbsp;·&nbsp; Answer <span class="m-name">with</span>(String key, Object value)</div>
+        <div class="desc"><p><span lang="en">Add/replace an entry. <code>with</code> is the fluent variant returning <code>this</code> for chaining. Key must be non-null; value may be null.</span><span lang="es">Añade/reemplaza una entrada. <code>with</code> es la variante fluida que devuelve <code>this</code> para encadenar. La clave no puede ser null; el valor sí.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Object <span class="m-name">getResult</span>(String key) &nbsp;·&nbsp; &lt;T&gt; T <span class="m-name">getResult</span>(String key, Class&lt;T&gt; type)</div>
+        <div class="desc"><p><span lang="en">Raw lookup, or a type-safe one that returns <code>null</code> when absent <em>or</em> of a different type — so it never throws <code>ClassCastException</code>.</span><span lang="es">Búsqueda cruda, o una con tipo seguro que devuelve <code>null</code> cuando no existe <em>o</em> es de otro tipo — así nunca lanza <code>ClassCastException</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Object <span class="m-name">getResultOrDefault</span>(String key, Object def) &nbsp;·&nbsp; boolean <span class="m-name">hasResult</span>(String key) &nbsp;·&nbsp; Object <span class="m-name">removeResult</span>(String key)</div>
+        <div class="desc"><p><span lang="en">Default-returning lookup, presence check, and removal (returns the previous value).</span><span lang="es">Búsqueda con valor por defecto, comprobación de presencia y eliminación (devuelve el valor anterior).</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Map&lt;String,Object&gt; <span class="m-name">getResults</span>()</div>
+        <div class="desc"><p><span lang="en">An <strong>unmodifiable view</strong> of all results — mutating it throws <code>UnsupportedOperationException</code>.</span><span lang="es">Una <strong>vista no modificable</strong> de todos los resultados — mutarla lanza <code>UnsupportedOperationException</code>.</span></p></div>
+      </div>
+
+      <h2 id="copy"><span lang="en">Copying &amp; equality</span><span lang="es">Copia e igualdad</span></h2>
+      <p>
+        <span lang="en"><code>clone()</code> and its cast-free alias <code>copy()</code> both
+        produce an independent <code>Answer</code> via the copy constructor (a
+        shallow copy of the result map — value references are shared).
+        <code>equals</code>/<code>hashCode</code>/<code>toString</code> consider all
+        fields, with deterministic ordering thanks to the <code>LinkedHashMap</code>.</span>
+        <span lang="es"><code>clone()</code> y su alias sin cast <code>copy()</code> producen ambos un
+        <code>Answer</code> independiente vía el constructor de copia (una copia
+        superficial del mapa de resultados — las referencias de los valores se
+        comparten). <code>equals</code>/<code>hashCode</code>/<code>toString</code>
+        consideran todos los campos, con orden determinista gracias al
+        <code>LinkedHashMap</code>.</span>
+      </p>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Shallow copy semantics</span><span lang="es">Semántica de copia superficial</span></span>
+          <p><span lang="en"><code>copy()</code> duplicates the map structure but shares the stored value objects. If a stored value is mutable and you mutate it, both answers see the change. Keep payload values immutable when that matters.</span><span lang="es"><code>copy()</code> duplica la estructura del mapa pero comparte los objetos de valor almacenados. Si un valor almacenado es mutable y lo mutas, ambos answers ven el cambio. Mantén inmutables los valores de la carga cuando eso importe.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> return <code>Answer</code> from service/business methods for a uniform success/failure contract across the app.</span><span lang="es"><strong>Devuelve</strong> <code>Answer</code> desde los métodos de servicio/negocio para un contrato uniforme de éxito/fallo en toda la app.</span></p>
+          <p><span lang="en"><strong>Do</strong> use the typed <code>getResult(key, type)</code> to avoid casts and accidental <code>ClassCastException</code>.</span><span lang="es"><strong>Usa</strong> el <code>getResult(key, type)</code> tipado para evitar casts y <code>ClassCastException</code> accidentales.</span></p>
+          <p><span lang="en"><strong>Do</strong> put the friendly text in <code>message</code> and the stack-trace-y detail in <code>internalMessage</code> — show one, log the other.</span><span lang="es"><strong>Pon</strong> el texto amable en <code>message</code> y el detalle tipo stack-trace en <code>internalMessage</code> — muestra uno, registra el otro.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="validator.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← Validator</div></a>
+        <a class="next" href="../persistence/entity-manager-helper.html"><div class="pn-label"><span lang="en">Next package</span><span lang="es">Siguiente paquete</span></div><div class="pn-title">EntityManagerHelper →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>
