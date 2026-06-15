@@ -81,7 +81,7 @@
     host.innerHTML =
       '<div class="nav-inner">' +
         '<button class="icon-btn nav-mobile-btn" data-toggle-sidebar aria-label="Open menu">☰</button>' +
-        '<a class="nav-brand" href="' + url("index.html") + '"><span class="logo">Fx</span> CoreFx</a>' +
+        '<a class="nav-brand" href="' + url("index.html") + '"><img src="' + url("assets/img/CoreFXLogo.png") + '" alt="CoreFx" class="nav-logo" />CoreFx</a>' +
         '<nav class="nav-links">' + links + "</nav>" +
         '<span class="nav-spacer"></span>' +
         '<div class="nav-actions">' +
