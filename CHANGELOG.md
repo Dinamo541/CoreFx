@@ -7,12 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-14
+
 ### Added
-- **Distribution**: Added `jitpack.yml` so the library can be consumed as a
-  dependency through [JitPack](https://jitpack.io), built with JDK 25.
+- **Distribution**: Published to **Maven Central** under
+  `io.github.dinamo541:corefx`. Releases are signed with GPG and uploaded through
+  the Sonatype Central Portal via a `release` Maven profile.
 - **CI**: Added a GitHub Actions workflow (`.github/workflows/build.yml`) that
   builds the project and runs the test suite on every push and pull request to `main`.
-- **Docs**: Added a JitPack installation section to `README.md`.
+- **Tests**: Added a JUnit 5 unit-test suite (47 tests) covering the
+  runtime-free classes: `Validator`, `Answer`, `AppContext`, and the non-UI
+  surface of `Format`.
+- **Build**: Stamped an `Automatic-Module-Name` (`io.github.dinamo541.corefx`)
+  into the jar manifest so JPMS consumers get a stable module name without a
+  full `module-info.java`.
+- **API — `FlowController`**: Blocking modals (`goViewInModalAndWait`), a typed
+  data-transfer slot (`setTransferValue` / `getTransferValue`), and
+  internationalization via an injectable `ResourceBundle` (`setIdioma`, plus an
+  `initialize` overload that accepts a locale bundle).
+- **API — `AppContext`**: `putIfAbsent`, `getOrDefault`, `isEmpty`, `size`, and a
+  generic, type-inferring `get`.
+- **API — `Answer`**: Static factories (`ok`, `success`, `failure`), a fluent
+  `with` builder, type-safe `getResult(key, type)`, and `copy()`.
+- **API — `Validator`**: Full suite of null-safe predicates and throwing
+  contract validators, including `requireInRange(double, ...)`.
+- **Docs**: Added a Maven Central installation section (Maven + Gradle) to `README.md`.
 
 ### Changed
 - **Docs**: Moved `CONTRIBUTING.md` into `.github/` to consolidate the
@@ -20,8 +39,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Environment**: Upgraded to **Java 25** and **JavaFX 25**.
 - **Group/Package**: Reorganized folder structure and migrated packages to `io.github.dinamo541.corefx` from `cr.ac.una.corefx`. The Maven `groupId` remains `io.github.dinamo541`.
 - **Build**: Added JUnit 5 (Jupiter) test dependencies and `maven-surefire-plugin` configuration.
-- **Build**: Added Maven publication metadata (`<name>`, `<description>`, `<url>`, `<licenses>`, `<developers>`, `<scm>`) for Maven Central / JitPack compatibility.
+- **Build**: Added Maven publication metadata (`<name>`, `<description>`, `<url>`, `<licenses>`, `<developers>`, `<scm>`) required by Maven Central.
+- **Hardening (all packages)**: Sealed utility/singleton classes as `final`,
+  enforced null-safety contracts with `Objects.requireNonNull`, pre-compiled
+  regular expressions into reusable constants, and made `equals`/`hashCode`
+  consistent with singleton identity.
+- **`Format`**: `lettersFormat` is now Unicode-aware (accepts accented names such
+  as *María*, *Ñoño*); `getDecimalFormat()` returns a defensive copy; primitive
+  `int` parameters replace boxed `Integer` to remove auto-unboxing NPEs.
+- **`Message`**: Converted from a singleton to a pure static utility class,
+  consistent with the other `ui` helpers.
+- **`Answer` / `AppContext`**: Made key and value null-handling consistent across
+  the entire map API surface.
 - **Docs**: Added `LICENSE` (MIT) and refreshed `.gitignore` / `licenseheader.txt`.
+
+### Fixed
+- **`FlowController`**: Fixed an `NullPointerException` in `prepareStage` when no
+  application icon is present, added `checkInitialized` guards to every public
+  navigation method, and corrected `equals`/`hashCode` to singleton identity.
+- **`Message`**: `loadIcon` no longer throws an opaque `NullPointerException`
+  when a resource is missing; it now delegates to `ImageUtil` and reports a clear
+  `IllegalArgumentException`.
+- **`Answer`**: Fixed inconsistent null-key handling where read methods silently
+  accepted `null` keys while writes rejected them.
 
 ## [1.0.2] - 2026-06-10
 
@@ -55,3 +95,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 [unreleased]: #unreleased
+[1.2.0]: #120---2026-06-14

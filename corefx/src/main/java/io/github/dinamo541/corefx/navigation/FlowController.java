@@ -8,6 +8,7 @@ package io.github.dinamo541.corefx.navigation;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -19,10 +20,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -61,10 +59,10 @@ import javafx.stage.WindowEvent;
  * </ul>
  *
  * @author Dominique
- * @version 2.6
+ * @version 2.7
  * @since 2026-06-25
  */
-public class FlowController {
+public final class FlowController {
 
     // =========================================================================
     // SECTION 1: SINGLETON & FIELDS
@@ -107,6 +105,17 @@ public class FlowController {
     /** Primary JavaFX {@link Stage} managed by this controller. */
     private volatile Stage mainStage;
 
+    /**
+     * Optional {@link ResourceBundle} injected into every {@link FXMLLoader}
+     * created by this controller, enabling internationalized FXML — {@code %key}
+     * references in the markup resolve against this bundle. Declared
+     * {@code volatile} so its registration is visible across threads.
+     * Set via {@link #setIdioma(ResourceBundle)}; {@code null} loads views without
+     * a bundle. Changing it clears the loader cache so subsequent loads pick up
+     * the new locale.
+     */
+    private volatile ResourceBundle idioma;
+
     /** Application display name used as the window title. */
     private volatile String appName;
 
@@ -139,6 +148,16 @@ public class FlowController {
      * unstyled.
      */
     private volatile Consumer<Scene> themeApplier = null;
+
+    /**
+     * Arbitrary value handed from one view's controller to the next across a
+     * navigation, letting controllers share data without referencing one another.
+     * Declared {@code volatile} to guarantee visibility of writes across threads.
+     * Set via {@link #setTransferValue(Object)} and consumed via
+     * {@link #getTransferValue()} or {@link #getTransferValue(Class)};
+     * {@code null} means no value is pending.
+     */
+    private volatile Object transferValue;
 
     /**
      * Private constructor — use {@link #getInstance()} to obtain the singleton.
@@ -282,9 +301,46 @@ public class FlowController {
     public void initialize(Stage stage, String appName, String baseViewPath,
             String baseResourcePath, String appIconPath,
             Class<?> appClass, Consumer<Scene> themeApplier) {
-        // themeApplier is registered AFTER so it is not modified if initialize() throws
         initialize(stage, appName, baseViewPath, baseResourcePath, appIconPath, appClass);
         setThemeApplier(themeApplier);
+    }
+
+    /**
+     * Initializes the controller with full parameters plus a theme applier and a
+     * localization bundle. Both the theme applier and the bundle are registered
+     * only after the core initialization succeeds, preventing partial state if
+     * initialization fails (e.g. called twice).
+     *
+     * <p>
+     * Unlike the {@code String} parameters, {@code idioma} is fully optional:
+     * passing {@code null} simply loads views without a {@link ResourceBundle},
+     * which is harmless for FXML that contains no {@code %key} references. See
+     * {@link #setIdioma(ResourceBundle)}.
+     * </p>
+     *
+     * @param stage            the primary JavaFX stage
+     * @param appName          the display name used as the window title
+     * @param baseViewPath     classpath path to the view folder
+     * @param baseResourcePath classpath path to the resources folder
+     * @param appIconPath      classpath path to the application icon
+     * @param appClass         the main application class, used to load resources
+     * @param themeApplier     optional callback to apply theming to created scenes;
+     *                         pass {@code null} to leave scenes unstyled
+     * @param idioma           optional resource bundle for localizing views;
+     *                         pass {@code null} to load views without one
+     * @throws NullPointerException     if {@code stage} or {@code appClass} is
+     *                                  {@code null}
+     * @throws IllegalArgumentException if any {@code String} parameter is
+     *                                  {@code null} or blank
+     * @throws IllegalStateException    if the controller has already been
+     *                                  initialized
+     */
+    public void initialize(Stage stage, String appName, String baseViewPath,
+            String baseResourcePath, String appIconPath,
+            Class<?> appClass, Consumer<Scene> themeApplier, ResourceBundle idioma) {
+        initialize(stage, appName, baseViewPath, baseResourcePath, appIconPath, appClass);
+        setThemeApplier(themeApplier);
+        setIdioma(idioma);
     }
 
     /**
@@ -373,6 +429,13 @@ public class FlowController {
      * Use {@link #getLoader(String)} to obtain a cached instance instead.
      * </p>
      *
+     * <p>
+     * The currently registered {@link ResourceBundle} (see
+     * {@link #setIdioma(ResourceBundle)}) is passed to the loader, so
+     * internationalized FXML resolves against it; a {@code null} bundle loads the
+     * view without one.
+     * </p>
+     *
      * @param name the view name, without the {@code .fxml} extension
      * @return a loaded {@link FXMLLoader} for the specified view
      * @throws IllegalStateException if the controller has not been initialized
@@ -381,7 +444,7 @@ public class FlowController {
     public FXMLLoader createLoaderInstance(String name) throws IOException {
         checkInitialized();
         try {
-            FXMLLoader loader = new FXMLLoader(appClass.getResource(baseViewPath + name + ".fxml"));
+            FXMLLoader loader = new FXMLLoader(appClass.getResource(baseViewPath + name + ".fxml"), idioma);
             loader.load();
             return loader;
         } catch (IOException | RuntimeException ex) {
@@ -436,6 +499,7 @@ public class FlowController {
      * @param view the view name to remove from cache
      */
     public void removeLoader(String view) {
+        checkInitialized();
         loaders.remove(view);
     }
 
@@ -444,6 +508,7 @@ public class FlowController {
      * Forces all views to be reloaded from disk on next access.
      */
     public void clearLoadersMap() {
+        checkInitialized();
         loaders.clear();
     }
 
@@ -500,7 +565,10 @@ public class FlowController {
     private void prepareStage(Stage stage, Scene scene) {
         stage.setScene(scene);
         stage.setTitle(appName);
-        stage.getIcons().add(loadAppIcon());
+        Image icon = loadAppIcon();
+        if (icon != null) {
+            stage.getIcons().add(icon);
+        }
     }
 
     // =========================================================================
@@ -686,9 +754,6 @@ public class FlowController {
             if (viewName == null || viewName.isBlank()) {
                 throw new IllegalArgumentException("View name is null or empty");
             }
-            if (mainStage == null) {
-                throw new IllegalStateException("Main stage is not initialized");
-            }
 
             Parent root = getLoader(viewName).getRoot();
             Scene scene = mainStage.getScene();
@@ -721,9 +786,6 @@ public class FlowController {
         try {
             if (viewName == null || viewName.isBlank()) {
                 throw new IllegalArgumentException("View name is null or empty");
-            }
-            if (mainStage == null) {
-                throw new IllegalStateException("Main stage is not initialized");
             }
 
             Parent view = getLoader(viewName).getRoot();
@@ -860,6 +922,86 @@ public class FlowController {
         }
     }
 
+    /**
+     * Opens a view in a modal dialog owned by the main stage and blocks until it
+     * is closed. Uses default resizable setting (true).
+     *
+     * @param viewName the name of the view to load
+     *
+     * @see #goViewInModalAndWait(String, Stage, Boolean)
+     */
+    public void goViewInModalAndWait(String viewName) {
+        checkInitialized();
+        goViewInModalAndWait(viewName, mainStage, true);
+    }
+
+    /**
+     * Opens a view in a modal dialog owned by the specified stage and blocks
+     * until it is closed. Uses default resizable setting (true).
+     *
+     * @param viewName the name of the view to load
+     * @param owner    the owner stage for the modal dialog
+     *
+     * @see #goViewInModalAndWait(String, Stage, Boolean)
+     */
+    public void goViewInModalAndWait(String viewName, Stage owner) {
+        checkInitialized();
+        goViewInModalAndWait(viewName, owner, true);
+    }
+
+    /**
+     * Opens a view in a modal dialog owned by the main stage and blocks until it
+     * is closed.
+     *
+     * @param viewName  the name of the view to load
+     * @param resizable whether the dialog can be resized by the user
+     *
+     * @see #goViewInModalAndWait(String, Stage, Boolean)
+     */
+    public void goViewInModalAndWait(String viewName, Boolean resizable) {
+        checkInitialized();
+        goViewInModalAndWait(viewName, mainStage, resizable);
+    }
+
+    /**
+     * Opens a view in a modal dialog and blocks the calling thread until the
+     * dialog is closed.
+     *
+     * <p>
+     * This is the blocking counterpart of
+     * {@link #goViewInModal(String, Stage, Boolean)}: it uses
+     * {@link Stage#showAndWait()} so the call does not return until the user
+     * dismisses the dialog, which is useful for confirmation flows where the
+     * result must be read immediately after navigation (for example via
+     * {@link #getTransferValue()}). It must be invoked on the JavaFX Application
+     * Thread.
+     * </p>
+     *
+     * @param viewName  the name of the view to load
+     * @param owner     the owner stage for the modal dialog
+     * @param resizable whether the dialog can be resized by the user
+     * @throws RuntimeException if the view cannot be loaded
+     */
+    public void goViewInModalAndWait(String viewName, Stage owner, Boolean resizable) {
+        checkInitialized();
+        try {
+            FXMLLoader loader = getLoader(viewName);
+            Stage stage = new Stage();
+
+            stage.setResizable(resizable);
+            stage.initOwner(owner);
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setOnHidden((WindowEvent event) -> {
+                stage.getScene().setRoot(new Pane());
+            });
+            prepareStage(stage, createScene(loader.getRoot()));
+            stage.centerOnScreen();
+            stage.showAndWait();
+        } catch (RuntimeException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     // =========================================================================
     // SECTION 10: SCENE & STAGE NAVIGATION
     // =========================================================================
@@ -869,13 +1011,12 @@ public class FlowController {
      *
      * @param viewName the name of the view to load
      * @param stage    the stage whose scene should be changed
-     * @throws RuntimeException if stage is null or view cannot be loaded
+     * @throws NullPointerException if {@code stage} is {@code null}
+     * @throws RuntimeException     if the view cannot be loaded
      */
     public void changeViewInStage(String viewName, Stage stage) {
         checkInitialized();
-        if (stage == null) {
-            throw new RuntimeException("The Stage can not be null");
-        }
+        Objects.requireNonNull(stage, "stage cannot be null");
         try {
             FXMLLoader loader = getLoader(viewName);
             prepareStage(stage, createScene(loader.getRoot()));
@@ -906,13 +1047,12 @@ public class FlowController {
      *
      * @param viewName the name of the view to load
      * @param scene    the scene whose root should be changed
-     * @throws RuntimeException if scene is null or view cannot be loaded
+     * @throws NullPointerException if {@code scene} is {@code null}
+     * @throws RuntimeException     if the view cannot be loaded
      */
     public void changeViewInScene(String viewName, Scene scene) {
         checkInitialized();
-        if (scene == null) {
-            throw new RuntimeException("The Scene can not be null");
-        }
+        Objects.requireNonNull(scene, "scene cannot be null");
         try {
             FXMLLoader loader = getLoader(viewName);
             Node root = scene.getRoot();
@@ -1063,6 +1203,7 @@ public class FlowController {
      * @throws IllegalArgumentException if region is invalid
      */
     public void clearRegion(String region, BorderPane borderPane) {
+        checkInitialized();
         switch (region) {
             case "Center" ->
                 borderPane.setCenter(null);
@@ -1193,7 +1334,104 @@ public class FlowController {
     }
 
     // =========================================================================
-    // SECTION 14: STATE & ACCESSORS
+    // SECTION 14: INTERNATIONALIZATION
+    // =========================================================================
+
+    /**
+     * Registers the {@link ResourceBundle} used to localize every view loaded
+     * afterwards. The bundle is passed to each {@link FXMLLoader}, so {@code %key}
+     * references in the FXML resolve against it.
+     *
+     * <p>
+     * Because cached loaders capture the bundle at creation time, this method
+     * clears the loader cache; subsequent loads rebuild their views against the
+     * new bundle, which makes runtime language switching work. Pass {@code null}
+     * to load views without any bundle.
+     * </p>
+     *
+     * <p>
+     * Example:
+     * </p>
+     *
+     * <pre>{@code
+     * FlowController.getInstance()
+     *         .setIdioma(ResourceBundle.getBundle("i18n.messages", new Locale("es")));
+     * }</pre>
+     *
+     * @param idioma the resource bundle to apply, or {@code null} to disable
+     *               localization
+     */
+    public void setIdioma(ResourceBundle idioma) {
+        this.idioma = idioma;
+        loaders.clear();
+    }
+
+    /**
+     * Returns the currently registered localization bundle.
+     *
+     * @return the active {@link ResourceBundle}, or {@code null} if none is set
+     */
+    public ResourceBundle getIdioma() {
+        return idioma;
+    }
+
+    // =========================================================================
+    // SECTION 15: DATA TRANSFER
+    // =========================================================================
+
+    /**
+     * Stores a value to be handed to the next view, replacing any value
+     * previously stored. This lets a controller pass data to the controller it
+     * navigates to without the two referencing each other directly.
+     *
+     * @param value the value to transfer; pass {@code null} to clear any pending
+     *              value
+     */
+    public void setTransferValue(Object value) {
+        this.transferValue = value;
+    }
+
+    /**
+     * Returns the pending transfer value as an opaque {@link Object}.
+     *
+     * <p>
+     * The value is not consumed by this call; it remains available until
+     * overwritten or cleared via {@link #setTransferValue(Object)}. Prefer the
+     * type-safe {@link #getTransferValue(Class)} when the expected type is known.
+     * </p>
+     *
+     * @return the pending transfer value, or {@code null} if none is set
+     */
+    public Object getTransferValue() {
+        return transferValue;
+    }
+
+    /**
+     * Returns the pending transfer value cast to the requested type.
+     *
+     * @param <T>  the expected type of the transfer value
+     * @param type the class object of the expected type; must not be {@code null}
+     * @return the transfer value cast to {@code T}, or {@code null} if none is set
+     * @throws NullPointerException  if {@code type} is {@code null}
+     * @throws IllegalStateException if the stored value is not an instance of
+     *                               {@code type}
+     */
+    public <T> T getTransferValue(Class<T> type) {
+        Objects.requireNonNull(type, "type cannot be null");
+        Object current = transferValue;
+        if (current == null) {
+            return null;
+        }
+        if (!type.isInstance(current)) {
+            throw new IllegalStateException(
+                    "The transfer value is of type " + current.getClass().getName()
+                            + " and cannot be viewed as " + type.getName() + ".");
+        }
+        return type.cast(current);
+    }
+
+    // =========================================================================
+    // SECTION 16: STATE & ACCESSORS
     // =========================================================================
 
     /**
@@ -1212,9 +1450,7 @@ public class FlowController {
      * @throws IllegalStateException if main stage is not initialized
      */
     public Stage getMainStage() {
-        if (mainStage == null) {
-            throw new IllegalStateException("Main stage is not initialized");
-        }
+        checkInitialized();
         return mainStage;
     }
 
@@ -1255,7 +1491,7 @@ public class FlowController {
     }
 
     // =========================================================================
-    // SECTION 15: OBJECT CONTRACT
+    // SECTION 17: OBJECT CONTRACT
     // =========================================================================
 
     /**
@@ -1272,21 +1508,21 @@ public class FlowController {
     }
 
     /**
-     * Computes the hash code for this FlowController.
+     * Computes the hash code for this singleton class.
      *
-     * @return hash code based on main stage and loaders
+     * @return hash code
      */
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(mainStage, loaders);
+        return Objects.hash();
     }
 
     /**
-     * Compares this FlowController with another object for equality.
-     * Two controllers are equal if their main stage and loaders are equal.
+     * Compares this {@code FlowController} singleton with another object for
+     * equality.
      *
      * @param obj the object to compare with
-     * @return true if the objects are equal, false otherwise
+     * @return {@code true} if the objects are of the same class
      */
     @Override
     public boolean equals(Object obj) {
@@ -1294,9 +1530,7 @@ public class FlowController {
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        FlowController other = (FlowController) obj;
-        return java.util.Objects.equals(mainStage, other.mainStage) &&
-                java.util.Objects.equals(loaders, other.loaders);
+        return true;
     }
 
     /**

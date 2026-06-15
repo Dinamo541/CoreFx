@@ -41,18 +41,20 @@ import java.util.Objects;
  * with the fluent {@link #with(String, Object)} builder.
  * </p>
  *
+ * @author Sem
  * @author Carranza
  * @author Dominique
- * @author Sem
- * @version 2.1
+ * @version 2.2
  * @since 2026/06/10
  */
-public class Answer implements java.io.Serializable, Cloneable {
+public final class Answer implements java.io.Serializable, Cloneable {
 
     @java.io.Serial
     private static final long serialVersionUID = 1L;
 
-    /** Operation outcome flag; {@code true} on success, {@code false} on failure. */
+    /**
+     * Operation outcome flag; {@code true} on success, {@code false} on failure.
+     */
     private Boolean state;
 
     /** Human-readable message intended to be shown to the end user. */
@@ -268,10 +270,12 @@ public class Answer implements java.io.Serializable, Cloneable {
     /**
      * Gets a result from the map by key name.
      *
-     * @param key the result key (may be {@code null})
+     * @param key the result key (must not be {@code null})
      * @return the stored object, or {@code null} if not found
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public Object getResult(String key) {
+        Objects.requireNonNull(key, "result key cannot be null");
         return result.get(key);
     }
 
@@ -281,14 +285,15 @@ public class Answer implements java.io.Serializable, Cloneable {
      * {@code type}, so this method never throws {@link ClassCastException}.
      *
      * @param <T>  the expected result type
-     * @param key  the result key (may be {@code null})
+     * @param key  the result key (must not be {@code null})
      * @param type the class object of the expected type (must not be
      *             {@code null})
      * @return the stored value cast to {@code T}, or {@code null} if absent or of
      *         a different type
-     * @throws NullPointerException if {@code type} is {@code null}
+     * @throws NullPointerException if {@code key} or {@code type} is {@code null}
      */
     public <T> T getResult(String key, Class<T> type) {
+        Objects.requireNonNull(key, "result key cannot be null");
         Objects.requireNonNull(type, "type cannot be null");
         Object value = result.get(key);
         return type.isInstance(value) ? type.cast(value) : null;
@@ -297,22 +302,26 @@ public class Answer implements java.io.Serializable, Cloneable {
     /**
      * Gets a result, or a fallback value when the key is absent.
      *
-     * @param key          the result key (may be {@code null})
+     * @param key          the result key (must not be {@code null})
      * @param defaultValue value returned when the key is not present
      * @return the stored value, or {@code defaultValue} if the key is absent
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public Object getResultOrDefault(String key, Object defaultValue) {
+        Objects.requireNonNull(key, "result key cannot be null");
         return result.containsKey(key) ? result.get(key) : defaultValue;
     }
 
     /**
      * Tests whether a result is stored under the given key.
      *
-     * @param key the result key (may be {@code null})
+     * @param key the result key (must not be {@code null})
      * @return {@code true} if a value (including {@code null}) is mapped to
      *         {@code key}
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public boolean hasResult(String key) {
+        Objects.requireNonNull(key, "result key cannot be null");
         return result.containsKey(key);
     }
 
@@ -345,16 +354,18 @@ public class Answer implements java.io.Serializable, Cloneable {
      */
     public Answer with(String key, Object value) {
         setResult(key, value);
-        return this; 
+        return this;
     }
 
     /**
      * Removes a result entry.
      *
-     * @param key the result key (may be {@code null})
+     * @param key the result key (must not be {@code null})
      * @return the previously stored value, or {@code null} if none
+     * @throws NullPointerException if {@code key} is {@code null}
      */
     public Object removeResult(String key) {
+        Objects.requireNonNull(key, "result key cannot be null");
         return result.remove(key);
     }
 
@@ -367,7 +378,7 @@ public class Answer implements java.io.Serializable, Cloneable {
      * @return an unmodifiable view of the result map (never {@code null})
      */
     public Map<String, Object> getResults() {
-        return Collections.unmodifiableMap(result);  
+        return Collections.unmodifiableMap(result);
     }
 
     // ---------------------------------------------------------------------
@@ -396,7 +407,7 @@ public class Answer implements java.io.Serializable, Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(state, message, internalMessage, result); 
+        return Objects.hash(state, message, internalMessage, result);
     }
 
     /**

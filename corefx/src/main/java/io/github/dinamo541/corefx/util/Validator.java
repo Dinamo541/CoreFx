@@ -43,9 +43,9 @@ import java.util.regex.Pattern;
  * avoid catastrophic regex performance against hostile input.
  * </p>
  *
- * @author Dominique
  * @author Sem
- * @version 1.0
+ * @author Dominique
+ * @version 1.1
  * @since 2026/06/10
  */
 public final class Validator {
@@ -65,13 +65,17 @@ public final class Validator {
     /** Matches an optionally signed integer. */
     private static final Pattern INTEGER = Pattern.compile("[+-]?\\d+");
 
-    /** Matches an optionally signed decimal number (e.g. {@code -12}, {@code 3.14}). */
+    /**
+     * Matches an optionally signed decimal number (e.g. {@code -12}, {@code 3.14}).
+     */
     private static final Pattern DECIMAL = Pattern.compile("[+-]?\\d+(\\.\\d+)?");
 
     /** Matches one or more Unicode letters. */
     private static final Pattern ALPHABETIC = Pattern.compile("\\p{L}+");
 
-    /** Matches one or more Unicode letters and spaces (no leading/trailing space). */
+    /**
+     * Matches one or more Unicode letters and spaces (no leading/trailing space).
+     */
     private static final Pattern ALPHABETIC_SPACES = Pattern.compile("\\p{L}+(\\s\\p{L}+)*");
 
     /** Matches one or more Unicode letters or digits. */
@@ -294,8 +298,8 @@ public final class Validator {
      * @param regex the regular expression (may be {@code null})
      * @return {@code true} if {@code value} fully matches {@code regex}
      */
-    public boolean matches(String value, String regex) { 
-        
+    public boolean matches(String value, String regex) {
+
         if (value == null || regex == null) {
             return false;
         }
@@ -496,6 +500,28 @@ public final class Validator {
      * @throws IllegalArgumentException if {@code value} is outside the range
      */
     public long requireInRange(long value, long min, long max, String name) {
+        if (!isInRange(value, min, max)) {
+            throw new IllegalArgumentException(
+                    (name == null ? "value" : name) + " (" + value
+                            + ") must be between " + Math.min(min, max)
+                            + " and " + Math.max(min, max));
+        }
+        return value;
+    }
+
+    /**
+     * Ensures a {@code double} value lies within the inclusive range
+     * {@code [min, max]}, returning it unchanged. {@code NaN} is never in range and
+     * therefore always fails validation.
+     *
+     * @param value the value to validate
+     * @param min   one bound of the range
+     * @param max   the other bound of the range
+     * @param name  the field name used to build the exception message
+     * @return {@code value}, guaranteed to be in range
+     * @throws IllegalArgumentException if {@code value} is outside the range
+     */
+    public double requireInRange(double value, double min, double max, String name) {
         if (!isInRange(value, min, max)) {
             throw new IllegalArgumentException(
                     (name == null ? "value" : name) + " (" + value
