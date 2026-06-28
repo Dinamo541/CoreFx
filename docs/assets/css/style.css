@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 /* =========================================================================
    CoreFx Documentation — design system
    Dark-first theme with a light toggle. All colors flow from CSS variables.
@@ -19,11 +21,11 @@
   --accent-3: #00c2a8;
   --java: #f89820;
   --grad: linear-gradient(135deg, #2370ED 0%, #1f9bcf 50%, #00c2a8 100%);
-  --grad-soft: linear-gradient(135deg, rgba(35,112,237,.16), rgba(0,194,168,.16));
+  --grad-soft: linear-gradient(135deg, rgba(35, 112, 237, .16), rgba(0, 194, 168, .16));
 
   --code-bg: #0b0f16;
   --code-border: #1f2733;
-  --sel: rgba(31,155,207,.28);
+  --sel: rgba(31, 155, 207, .28);
 
   --green: #3fb950;
   --amber: #d29922;
@@ -31,14 +33,21 @@
 
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow: 0 8px 30px rgba(0,0,0,.35);
-  --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --shadow: 0 8px 30px rgba(0, 0, 0, .35);
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "SF Mono", Consolas, "Liberation Mono", monospace;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-  --nav-h: 60px;
+  --nav-h: 66px;
   --sidebar-w: 270px;
   --content-max: 1160px;
   --shell-max: 1760px;
+
+  /* Rediseño v2 — fondo y profundidad */
+  --grid-line: rgba(255, 255, 255, .025);
+  --orb-1: rgba(35, 112, 237, .50);
+  --orb-2: rgba(31, 155, 207, .45);
+  --orb-3: rgba(0, 194, 168, .42);
+  --card-glow: rgba(31, 155, 207, .13);
 }
 
 [data-theme="light"] {
@@ -54,407 +63,3000 @@
 
   --code-bg: #f6f8fa;
   --code-border: #d8dee4;
-  --sel: rgba(31,155,207,.22);
-  --shadow: 0 8px 30px rgba(140,149,159,.2);
+  --sel: rgba(31, 155, 207, .22);
+  --shadow: 0 8px 30px rgba(140, 149, 159, .2);
+
+  --grid-line: rgba(20, 30, 60, .05);
+  --orb-1: rgba(35, 112, 237, .40);
+  --orb-2: rgba(31, 155, 207, .36);
+  --orb-3: rgba(0, 194, 168, .32);
+  --card-glow: rgba(31, 155, 207, .10);
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); }
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + 16px);
+  /* El fondo base va en <html> (no en <body>) para que el body pueda quedar
+     transparente y los orbes vivos (z-index:-1, hijos del body) se vean SIEMPRE
+     encima del fondo, en todas las vistas. Poner fondo sólido al body los taparía. */
+  background: var(--bg);
+}
 
 body {
   margin: 0;
   font-family: var(--sans);
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-::selection { background: var(--sel); }
+::selection {
+  background: var(--sel);
+}
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
 
 /* ---------------------------------------------------------------- i18n
    Bilingual content. Every translatable element holds two inline children:
    <span lang="en"> and <span lang="es">. English is the default; the inactive
    language is hidden via the data-lang attribute set on <html> by theme.js
    before paint, so there is no flash and no JavaScript content-swapping. */
-:root:not([data-lang="es"]) [lang="es"] { display: none; }
-:root[data-lang="es"] [lang="en"] { display: none; }
+:root:not([data-lang="es"]) [lang="es"] {
+  display: none;
+}
+
+:root[data-lang="es"] [lang="en"] {
+  display: none;
+}
 
 /* ---------------------------------------------------------------- Navbar */
 .navbar {
-  position: sticky; top: 0; z-index: 50;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   height: var(--nav-h);
-  display: flex; align-items: center;
+  display: flex;
+  align-items: center;
   padding: 0 20px;
   background: color-mix(in srgb, var(--bg) 86%, transparent);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
+
 .nav-inner {
-  width: 100%; max-width: var(--shell-max); margin: 0 auto;
-  display: flex; align-items: center; gap: 18px;
+  width: 100%;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 18px;
 }
+
 .nav-brand {
-  display: flex; align-items: center; gap: 10px;
-  font-weight: 800; font-size: 1.15rem; color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--text);
   letter-spacing: -.02em;
 }
-.nav-brand:hover { text-decoration: none; }
+
+.nav-brand:hover {
+  text-decoration: none;
+}
+
 .nav-logo {
-  width: 32px; height: 32px; border-radius: 8px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   object-fit: contain;
+  transition: transform .3s cubic-bezier(.22, 1, .36, 1);
 }
-.nav-links { display: flex; gap: 4px; margin-left: 8px; }
+
+.nav-brand:hover .nav-logo {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.nav-brand {
+  font-size: 1.25rem;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+}
+
 .nav-links a {
-  color: var(--text-dim); padding: 6px 12px; border-radius: 8px;
-  font-size: .92rem; font-weight: 500;
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: .92rem;
+  font-weight: 500;
 }
-.nav-links a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
-.nav-spacer { flex: 1; }
-.nav-actions { display: flex; align-items: center; gap: 8px; }
+
+.nav-links a:hover {
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+}
+
+.nav-spacer {
+  flex: 1;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .icon-btn {
-  width: 38px; height: 38px; border-radius: 9px;
-  display: grid; place-items: center; cursor: pointer;
-  background: var(--surface); border: 1px solid var(--border);
-  color: var(--text-dim); font-size: 1.05rem; transition: .15s;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  transition: .15s;
 }
-.icon-btn:hover { color: var(--text); border-color: var(--accent); }
-.nav-mobile-btn { display: none; }
+
+.icon-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.nav-mobile-btn {
+  display: none;
+}
 
 /* Language switch — a small segmented EN/ES control in the navbar. The active
    segment is highlighted purely via the :root[data-lang] state (no JS class). */
 .lang-switch {
-  display: inline-flex; align-items: stretch;
-  height: 38px; border: 1px solid var(--border); border-radius: 9px;
-  overflow: hidden; background: var(--surface);
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
 }
+
+/* A gradient pill that glides between EN and ES instead of snapping. */
+.lang-switch::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 7px;
+  background: var(--grad);
+  z-index: 0;
+  transition: transform .4s cubic-bezier(.34, 1.4, .5, 1);
+}
+
+:root[data-lang="es"] .lang-switch::before {
+  transform: translateX(100%);
+}
+
 .lang-switch button {
-  background: none; border: none; cursor: pointer;
-  color: var(--text-dim); font-weight: 700; font-size: .78rem;
-  letter-spacing: .03em; padding: 0 11px; transition: .15s;
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-dim);
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .03em;
+  padding: 0 13px;
+  transition: color .25s ease;
 }
-.lang-switch button:hover { color: var(--text); }
+
+.lang-switch button:hover {
+  color: var(--text);
+}
+
 :root:not([data-lang="es"]) .lang-switch [data-lang-set="en"],
 :root[data-lang="es"] .lang-switch [data-lang-set="es"] {
-  background: var(--grad); color: #fff;
+  color: #fff;
 }
 
 /* ---------------------------------------------------------------- Layout */
 .layout {
-  max-width: var(--shell-max); margin: 0 auto;
-  display: grid; grid-template-columns: var(--sidebar-w) 1fr;
-  gap: 0; align-items: start;
+  max-width: var(--shell-max);
+  margin: 0 auto;
+  display: block;
 }
-.layout.no-sidebar { display: block; }
 
+.layout.no-sidebar {
+  display: block;
+}
+
+/* The sidebar is a slide-out overlay at every width now (closed by default, so
+   the content reads full-width). The ☰ button opens it; staggered groups inside. */
 .sidebar {
-  position: sticky; top: var(--nav-h);
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  z-index: 40;
+  width: 300px;
+  max-width: 86vw;
   height: calc(100vh - var(--nav-h));
   overflow-y: auto;
-  padding: 24px 14px 60px;
+  padding: 22px 14px 60px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-right: 1px solid var(--border);
+  transform: translateX(-100%);
+  -webkit-user-select: none;
+  user-select: none;
+  /* el menú no es texto seleccionable:
+     evita que al tocar/expandir las opciones queden "marcadas" como para copiar. */
 }
-.sidebar::-webkit-scrollbar { width: 8px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+
+/* El deslizamiento se anima SOLO cuando el usuario abre/cierra el menú (el body
+   recibe .sidebar-animating). Cuando el menú se RESTAURA abierto desde la memoria
+   al cargar, aparece al instante — así "se ve tal como lo dejaste", sin repetir
+   la animación en cada navegación. data-sb-open lo pone theme.js antes del paint. */
+body.sidebar-animating .sidebar {
+  transition: transform .38s cubic-bezier(.22, 1, .36, 1);
+}
+
+body.sidebar-open .sidebar,
+html[data-sb-open] .sidebar {
+  transform: translateX(0);
+  box-shadow: var(--shadow);
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+}
+
+.sidebar>* {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+body.sidebar-animating .sidebar>* {
+  transition: opacity .4s ease, transform .5s cubic-bezier(.22, 1, .36, 1);
+}
+
+body.sidebar-open .sidebar>*,
+html[data-sb-open] .sidebar>* {
+  opacity: 1;
+  transform: none;
+}
+
+/* El escalonado "burbuja" de los enlaces solo corre mientras se abre activamente. */
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(1) {
+  transition-delay: .06s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(2) {
+  transition-delay: .11s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(3) {
+  transition-delay: .16s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(4) {
+  transition-delay: .21s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(5) {
+  transition-delay: .26s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(6) {
+  transition-delay: .31s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(7) {
+  transition-delay: .36s;
+}
+
+body.sidebar-animating.sidebar-open .sidebar>*:nth-child(8) {
+  transition-delay: .41s;
+}
+
 .sb-home {
-  display: block; font-weight: 700; color: var(--text);
-  padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;
+  display: block;
+  font-weight: 700;
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
 }
-.sb-home:hover { background: var(--surface); text-decoration: none; }
-.sb-group { margin: 4px 0; }
-.sb-group > summary {
-  list-style: none; cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: 8px;
-  font-weight: 700; font-size: .8rem; letter-spacing: .04em;
-  text-transform: uppercase; color: var(--text-dim);
+
+.sb-home:hover {
+  background: var(--surface);
+  text-decoration: none;
 }
-.sb-group > summary::-webkit-details-marker { display: none; }
-.sb-group > summary:hover { background: var(--surface); color: var(--text); }
-.sb-group > summary .emoji { font-size: 1rem; }
-.sb-group > summary .chev { margin-left: auto; transition: .2s; font-size: .7rem; }
-.sb-group[open] > summary .chev { transform: rotate(90deg); }
-.sb-links { display: flex; flex-direction: column; padding: 2px 0 8px 14px; }
+
+.sb-group {
+  margin: 4px 0;
+}
+
+.sb-group>summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: .8rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.sb-group>summary::-webkit-details-marker {
+  display: none;
+}
+
+.sb-group>summary:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.sb-group>summary .emoji {
+  font-size: 1rem;
+}
+
+.sb-group>summary .chev {
+  margin-left: auto;
+  transition: .2s;
+  font-size: .7rem;
+}
+
+.sb-group[open]>summary .chev {
+  transform: rotate(90deg);
+}
+
+/* Accordion suave y COMPATIBLE: animamos max-height (soportado en todos los
+   navegadores, incl. móviles antiguos) en vez de grid-template-rows (que no se
+   anima en muchos móviles → ahí no se veía la animación). display:block anula el
+   "ocultar al cerrar" del navegador para que el panel pueda animarse. La transición
+   se habilita tras el primer pintado (theme-ready) → un grupo restaurado abierto
+   no se reanima al cargar. */
+.sb-links {
+  display: block;
+  overflow: hidden;
+  max-height: 0;
+}
+
+.sb-group[open]>.sb-links {
+  max-height: 420px;
+}
+
+body.theme-ready .sb-links {
+  transition: max-height .34s cubic-bezier(.22, 1, .36, 1);
+}
+
+.sb-links-inner {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 2px 0 8px 14px;
+}
+
+/* Sacar del orden de tabulación los enlaces colapsados, pero solo DESPUÉS de que
+   termine el cierre, para que la animación de colapso siga siendo visible. */
+.sb-group:not([open])>.sb-links .sb-links-inner {
+  visibility: hidden;
+  transition: visibility 0s linear .34s;
+}
+
+.sb-group[open]>.sb-links .sb-links-inner {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
 .sb-links a {
-  color: var(--text-dim); padding: 6px 12px; border-radius: 7px;
-  font-size: .9rem; border-left: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: .9rem;
+  border-left: 2px solid transparent;
 }
-.sb-links a:hover { color: var(--text); background: var(--surface); text-decoration: none; }
+
+.sb-links a:hover {
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+}
+
 .sb-links a.active {
-  color: var(--accent); background: var(--grad-soft);
-  border-left-color: var(--accent); font-weight: 600;
+  color: var(--accent);
+  background: var(--grad-soft);
+  border-left-color: var(--accent);
+  font-weight: 600;
 }
 
 .content {
   min-width: 0;
   padding: 38px 48px 100px;
 }
-.content-inner { max-width: var(--content-max); margin: 0 auto; }
+
+.content-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
 
 /* ---------------------------------------------------------------- Hero */
 .hero {
-  position: relative; overflow: hidden;
+  position: relative;
+  overflow: hidden;
   text-align: center;
   padding: 86px 24px 72px;
   border-bottom: 1px solid var(--border);
 }
+
 .hero::before {
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(900px 380px at 50% -10%, rgba(31,155,207,.22), transparent 70%);
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(900px 380px at 50% -10%, rgba(31, 155, 207, .22), transparent 70%);
   pointer-events: none;
 }
-.hero-badge {
-  display: inline-block; padding: 5px 14px; margin-bottom: 22px;
-  border: 1px solid var(--border); border-radius: 999px;
-  background: var(--surface); color: var(--text-dim);
-  font-size: .82rem; font-weight: 600;
-}
-.hero h1 {
-  font-size: clamp(2.6rem, 6vw, 4.4rem); margin: 0 0 .2em;
-  font-weight: 900; letter-spacing: -.04em; line-height: 1.02;
-}
-.gradient-text {
-  background: var(--grad); -webkit-background-clip: text;
-  background-clip: text; color: transparent;
-}
-.hero-tagline { font-size: clamp(1.1rem, 2.4vw, 1.5rem); font-weight: 600; color: var(--text); margin: 0 auto .4em; max-width: 720px; }
-.hero-sub { font-size: 1.05rem; color: var(--text-dim); max-width: 640px; margin: 0 auto 30px; }
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
 
-.badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.badges img { height: 22px; }
+.hero-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  margin-bottom: 22px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.hero h1 {
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  margin: 0 0 .2em;
+  font-weight: 900;
+  letter-spacing: -.04em;
+  line-height: 1.02;
+}
+
+.gradient-text {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-tagline {
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 auto .4em;
+  max-width: 720px;
+}
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-dim);
+  max-width: 640px;
+  margin: 0 auto 30px;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.badges img {
+  height: 22px;
+}
 
 .btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: .98rem;
-  cursor: pointer; border: 1px solid transparent; transition: .18s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: .98rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: .18s;
 }
-.btn:hover { text-decoration: none; transform: translateY(-1px); }
-.btn-primary { background: var(--grad); color: #fff; box-shadow: 0 6px 22px rgba(31,155,207,.38); }
-.btn-primary:hover { box-shadow: 0 10px 28px rgba(31,155,207,.5); }
-.btn-ghost { background: var(--surface); color: var(--text); border-color: var(--border); }
-.btn-ghost:hover { border-color: var(--accent); }
+
+.btn:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(31, 155, 207, .38);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 28px rgba(31, 155, 207, .5);
+}
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--accent);
+}
 
 /* ---------------------------------------------------------------- Typography */
-.content h1 { font-size: 2.3rem; font-weight: 900; letter-spacing: -.03em; margin: 0 0 .35em; }
-.content h2 {
-  font-size: 1.55rem; font-weight: 800; margin: 2.2em 0 .7em;
-  padding-bottom: .3em; border-bottom: 1px solid var(--border); letter-spacing: -.02em;
+.content h1 {
+  font-size: 2.3rem;
+  font-weight: 900;
+  letter-spacing: -.03em;
+  margin: 0 0 .35em;
 }
-.content h3 { font-size: 1.18rem; font-weight: 700; margin: 1.8em 0 .5em; }
-.content h4 { font-size: 1rem; font-weight: 700; margin: 1.4em 0 .4em; color: var(--text); }
-.content p { margin: .8em 0; }
-.lead { font-size: 1.15rem; color: var(--text-dim); margin-bottom: 1.5em; }
-.content ul, .content ol { padding-left: 1.4em; }
-.content li { margin: .35em 0; }
-.content strong { color: var(--text); font-weight: 700; }
+
+.content h2 {
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin: 2.2em 0 .7em;
+  padding-bottom: .3em;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -.02em;
+}
+
+.content h3 {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin: 1.8em 0 .5em;
+}
+
+.content h4 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.4em 0 .4em;
+  color: var(--text);
+}
+
+.content p {
+  margin: .8em 0;
+}
+
+.lead {
+  font-size: 1.15rem;
+  color: var(--text-dim);
+  margin-bottom: 1.5em;
+}
+
+.content ul,
+.content ol {
+  padding-left: 1.4em;
+}
+
+.content li {
+  margin: .35em 0;
+}
+
+.content strong {
+  color: var(--text);
+  font-weight: 700;
+}
 
 /* inline code */
-:not(pre) > code {
-  font-family: var(--mono); font-size: .88em;
-  background: var(--surface-2); border: 1px solid var(--border-soft);
-  padding: .12em .42em; border-radius: 6px; color: var(--accent-3);
+:not(pre)>code {
+  font-family: var(--mono);
+  font-size: .88em;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  padding: .12em .42em;
+  border-radius: 6px;
+  color: var(--accent-3);
 }
-[data-theme="light"] :not(pre) > code { color: #0b6a8f; }
+
+[data-theme="light"] :not(pre)>code {
+  color: #0b6a8f;
+}
 
 /* ---------------------------------------------------------------- Breadcrumb */
 .breadcrumb {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  font-size: .88rem; color: var(--text-faint); margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: .88rem;
+  color: var(--text-faint);
+  margin-bottom: 18px;
 }
-.breadcrumb a { color: var(--text-dim); }
-.breadcrumb .sep { opacity: .5; }
 
-/* ---------------------------------------------------------------- Tags / chips */
-.tags { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 4px; }
-.tag {
-  font-size: .76rem; font-weight: 700; letter-spacing: .02em;
-  padding: 4px 11px; border-radius: 999px;
-  background: var(--surface-2); border: 1px solid var(--border);
+.breadcrumb a {
   color: var(--text-dim);
 }
-.tag.accent { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
-.tag.green  { color: var(--green);  border-color: color-mix(in srgb, var(--green) 45%, var(--border)); }
-.tag.java   { color: var(--java);   border-color: color-mix(in srgb, var(--java) 45%, var(--border)); }
+
+.breadcrumb .sep {
+  opacity: .5;
+}
+
+/* ---------------------------------------------------------------- Tags / chips */
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 14px 0 4px;
+}
+
+.tag {
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.tag.accent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+.tag.green {
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 45%, var(--border));
+}
+
+.tag.java {
+  color: var(--java);
+  border-color: color-mix(in srgb, var(--java) 45%, var(--border));
+}
+
 .pkg-path {
-  display: inline-block; font-family: var(--mono); font-size: .9rem;
-  color: var(--text-dim); background: var(--surface);
-  border: 1px solid var(--border); padding: 4px 12px; border-radius: 8px; margin-bottom: 6px;
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .9rem;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 8px;
+  margin-bottom: 6px;
 }
 
 /* ---------------------------------------------------------------- Cards */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; margin: 22px 0; }
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+
 /* Force a fixed number of columns on one row (e.g. the 4 package cards),
    shrinking the cards rather than wrapping. min-width:0 lets them shrink. */
-.card-grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.card-grid.cols-4 > .card { min-width: 0; }
-.card {
-  display: block; padding: 20px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border);
-  transition: .18s; color: var(--text);
+.card-grid.cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-.card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); text-decoration: none; }
-.card .card-emoji { font-size: 1.7rem; display: block; margin-bottom: 10px; }
-.card .card-title { font-weight: 800; font-size: 1.08rem; margin-bottom: 6px; }
-.card .card-title code { font-family: var(--mono); font-size: .95rem; background: none; border: none; color: var(--text); padding: 0; }
-.card .card-desc { color: var(--text-dim); font-size: .92rem; line-height: 1.5; }
-.card .card-arrow { color: var(--accent); font-weight: 700; margin-top: 10px; display: inline-block; font-size: .88rem; }
 
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+.card-grid.cols-4>.card {
+  min-width: 0;
+}
+
+.card {
+  display: block;
+  padding: 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: .18s;
+  color: var(--text);
+}
+
+/* Las tarjetas NO se elevan ni se agrandan: son superficies de contenido, no
+   botones. Solo se resaltan el borde y el resplandor que sigue al cursor, para
+   no confundirlas con los botones reales (CTA, Anterior/Siguiente). */
+.card:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.card .card-emoji {
+  font-size: 1.7rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.card .card-title {
+  font-weight: 800;
+  font-size: 1.08rem;
+  margin-bottom: 6px;
+}
+
+.card .card-title code {
+  font-family: var(--mono);
+  font-size: .95rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  padding: 0;
+}
+
+.card .card-desc {
+  color: var(--text-dim);
+  font-size: .92rem;
+  line-height: 1.5;
+}
+
+.card .card-arrow {
+  color: var(--accent);
+  font-weight: 700;
+  margin-top: 10px;
+  display: inline-block;
+  font-size: .88rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
 .feature {
-  padding: 22px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border);
+  padding: 22px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
+
 .feature .f-icon {
-  width: 44px; height: 44px; border-radius: 11px; display: grid; place-items: center;
-  font-size: 1.4rem; background: var(--grad-soft); margin-bottom: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  background: var(--grad-soft);
+  margin-bottom: 14px;
 }
-.feature h3 { margin: 0 0 6px; font-size: 1.08rem; }
-.feature p { margin: 0; color: var(--text-dim); font-size: .94rem; }
+
+.feature h3 {
+  margin: 0 0 6px;
+  font-size: 1.08rem;
+}
+
+.feature p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: .94rem;
+}
 
 /* ---------------------------------------------------------------- Code blocks */
-.code-wrap { position: relative; margin: 1.1em 0; }
+.code-wrap {
+  position: relative;
+  margin: 1.1em 0;
+}
+
 .code-wrap .code-lang {
-  position: absolute; top: 0; left: 16px; transform: translateY(-50%);
-  font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  background: var(--accent); color: #fff; padding: 2px 9px; border-radius: 6px;
+  position: absolute;
+  top: 0;
+  left: 16px;
+  transform: translateY(-50%);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #fff;
+  padding: 2px 9px;
+  border-radius: 6px;
 }
+
 pre {
-  margin: 0; padding: 20px 18px; overflow-x: auto;
-  background: var(--code-bg); border: 1px solid var(--code-border);
-  border-radius: var(--radius); font-family: var(--mono); font-size: .86rem; line-height: 1.6;
+  margin: 0;
+  padding: 20px 18px;
+  overflow-x: auto;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: .86rem;
+  line-height: 1.6;
 }
-pre code { font-family: var(--mono); color: var(--text); background: none; border: none; padding: 0; }
+
+pre code {
+  font-family: var(--mono);
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
 .copy-btn {
-  position: absolute; top: 10px; right: 10px;
-  background: var(--surface-2); border: 1px solid var(--border);
-  color: var(--text-dim); border-radius: 7px; padding: 5px 10px;
-  font-size: .76rem; font-weight: 600; cursor: pointer; opacity: 0; transition: .15s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: .76rem;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transition: .15s;
 }
-.code-wrap:hover .copy-btn { opacity: 1; }
-.copy-btn:hover { color: var(--text); border-color: var(--accent); }
-.copy-btn.copied { color: var(--green); border-color: var(--green); }
+
+.code-wrap:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.copy-btn.copied {
+  color: var(--green);
+  border-color: var(--green);
+}
 
 /* token coloring (applied by site.js) */
-.tok-key { color: #ff7b72; }
-.tok-str { color: #a5d6ff; }
-.tok-com { color: var(--text-faint); font-style: italic; }
-.tok-num { color: #79c0ff; }
-.tok-type { color: #ffa657; }
-.tok-ann { color: #d2a8ff; }
-[data-theme="light"] .tok-key { color: #cf222e; }
-[data-theme="light"] .tok-str { color: #0a3069; }
-[data-theme="light"] .tok-num { color: #0550ae; }
-[data-theme="light"] .tok-type { color: #953800; }
-[data-theme="light"] .tok-ann { color: #6639ba; }
+.tok-key {
+  color: #ff7b72;
+}
+
+.tok-str {
+  color: #a5d6ff;
+}
+
+.tok-com {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.tok-num {
+  color: #79c0ff;
+}
+
+.tok-type {
+  color: #ffa657;
+}
+
+.tok-ann {
+  color: #d2a8ff;
+}
+
+[data-theme="light"] .tok-key {
+  color: #cf222e;
+}
+
+[data-theme="light"] .tok-str {
+  color: #0a3069;
+}
+
+[data-theme="light"] .tok-num {
+  color: #0550ae;
+}
+
+[data-theme="light"] .tok-type {
+  color: #953800;
+}
+
+[data-theme="light"] .tok-ann {
+  color: #6639ba;
+}
 
 /* ---------------------------------------------------------------- Callouts */
 .callout {
-  display: flex; gap: 12px; padding: 14px 18px; margin: 1.2em 0;
-  border-radius: var(--radius); border: 1px solid var(--border);
-  background: var(--surface); border-left-width: 4px;
+  display: flex;
+  gap: 12px;
+  padding: 14px 18px;
+  margin: 1.2em 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-left-width: 4px;
 }
-.callout .c-icon { font-size: 1.15rem; line-height: 1.5; }
-.callout .c-body { flex: 1; }
-.callout .c-body p { margin: .2em 0; }
-.callout .c-title { font-weight: 700; display: block; margin-bottom: 2px; }
-.callout.note    { border-left-color: var(--accent); }
-.callout.tip     { border-left-color: var(--green); }
-.callout.warning { border-left-color: var(--amber); }
-.callout.danger  { border-left-color: var(--red); }
-.callout.note .c-title    { color: var(--accent); }
-.callout.tip .c-title     { color: var(--green); }
-.callout.warning .c-title { color: var(--amber); }
-.callout.danger .c-title  { color: var(--red); }
+
+.callout .c-icon {
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.callout .c-body {
+  flex: 1;
+}
+
+.callout .c-body p {
+  margin: .2em 0;
+}
+
+.callout .c-title {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.callout.note {
+  border-left-color: var(--accent);
+}
+
+.callout.tip {
+  border-left-color: var(--green);
+}
+
+.callout.warning {
+  border-left-color: var(--amber);
+}
+
+.callout.danger {
+  border-left-color: var(--red);
+}
+
+.callout.note .c-title {
+  color: var(--accent);
+}
+
+.callout.tip .c-title {
+  color: var(--green);
+}
+
+.callout.warning .c-title {
+  color: var(--amber);
+}
+
+.callout.danger .c-title {
+  color: var(--red);
+}
 
 /* ---------------------------------------------------------------- API tables */
 .api-method {
-  border: 1px solid var(--border); border-radius: var(--radius);
-  margin: 16px 0; overflow: hidden; background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin: 16px 0;
+  overflow: hidden;
+  background: var(--surface);
 }
-.api-method > .sig {
-  font-family: var(--mono); font-size: .9rem; padding: 14px 18px;
-  background: var(--surface-2); border-bottom: 1px solid var(--border);
-  color: var(--text); overflow-x: auto;
-}
-.api-method > .sig .m-name { color: var(--accent-3); font-weight: 700; }
-.api-method > .desc { padding: 4px 18px 16px; }
-.api-method > .desc p { margin: .6em 0; color: var(--text-dim); }
-.api-method > .desc p strong { color: var(--text); }
 
-table.tbl { width: 100%; border-collapse: collapse; margin: 1em 0; font-size: .92rem; }
-table.tbl th, table.tbl td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-table.tbl th { color: var(--text); font-weight: 700; background: var(--surface); }
-table.tbl td { color: var(--text-dim); }
-table.tbl code { white-space: nowrap; }
+.api-method>.sig {
+  font-family: var(--mono);
+  font-size: .9rem;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  overflow-x: auto;
+}
+
+.api-method>.sig .m-name {
+  color: var(--accent-3);
+  font-weight: 700;
+}
+
+.api-method>.desc {
+  padding: 4px 18px 16px;
+}
+
+.api-method>.desc p {
+  margin: .6em 0;
+  color: var(--text-dim);
+}
+
+.api-method>.desc p strong {
+  color: var(--text);
+}
+
+table.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: .92rem;
+}
+
+table.tbl th,
+table.tbl td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+table.tbl th {
+  color: var(--text);
+  font-weight: 700;
+  background: var(--surface);
+}
+
+table.tbl td {
+  color: var(--text-dim);
+}
+
+table.tbl code {
+  white-space: nowrap;
+}
 
 /* method index pills */
-.method-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
-.method-list a {
-  font-family: var(--mono); font-size: .82rem; padding: 5px 11px; border-radius: 8px;
-  background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+.method-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 6px;
 }
-.method-list a:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+
+.method-list a {
+  font-family: var(--mono);
+  font-size: .82rem;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.method-list a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
+}
 
 /* prev/next nav */
-.page-nav { display: flex; justify-content: space-between; gap: 16px; margin-top: 60px; flex-wrap: wrap; }
-.page-nav a {
-  flex: 1; min-width: 200px; padding: 16px 20px; border-radius: var(--radius);
-  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 60px;
+  flex-wrap: wrap;
 }
-.page-nav a:hover { border-color: var(--accent); text-decoration: none; }
-.page-nav .pn-label { font-size: .76rem; color: var(--text-faint); text-transform: uppercase; letter-spacing: .05em; }
-.page-nav .pn-title { font-weight: 700; color: var(--accent); }
-.page-nav a.next { text-align: right; }
+
+.page-nav a {
+  flex: 1;
+  min-width: 200px;
+  padding: 16px 20px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* Estos SÍ son botones: insinúan su dirección al pasar el cursor (la misma que
+   tomará la transición de diapositiva al pulsarlos). */
+.page-nav a {
+  transition: border-color .18s ease, background .18s ease, transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+.page-nav a:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+  text-decoration: none;
+}
+
+.page-nav a.prev:hover {
+  transform: translateX(-5px);
+}
+
+.page-nav a.next:hover {
+  transform: translateX(5px);
+}
+
+.page-nav .pn-label {
+  font-size: .76rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.page-nav .pn-title {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.page-nav a.next {
+  text-align: right;
+}
 
 /* ---------------------------------------------------------------- Install tabs */
-.tabs { margin: 1.2em 0; }
-.tab-btns { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: -1px; }
-.tab-btns button {
-  background: none; border: none; border-bottom: 2px solid transparent;
-  color: var(--text-dim); padding: 9px 16px; cursor: pointer; font-weight: 600; font-size: .9rem;
+.tabs {
+  margin: 1.2em 0;
 }
-.tab-btns button.active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
+
+.tab-btns {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: -1px;
+}
+
+.tab-btns button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 9px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.tab-btns button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
 
 /* ---------------------------------------------------------------- Footer */
 .site-footer {
-  border-top: 1px solid var(--border); padding: 40px 24px;
-  text-align: center; color: var(--text-dim); font-size: .9rem;
+  border-top: 1px solid var(--border);
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: .9rem;
   background: var(--bg-soft);
 }
-.site-footer a { color: var(--accent); }
-.site-footer .f-links { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; }
+
+.site-footer a {
+  color: var(--accent);
+}
+
+.site-footer .f-links {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
 
 /* ---------------------------------------------------------------- Responsive */
-.backdrop { display: none; }
+/* The slide-out menu is the only navigation now: the inline navbar links are
+   retired and the ☰ button is ALWAYS visible, on every page and width. The menu
+   stays closed by default so the content has full width — the user opens it. */
+.nav-links {
+  display: none;
+}
+
+.nav-mobile-btn {
+  display: grid;
+}
+
+.backdrop {
+  display: none;
+}
+
+body.sidebar-open .backdrop,
+html[data-sb-open] .backdrop {
+  display: block;
+  position: fixed;
+  inset: var(--nav-h) 0 0 0;
+  z-index: 39;
+  background: rgba(0, 0, 0, .42);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+/* El fundido del fondo solo corre al abrir el menú, no al restaurarlo. */
+body.sidebar-animating.sidebar-open .backdrop {
+  animation: backdrop-in .3s ease;
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Contenido ancho con scroll PROPIO (no desborda la página en móvil): las tablas
+   se envuelven en .table-wrap (site.js) y las rutas de paquete largas scrollean. */
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1em 0;
+}
+
+.table-wrap table.tbl {
+  margin: 0;
+}
+
+.pkg-path {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 980px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar {
-    position: fixed; top: var(--nav-h); left: 0; z-index: 40;
-    width: 280px; max-width: 84vw; height: calc(100vh - var(--nav-h));
-    background: var(--bg); transform: translateX(-100%); transition: transform .22s ease;
-    border-right: 1px solid var(--border);
+  .content {
+    padding: 28px 22px 80px;
   }
-  body.sidebar-open .sidebar { transform: translateX(0); box-shadow: var(--shadow); }
-  body.sidebar-open .backdrop {
-    display: block; position: fixed; inset: var(--nav-h) 0 0 0; z-index: 39;
-    background: rgba(0,0,0,.5);
-  }
-  .nav-mobile-btn { display: grid; }
-  .nav-links { display: none; }
-  .content { padding: 28px 22px 80px; }
+
   /* Below the phone breakpoint, a 4-up row of cards stops being readable. */
-  .card-grid.cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card-grid.cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
+
 @media (max-width: 560px) {
-  .hero { padding: 60px 18px 50px; }
-  .content h1 { font-size: 1.8rem; }
-  .card-grid.cols-4 { grid-template-columns: 1fr; }
+  .navbar {
+    padding: 0 14px;
+  }
+
+  .nav-inner {
+    gap: 10px;
+  }
+
+  .nav-brand {
+    font-size: 1.1rem;
+  }
+
+  .nav-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .nav-actions {
+    gap: 6px;
+  }
+
+  .lang-switch button {
+    padding: 0 10px;
+  }
+
+  .hero {
+    padding: 54px 16px 44px;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.2rem, 13vw, 3rem);
+  }
+
+  .content {
+    padding: 22px 16px 68px;
+  }
+
+  .content h1 {
+    font-size: 1.8rem;
+  }
+
+  .content h2 {
+    font-size: 1.32rem;
+  }
+
+  .breadcrumb {
+    font-size: .82rem;
+  }
+
+  .card-grid,
+  .card-grid.cols-4 {
+    grid-template-columns: 1fr;
+  }
+
+  .api-method>.sig {
+    font-size: .82rem;
+  }
+
+  table.tbl {
+    font-size: .86rem;
+  }
+
+  /* Las palabras larguísimas (firmas, identificadores) no rompen el ancho. */
+  .content p,
+  .content li,
+  .lead,
+  .callout .c-body {
+    overflow-wrap: anywhere;
+  }
 }
+
+/* =========================================================================
+   Animaciones, transiciones y pulido (añadido)
+   Todo el movimiento DECORATIVO vive dentro de @media (prefers-reduced-motion:
+   no-preference), así respetamos a quien pide "menos animación" en su sistema.
+   ========================================================================= */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ----- Entrada del hero: cada parte aparece deslizándose, escalonada ----- */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero-badge {
+    animation: fade-up .6s ease both;
+  }
+
+  .hero h1 {
+    animation: fade-up .6s ease .08s both;
+  }
+
+  .hero-tagline {
+    animation: fade-up .6s ease .16s both;
+  }
+
+  .hero-sub {
+    animation: fade-up .6s ease .24s both;
+  }
+
+  .hero-cta {
+    animation: fade-up .6s ease .32s both;
+  }
+
+  .badges {
+    animation: fade-up .6s ease .40s both;
+  }
+
+  /* ----- El resplandor del hero "respira" suavemente, en bucle ----- */
+  @keyframes hero-glow {
+
+    0%,
+    100% {
+      opacity: .7;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .hero::before {
+    animation: hero-glow 7s ease-in-out infinite;
+  }
+
+  /* ----- Revelado al hacer scroll -----
+     site.js marca elementos con .reveal (empiezan invisibles y un poco abajo)
+     y les añade .is-visible cuando entran en pantalla → se deslizan a su sitio. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity .6s ease, transform .6s cubic-bezier(.22, 1, .36, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ----- Cambio de tema (claro/oscuro) suave -----
+     Solo en superficies grandes sin hover, para no frenar las micro-animaciones.
+     La clase .theme-ready la pone site.js tras el primer pintado (evita parpadeo). */
+  body.theme-ready,
+  body.theme-ready .navbar,
+  body.theme-ready .sidebar,
+  body.theme-ready .hero,
+  body.theme-ready .site-footer,
+  body.theme-ready pre,
+  body.theme-ready .content h2 {
+    transition: background-color .35s ease, border-color .35s ease, color .35s ease;
+  }
+}
+
+/* ----- Barra de progreso de lectura (arriba del todo) ----- */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--grad);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  z-index: 60;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ----- El navbar gana sombra al separarse del tope ----- */
+.navbar {
+  transition: box-shadow .25s ease;
+}
+
+.navbar.scrolled {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .28);
+}
+
+[data-theme="light"] .navbar.scrolled {
+  box-shadow: 0 6px 24px rgba(140, 149, 159, .25);
+}
+
+/* ----- Las tarjetas de característica tampoco se elevan: solo cambian el borde
+   y muestran el resplandor que sigue al cursor (no son botones) ----- */
+.feature {
+  transition: border-color .2s ease;
+}
+
+.feature:hover {
+  border-color: var(--accent);
+}
+
+/* ----- Foco visible accesible (teclado) ----- */
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ----- Cajón de navegación (slide-out) -----
+   site.js lo inyecta en la portada (que no tiene sidebar). Funciona en TODOS los
+   tamaños: en PC también, abierto con el botón ☰. Los enlaces aparecen uno a uno
+   (efecto burbuja) gracias a los transition-delay escalonados de más abajo. */
+.mobile-menu {
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  z-index: 40;
+  width: 300px;
+  max-width: 86vw;
+  height: calc(100vh - var(--nav-h));
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-right: 1px solid var(--border);
+  transform: translateX(-100%);
+  transition: transform .36s cubic-bezier(.22, 1, .36, 1);
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+body.sidebar-open .mobile-menu {
+  transform: translateX(0);
+  box-shadow: var(--shadow);
+}
+
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-dim);
+  padding: 12px 14px;
+  border-radius: 11px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateX(-18px);
+  transition: opacity .4s ease, transform .5s cubic-bezier(.22, 1, .36, 1),
+    color .15s ease, background .15s ease;
+}
+
+.mobile-menu a:hover {
+  color: var(--text);
+  background: var(--surface);
+  text-decoration: none;
+  transform: translateX(4px);
+  transition-delay: 0s;
+}
+
+.mobile-menu .mm-home {
+  color: var(--text);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.mobile-menu .mm-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 8px;
+  opacity: .7;
+}
+
+/* Cuando el cajón se abre, cada enlace entra con un pequeño retraso creciente. */
+body.sidebar-open .mobile-menu a {
+  opacity: 1;
+  transform: none;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(1) {
+  transition-delay: .10s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(2) {
+  transition-delay: .16s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(3) {
+  transition-delay: .22s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(4) {
+  transition-delay: .28s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(5) {
+  transition-delay: .34s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(6) {
+  transition-delay: .40s;
+}
+
+body.sidebar-open .mobile-menu a:nth-of-type(7) {
+  transition-delay: .46s;
+}
+
+/* =========================================================================
+   REDISEÑO v2 — profundidad de fondo, tipografía, bento, terminal, spotlight
+   ========================================================================= */
+
+/* ---- Fondo global: rejilla de puntos sutil + orbes de color a la deriva ---- */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: radial-gradient(var(--grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+  -webkit-mask-image: radial-gradient(ellipse 95% 65% at 50% 0%, #000 35%, transparent 85%);
+  mask-image: radial-gradient(ellipse 95% 65% at 50% 0%, #000 35%, transparent 85%);
+}
+
+.bg-layer {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(75px);
+  opacity: .6;
+}
+
+.orb.o1 {
+  width: 540px;
+  height: 540px;
+  background: var(--orb-1);
+  top: -180px;
+  left: -140px;
+}
+
+.orb.o2 {
+  width: 480px;
+  height: 480px;
+  background: var(--orb-3);
+  top: 8%;
+  right: -180px;
+}
+
+.orb.o3 {
+  width: 440px;
+  height: 440px;
+  background: var(--orb-2);
+  top: 58%;
+  left: 28%;
+}
+
+[data-theme="light"] .orb {
+  opacity: .85;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes drift1 {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(70px, 50px);
+    }
+  }
+
+  @keyframes drift2 {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(-60px, 40px);
+    }
+  }
+
+  @keyframes drift3 {
+
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+
+    50% {
+      transform: translate(50px, -60px);
+    }
+  }
+
+  .orb.o1 {
+    animation: drift1 19s ease-in-out infinite;
+  }
+
+  .orb.o2 {
+    animation: drift2 23s ease-in-out infinite;
+  }
+
+  .orb.o3 {
+    animation: drift3 27s ease-in-out infinite;
+  }
+}
+
+/* ---- Tipografía afinada (titulares más apretados) ---- */
+.hero h1,
+.content h1,
+.content h2,
+.content h3,
+.card .card-title,
+.feature h3,
+.nav-brand,
+.sec-head h2 {
+  letter-spacing: -.03em;
+}
+
+/* ---- Eyebrow: etiqueta superior de sección (reemplaza a los emojis) ---- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--mono);
+  font-size: .74rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+
+.eyebrow-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-3);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-3) 20%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes pulse-dot {
+
+    0%,
+    100% {
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-3) 26%, transparent);
+    }
+
+    50% {
+      box-shadow: 0 0 0 7px color-mix(in srgb, var(--accent-3) 0%, transparent);
+    }
+  }
+
+  .eyebrow-dot {
+    animation: pulse-dot 2.6s ease-in-out infinite;
+  }
+}
+
+/* ---- Encabezados de sección (sin borde, con eyebrow) ---- */
+.sec-head {
+  margin: 3.2em 0 1.3em;
+}
+
+.sec-head h2 {
+  border: none;
+  padding: 0;
+  margin: 0 0 .3em;
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+}
+
+.sec-head .sec-sub {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  margin: 0;
+  max-width: 660px;
+}
+
+/* ---- Hero v2 ---- */
+.hero {
+  padding: 104px 24px 84px;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.hero .eyebrow {
+  justify-content: center;
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 7vw, 5rem);
+}
+
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .4), transparent);
+  transform: skewX(-18deg);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes shine {
+    0% {
+      left: -130%;
+    }
+
+    100% {
+      left: 150%;
+    }
+  }
+
+  /* El destello se repite mientras el cursor esté encima (no una sola vez). */
+  .btn-primary:hover::after {
+    animation: shine 1.4s ease-in-out infinite;
+  }
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px) scale(1.015);
+  box-shadow: 0 14px 34px rgba(31, 155, 207, .55);
+}
+
+/* barra de estadísticas (reemplaza la fila de badges) */
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px 44px;
+  margin-top: 40px;
+}
+
+.trust .stat {
+  text-align: center;
+  min-width: 70px;
+}
+
+.trust .num {
+  display: block;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 1.95rem;
+  line-height: 1.1;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.trust .lbl {
+  font-size: .76rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: .09em;
+}
+
+/* ventana de código tipo terminal (en el hero) */
+.hero-visual {
+  position: relative;
+  margin-top: 54px;
+}
+
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  inset: 26px 70px -6px;
+  z-index: -1;
+  border-radius: 50px;
+  background: var(--grad);
+  filter: blur(72px);
+  opacity: .26;
+}
+
+.window {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 34px 80px -24px rgba(0, 0, 0, .6);
+}
+
+.window .win-bar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.window .win-bar i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.window .win-bar i:nth-child(1) {
+  background: #ff5f57;
+}
+
+.window .win-bar i:nth-child(2) {
+  background: #febc2e;
+}
+
+.window .win-bar i:nth-child(3) {
+  background: #28c840;
+}
+
+.window .win-title {
+  margin-left: 8px;
+  font-family: var(--mono);
+  font-size: .76rem;
+  color: var(--text-faint);
+}
+
+.window .code-wrap {
+  margin: 0;
+}
+
+.window .code-lang {
+  display: none;
+}
+
+.window pre {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* ---- Bento de características (tamaños variados, no rejilla uniforme) ---- */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.bento .feature {
+  margin: 0;
+}
+
+.bento .b-nav {
+  grid-column: span 4;
+  grid-row: span 2;
+}
+
+.bento .feature:not(.b-nav) {
+  grid-column: span 2;
+}
+
+@media (max-width: 980px) {
+  .bento {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bento .b-nav {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .bento .feature:not(.b-nav) {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .bento {
+    grid-template-columns: 1fr;
+  }
+
+  .bento .feature,
+  .bento .b-nav {
+    grid-column: 1 / -1;
+  }
+}
+
+/* icono SVG dentro de contenedor con glow (reemplaza emojis) */
+.f-ico {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--grad-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--border));
+  margin-bottom: 16px;
+}
+
+.f-ico svg {
+  width: 23px;
+  height: 23px;
+}
+
+.b-nav .f-ico {
+  width: 52px;
+  height: 52px;
+}
+
+.b-nav .f-ico svg {
+  width: 26px;
+  height: 26px;
+}
+
+.b-nav h3 {
+  font-size: 1.4rem;
+}
+
+.b-nav .mini-code {
+  margin-top: 18px;
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: var(--text-dim);
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 10px;
+  padding: 13px 15px;
+}
+
+.b-nav .mini-code .k {
+  color: #ff7b72;
+}
+
+.b-nav .mini-code .s {
+  color: #a5d6ff;
+}
+
+[data-theme="light"] .b-nav .mini-code .k {
+  color: #cf222e;
+}
+
+[data-theme="light"] .b-nav .mini-code .s {
+  color: #0a3069;
+}
+
+/* tarjetas de módulo: icono SVG en vez de emoji grande */
+.card .f-ico {
+  margin-bottom: 12px;
+}
+
+/* ---- Spotlight: un resplandor que sigue al cursor sobre tarjetas/features ---- */
+.card,
+.feature {
+  position: relative;
+  isolation: isolate;
+}
+
+.card>*,
+.feature>* {
+  position: relative;
+  z-index: 1;
+}
+
+.card::after,
+.feature::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--card-glow), transparent 60%);
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.card:hover::after,
+.feature:hover::after {
+  opacity: 1;
+}
+
+.card::before,
+.feature::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 75%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.card:hover::before,
+.feature:hover::before {
+  opacity: 1;
+}
+
+/* ---- Iconos del sidebar y del menú móvil (reemplazan emojis) ---- */
+.sb-home {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sb-home svg {
+  width: 17px;
+  height: 17px;
+}
+
+.sb-ico,
+.mm-ico {
+  display: inline-grid;
+  place-items: center;
+  color: var(--text-dim);
+}
+
+.sb-ico svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.mm-ico svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* callout con icono SVG */
+.callout .c-icon svg {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+}
+
+/* =========================================================================
+   v3 — fondo vivo, scrollbars temáticos, toggles animados, más interacción
+   ========================================================================= */
+
+/* ---- Scrollbars que combinan con el tema (ya no blancas) ---- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 13px;
+  height: 13px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+  border: 3px solid var(--bg);
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+}
+
+/* En los bloques de código el fondo es más oscuro: la barra debe igualarlo */
+pre {
+  scrollbar-color: var(--code-border) var(--code-bg);
+}
+
+pre::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: var(--code-bg);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+pre::-webkit-scrollbar-thumb {
+  background: var(--code-border);
+  border-radius: 8px;
+  border: 2px solid var(--code-bg);
+  background-clip: padding-box;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+}
+
+/* ---- Fondo VIVO (en TODA la web): los orbes laten y se desplazan, cambiando la
+   tonalidad del conjunto entre más clara y más oscura, como Discord en reposo.
+   Solo transform+opacity → barato para la GPU. Dos temas distintos porque los
+   colores salen de variables que cambian con el tema. Ritmo algo más rápido para
+   que el movimiento se perciba de verdad. */
+.orb {
+  filter: blur(72px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes live1 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+      opacity: .55;
+    }
+
+    33% {
+      transform: translate(90px, 60px) scale(1.22);
+      opacity: .9;
+    }
+
+    66% {
+      transform: translate(40px, 100px) scale(.92);
+      opacity: .6;
+    }
+  }
+
+  @keyframes live2 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+      opacity: .5;
+    }
+
+    50% {
+      transform: translate(-85px, 65px) scale(1.25);
+      opacity: .85;
+    }
+  }
+
+  @keyframes live3 {
+
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+      opacity: .45;
+    }
+
+    50% {
+      transform: translate(75px, -70px) scale(1.15);
+      opacity: .82;
+    }
+  }
+
+  .orb.o1 {
+    animation: live1 calc(6.7s * var(--bg-speed, 1)) ease-in-out infinite;
+  }
+
+  .orb.o2 {
+    animation: live2 calc(7.7s * var(--bg-speed, 1)) ease-in-out infinite;
+  }
+
+  .orb.o3 {
+    animation: live3 calc(4.8s * var(--bg-speed, 1)) ease-in-out infinite;
+  }
+}
+
+/* ---- Pestañas dentro de la ventana del hero (Maven / Gradle …) ---- */
+.win-tabs .win-bar {
+  gap: 12px;
+}
+
+.win-tabs .tab-btns {
+  border: none;
+  margin: 0;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.win-tabs .tab-btns button {
+  padding: 4px 12px;
+  font-size: .76rem;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-faint);
+  transition: color .15s, background .15s;
+}
+
+.win-tabs .tab-btns button:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+.win-tabs .tab-btns button.active {
+  color: var(--text);
+  background: var(--surface);
+  border: none;
+}
+
+.win-tabs .tab-panel {
+  padding: 0;
+}
+
+.win-tabs .tab-panel .code-wrap {
+  margin: 0;
+}
+
+/* ---- Botón de tema: sol/luna SVG que rota y se desvanece (ya no un emoji) ---- */
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transition: transform .5s cubic-bezier(.34, 1.56, .64, 1), opacity .3s ease;
+}
+
+html[data-theme="dark"] .theme-toggle .i-sun {
+  opacity: 0;
+  transform: rotate(90deg) scale(.4);
+}
+
+html[data-theme="dark"] .theme-toggle .i-moon {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-theme="light"] .theme-toggle .i-moon {
+  opacity: 0;
+  transform: rotate(-90deg) scale(.4);
+}
+
+html[data-theme="light"] .theme-toggle .i-sun {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- Botón ☰ que se transforma en X al abrir el menú ---- */
+.nav-mobile-btn .ham {
+  position: relative;
+  width: 18px;
+  height: 14px;
+  display: block;
+}
+
+.nav-mobile-btn .ham i {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .3s ease, opacity .2s ease, top .3s ease;
+}
+
+.nav-mobile-btn .ham i:nth-child(1) {
+  top: 0;
+}
+
+.nav-mobile-btn .ham i:nth-child(2) {
+  top: 6px;
+}
+
+.nav-mobile-btn .ham i:nth-child(3) {
+  top: 12px;
+}
+
+body.sidebar-open .nav-mobile-btn .ham i:nth-child(1) {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+body.sidebar-open .nav-mobile-btn .ham i:nth-child(2) {
+  opacity: 0;
+}
+
+body.sidebar-open .nav-mobile-btn .ham i:nth-child(3) {
+  top: 6px;
+  transform: rotate(-45deg);
+}
+
+/* ---- Conmutador de idioma: micro-pulso al pulsar ---- */
+.lang-switch button:active {
+  transform: scale(.9);
+}
+
+/* Al cambiar de idioma, los titulares del hero entran con un barrido suave
+   (lo aplicamos solo a unos pocos elementos grandes, no a cada span, para que
+   sea vistoso sin coste). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lang-in {
+    from {
+      opacity: 0;
+      transform: translateY(9px);
+      filter: blur(5px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+
+  html.lang-switching .hero .eyebrow>span[lang],
+  html.lang-switching .hero-tagline>span[lang],
+  html.lang-switching .hero-sub>span[lang],
+  html.lang-switching .sec-head h2>span[lang],
+  html.lang-switching .sec-head .eyebrow>span[lang],
+  html.lang-switching .sec-head .sec-sub>span[lang] {
+    animation: lang-in .5s cubic-bezier(.22, 1, .36, 1);
+  }
+}
+
+/* ---- Más micro-interacciones (todas con transform → eficientes) ---- */
+.card-arrow {
+  transition: transform .2s ease;
+}
+
+.card:hover .card-arrow {
+  transform: translateX(6px);
+}
+
+.f-ico {
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease;
+}
+
+.feature:hover .f-ico,
+.card:hover .f-ico {
+  transform: translateY(-3px) rotate(-4deg);
+  box-shadow: 0 10px 22px -8px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.btn-ghost:hover {
+  transform: translateY(-2px);
+  background: var(--surface-2);
+}
+
+.icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.lang-switch {
+  transition: border-color .15s ease;
+}
+
+.lang-switch:hover {
+  border-color: var(--accent);
+}
+
+/* =========================================================================
+   v4 — pestañas animadas, ventanas de código más cuidadas, hover de GitHub,
+   y enlaces del menú con vida (iconos que se mueven al pasar/seleccionar)
+   ========================================================================= */
+
+/* ---- Cambio de pestaña (Maven/Gradle…): el panel entra con un barrido ---- */
+.win-tabs .tab-btns button {
+  transition: color .15s ease, background .2s ease, transform .15s ease;
+}
+
+.win-tabs .tab-btns button.active {
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .win-tabs .tab-panel.active {
+    animation: panel-in .38s cubic-bezier(.22, 1, .36, 1);
+  }
+}
+
+/* ---- Ventana de código: línea de acento superior, glow y mejor lectura ---- */
+.window {
+  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 30px 70px -26px rgba(0, 0, 0, .6);
+}
+
+.window::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: var(--grad);
+  z-index: 3;
+}
+
+.window .win-bar {
+  background: linear-gradient(180deg, var(--surface-2), color-mix(in srgb, var(--surface-2) 60%, transparent));
+}
+
+.window pre {
+  padding: 22px 22px 24px;
+  line-height: 1.75;
+}
+
+.b-nav .mini-code {
+  position: relative;
+  overflow: hidden;
+}
+
+.b-nav .mini-code::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--grad);
+}
+
+.b-nav .mini-code {
+  padding-left: 18px;
+}
+
+/* ---- Botón "Ver en GitHub": al pasar el mouse aparece el logo (y al salir,
+   se va con la animación inversa). Mismo espíritu que el botón de tema. ---- */
+.btn-ghost .gh-reveal {
+  display: inline-grid;
+  place-items: center;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: scale(.3) rotate(-120deg);
+  transition: width .3s ease, opacity .3s ease, margin .3s ease,
+    transform .5s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.btn-ghost .gh-reveal svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-ghost:hover .gh-reveal {
+  width: 18px;
+  opacity: 1;
+  margin-right: 9px;
+  transform: none;
+}
+
+/* ---- Enlaces del menú: el icono se adelanta al pasar el mouse (efecto de
+   "querer seleccionar") y la fila se hunde un poco al tocar. ---- */
+.mobile-menu a .mm-ico,
+.sb-group>summary .sb-ico,
+.sb-home svg {
+  transition: transform .28s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.mobile-menu a:hover .mm-ico {
+  transform: translateX(3px) scale(1.18);
+}
+
+.sb-group>summary:hover .sb-ico {
+  transform: translateX(2px) scale(1.15);
+}
+
+.mobile-menu a:active,
+.sb-links a:active {
+  transform: scale(.97);
+}
+
+/* Subopciones: entran UNA A UNA cada vez que se despliega el grupo, con la MISMA
+   animación que las opciones principales (deslizan desde la izquierda y se funden).
+   Usamos una @keyframes que site.js REACTIVA en cada apertura añadiendo .just-opened
+   (con un reflow para reiniciarla) → se reproduce SIEMPRE, en PC y en móvil, sin
+   depender de transiciones ni de theme-ready. Con fill 'both' el estado inicial
+   (opacity 0) se aplica de inmediato, así que no hay destello. */
+@keyframes sublink-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a {
+  animation: sublink-in .44s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(1) {
+  animation-delay: .03s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(2) {
+  animation-delay: .08s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(3) {
+  animation-delay: .13s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(4) {
+  animation-delay: .18s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(5) {
+  animation-delay: .23s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(6) {
+  animation-delay: .28s;
+}
+
+.sb-group.just-opened>.sb-links .sb-links-inner>a:nth-child(7) {
+  animation-delay: .33s;
+}
+
+.sb-links a {
+  transition: color .15s ease, background .15s ease, border-color .15s ease, transform .18s ease;
+}
+
+.sb-links a:hover {
+  transform: translateX(4px);
+}
+
+/* Resaltado del elemento activo (la página/paquete en el que estás). */
+.mobile-menu a.active,
+.sb-home.active {
+  color: var(--accent);
+  background: var(--grad-soft);
+}
+
+/* =========================================================================
+   v5 — transición de página, flecha de "Comenzar", detalles del menú
+   ========================================================================= */
+
+/* ---- Transiciones de vista SIN recargar la página (PJAX en site.js): solo se
+   intercambia y se anima el CENTRO (#view envuelve hero + contenido). El navbar,
+   el menú, el fondo y el footer NO se vuelven a dibujar → cero parpadeo. Modos:
+     · menu   → fundido (fade) rápido al navegar DESDE el menú abierto.
+     · scroll → la vista sale hacia arriba y la nueva entra desde abajo y
+                "aterriza" con un ease-out: como un scroll veloz que conecta con
+                el destino. (enlaces normales, tarjetas, breadcrumb, CTA, footer)
+     · slide  → cambio horizontal tipo diapositiva (botones Anterior/Siguiente).
+   La salida la marca site.js (.pt-leave + data-leave) y la llegada (data-arrive). */
+/* #view nunca debe forzar scroll horizontal de la página (clave en móvil): se
+   recorta en X, mientras el contenido ancho (código, tablas) hace su propio
+   scroll interno dentro de su caja. overflow-x:clip no rompe el sticky del navbar. */
+#view {
+  backface-visibility: hidden;
+  overflow-x: clip;
+}
+
+html.pt-leave #view,
+html[data-arrive] #view {
+  will-change: transform, opacity, filter;
+}
+
+/* En el slide recortamos el desborde horizontal con overflow-x:clip (no rompe el
+   position:sticky del navbar, a diferencia de overflow:hidden/auto). */
+html.pt-leave[data-leave="slide-next"],
+html.pt-leave[data-leave="slide-prev"],
+html[data-arrive="slide-next"],
+html[data-arrive="slide-prev"] {
+  overflow-x: clip;
+}
+
+/* --- Keyframes de transición de vista ---
+   · MENÚ: desenfoque + reenfoque ("rack focus"). El contenido se vuelve borroso
+     y vuelve a enfocar ya con la nueva vista — el efecto propio de un desplegable.
+   · SCROLL: viaje vertical amplio (vh) + leve escala → como un scroll por la
+     pantalla que aterriza en la vista nueva.
+   · SLIDE: desplazamiento horizontal amplio (vw) + escala → como pasar diapositivas.
+   Las distancias son grandes a propósito para que la animación sea NOTORIA, y la
+   opacidad/desenfoque tapan el intercambio del contenido (sin parpadeo). */
+@keyframes pt-out-fade {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pt-in-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pt-out-blur {
+  from {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+
+  to {
+    opacity: .3;
+    filter: blur(20px);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pt-in-blur {
+  from {
+    opacity: .3;
+    filter: blur(20px);
+    transform: scale(1.05);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@keyframes pt-out-up {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -26vh, 0) scale(.96);
+  }
+}
+
+@keyframes pt-in-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30vh, 0) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pt-out-left {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(-38vw, 0, 0) scale(.96);
+  }
+}
+
+@keyframes pt-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(40vw, 0, 0) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pt-out-right {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(38vw, 0, 0) scale(.96);
+  }
+}
+
+@keyframes pt-in-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-40vw, 0, 0) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* IMPORTANTE: estas duraciones de SALIDA deben coincidir con las esperas en
+   site.js (pjaxGo) — el contenido se intercambia cuando ya está oculto/borroso,
+   así NUNCA se ve el cambio a media opacidad. */
+/* ===== VELOCIDAD DE LAS TRANSICIONES DE VISTA =====
+   Equilibrio entre rapidez y apreciación. Si quieres cambiarla:
+     · más LENTAS  → sube estos segundos (p. ej. .45s → .55s)
+     · más RÁPIDAS → bájalos (p. ej. .45s → .35s)
+   IMPORTANTE: cada valor de SALIDA (pt-out-*) debe coincidir con el MODES de
+   site.js (allí en milisegundos: .45s = 450). La LLEGADA (pt-in-*) es libre.
+   La SALIDA acelera con calma (ease-in) y la LLEGADA "aterriza" suave (ease-out). */
+html.pt-leave[data-leave="menu"] #view {
+  animation: pt-out-blur .38s ease forwards;
+}
+
+html.pt-leave[data-leave="scroll"] #view {
+  animation: pt-out-up .53s cubic-bezier(.4, 0, .7, .3) forwards;
+}
+
+html.pt-leave[data-leave="slide-next"] #view {
+  animation: pt-out-left .53s cubic-bezier(.4, 0, .7, .3) forwards;
+}
+
+html.pt-leave[data-leave="slide-prev"] #view {
+  animation: pt-out-right .53s cubic-bezier(.4, 0, .7, .3) forwards;
+}
+
+html[data-arrive="menu"] #view {
+  animation: pt-in-blur .63s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+html[data-arrive="scroll"] #view {
+  animation: pt-in-up .81s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+html[data-arrive="slide-next"] #view {
+  animation: pt-in-right .78s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+html[data-arrive="slide-prev"] #view {
+  animation: pt-in-left .78s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+/* Mientras el centro entra, congelamos el revelado por-elemento (scroll-reveal)
+   para que la superficie se mueva como UNA sola pieza (sin doble movimiento). */
+html.is-arriving .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* En navegación PJAX el hero entra junto con #view, así que su entrada propia
+   (fade-up por elemento) se desactiva para no animar dos veces. En la carga
+   directa inicial (sin .pjax-active) el hero sí hace su entrada escalonada. */
+html.pjax-active .hero-badge,
+html.pjax-active .hero h1,
+html.pjax-active .hero-tagline,
+html.pjax-active .hero-sub,
+html.pjax-active .hero-cta,
+html.pjax-active .badges,
+html.is-arriving .hero-badge,
+html.is-arriving .hero h1,
+html.is-arriving .hero-tagline,
+html.is-arriving .hero-sub,
+html.is-arriving .hero-cta,
+html.is-arriving .badges {
+  animation: none !important;
+}
+
+/* NOTA: las transiciones de vista se reproducen SIEMPRE (aunque el sistema pida
+   "reducir movimiento"), porque son la identidad pedida para el sitio. El respeto
+   a "reducir movimiento" se mantiene para lo AMBIENTAL/decorativo (orbes, hover,
+   scroll-reveal). Si el sistema lo pide, al menos degradamos a un fundido suave. */
+@media (prefers-reduced-motion: reduce) {
+  html.pt-leave[data-leave] #view {
+    animation: pt-out-fade .26s ease forwards !important;
+  }
+
+  html[data-arrive] #view {
+    animation: pt-in-fade .40s ease both !important;
+  }
+}
+
+/* ---- Flecha del botón "Comenzar": oculta hasta el hover (como el logo de
+   GitHub) y algo más grande. Quitamos el gap del botón para que, oculta, no
+   deje un hueco a la derecha. ---- */
+.btn-primary {
+  gap: 0;
+}
+
+.btn-primary .arrow-reveal {
+  display: inline-flex;
+  align-items: center;
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  font-size: 1.35em;
+  line-height: 1;
+  transform: translateX(-6px);
+  transition: max-width .35s ease, opacity .3s ease, margin .3s ease,
+    transform .45s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.btn-primary:hover .arrow-reveal {
+  max-width: 1.5em;
+  opacity: 1;
+  margin-left: 9px;
+  transform: none;
+}
+
+/* ---- Separador y enlace de GitHub dentro del menú ---- */
+.mm-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 10px;
+  opacity: .7;
+}
+
+.sb-ext {
+  color: var(--text-dim);
+}
+
+.sb-ext:hover {
+  color: var(--text);
+}
+
+/* =========================================================================
+   v6 — Panel de configuración del usuario (al pie del menú desplegable)
+   Barra de velocidad del fondo + interruptor de animaciones. Colores tomados
+   de las variables del tema, así combinan en claro y oscuro automáticamente.
+   ========================================================================= */
+.sb-settings { padding: 2px 4px 10px; }
+.set-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: .68rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--accent);
+  padding: 4px 8px 10px;
+}
+.set-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 45%, transparent), transparent); }
+.set-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px 8px;
+}
+.set-label { font-size: .82rem; color: var(--text-dim); font-weight: 600; white-space: nowrap; }
+
+/* ---- Barra deslizante "mística": pista con degradado de marca + pulgar con
+   resplandor que late suavemente. El relleno (--range-fill) lo fija site.js. ---- */
+.anim-range {
+  -webkit-appearance: none; appearance: none;
+  width: 120px; height: 24px; margin: 0; background: transparent; cursor: pointer;
+}
+.anim-range:focus-visible { outline: none; }
+.anim-range::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 999px;
+  background:
+    linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-3)) left center / var(--range-fill, 62%) 100% no-repeat,
+    var(--surface-2);
+  border: 1px solid var(--border-soft);
+}
+.anim-range::-moz-range-track { height: 6px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-soft); }
+.anim-range::-moz-range-progress { height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--accent-2), var(--accent-3)); }
+.anim-range::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; margin-top: -6px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--accent-3) 60%);
+  border: 0; cursor: grab;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent),
+              0 0 14px color-mix(in srgb, var(--accent-3) 85%, transparent);
+}
+.anim-range::-moz-range-thumb {
+  width: 16px; height: 16px; border: 0; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, var(--accent-3) 60%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent),
+              0 0 14px color-mix(in srgb, var(--accent-3) 85%, transparent);
+}
+.anim-range:hover::-webkit-slider-thumb { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 30%, transparent), 0 0 18px var(--accent-3); }
+.anim-range:active::-webkit-slider-thumb { cursor: grabbing; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes thumb-aura {
+    0%, 100% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent), 0 0 12px color-mix(in srgb, var(--accent-3) 70%, transparent); }
+    50%      { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 30%, transparent), 0 0 20px color-mix(in srgb, var(--accent-3) 95%, transparent); }
+  }
+  .anim-range::-webkit-slider-thumb { animation: thumb-aura 2.8s ease-in-out infinite; }
+}
+
+/* ---- Interruptor de animaciones ON/OFF ---- */
+.anim-toggle {
+  position: relative; flex: none; width: 46px; height: 25px; padding: 0;
+  border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2);
+  cursor: pointer; transition: background .28s ease, border-color .28s ease;
+}
+.anim-toggle .knob {
+  position: absolute; top: 2px; left: 2px; width: 19px; height: 19px; border-radius: 50%;
+  background: var(--text-faint);
+  transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), background .28s ease;
+}
+.anim-toggle[aria-pressed="true"] { background: var(--grad); border-color: transparent; box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 45%, transparent); }
+.anim-toggle[aria-pressed="true"] .knob { transform: translateX(21px); background: #fff; }
+.anim-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---- MODO SIN ANIMACIONES: corta TODO movimiento (orbes, transiciones de
+   vista, hover, revelados, acordeón…) para quien quiere acceso instantáneo. ---- */
+html.anim-off, html.anim-off * , html.anim-off *::before, html.anim-off *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
+
+/* El escalonado del menú llega ahora hasta el panel de configuración. */
+body.sidebar-animating.sidebar-open .sidebar > *:nth-child(9)  { transition-delay: .46s; }
+body.sidebar-animating.sidebar-open .sidebar > *:nth-child(10) { transition-delay: .51s; }

@@ -23,6 +23,9 @@
 
   function apply(theme) {
     document.documentElement.setAttribute("data-theme", theme);
+    // Paint the root background to the theme color IMMEDIATELY (before the external
+    // CSS even loads), so a reload never shows a white/black flash in the gap.
+    document.documentElement.style.backgroundColor = (theme === "light") ? "#ffffff" : "#0d1117";
   }
 
   // Apply immediately (runs during <head> parsing).
@@ -45,6 +48,44 @@
   // Apply the saved language before paint, too.
   applyLang(preferredLang());
 
+  /* ------------------------------------------------------------- View transition
+     In-app navigation is partial (PJAX in site.js) and needs no handoff. But if PJAX
+     ever has to fall back to a real reload, it leaves an arrival mode here; we apply
+     it BEFORE paint so even a full reload animates the center in (never a bare flash).
+     site.js cleans the marks up. */
+  try {
+    var arr = sessionStorage.getItem("cfx-arrive");
+    if (arr) {
+      sessionStorage.removeItem("cfx-arrive");
+      document.documentElement.setAttribute("data-arrive", arr);
+      document.documentElement.classList.add("is-arriving");
+    }
+  } catch (e) { /* sessionStorage may be unavailable */ }
+
+  /* Restore the slide-out menu's open state BEFORE paint, so a refresh on a page
+     where the menu was left open never flashes closed first. */
+  try {
+    if (localStorage.getItem("corefx-sb-open") === "1") {
+      document.documentElement.setAttribute("data-sb-open", "");
+    }
+  } catch (e) { /* localStorage may be unavailable */ }
+
+  /* Restore the user's animation settings BEFORE paint: the live-background speed
+     (slider 0..100 → duration multiplier) and the global animations on/off switch.
+     Applying them this early avoids any flash of the wrong speed or a burst of
+     animation before it's disabled. site.js syncs the controls' visible state. */
+  try {
+    var bgv = localStorage.getItem("corefx-bg-speed");
+    if (bgv !== null) {
+      var factor = (2.0 - (+bgv / 100) * 1.6).toFixed(3);
+      document.documentElement.style.setProperty("--bg-speed", factor);
+      document.documentElement.style.setProperty("--range-fill", bgv + "%");
+    }
+    if (localStorage.getItem("corefx-anim-off") === "1") {
+      document.documentElement.classList.add("anim-off");
+    }
+  } catch (e) { /* localStorage may be unavailable */ }
+
   function currentLang() {
     return document.documentElement.getAttribute("data-lang") || "en";
   }
@@ -53,6 +94,10 @@
     if (lang !== "es") lang = "en";
     applyLang(lang);
     try { localStorage.setItem(LANG_KEY, lang); } catch (e) { /* ignore */ }
+    // Briefly flag the switch so CSS can fade the newly shown language in.
+    var root = document.documentElement;
+    root.classList.add("lang-switching");
+    window.setTimeout(function () { root.classList.remove("lang-switching"); }, 450);
   }
 
   function currentTheme() {
@@ -60,10 +105,11 @@
   }
 
   function syncIcons() {
+    // The sun/moon icons themselves are SVGs shown/hidden by CSS via the
+    // [data-theme] attribute, so here we only keep the tooltip/label in sync.
     var dark = currentTheme() === "dark";
     var btns = document.querySelectorAll("[data-theme-toggle]");
     for (var i = 0; i < btns.length; i++) {
-      btns[i].textContent = dark ? "🌙" : "☀️";
       btns[i].setAttribute("title", dark ? "Switch to light theme" : "Switch to dark theme");
       btns[i].setAttribute("aria-label", btns[i].getAttribute("title"));
     }
