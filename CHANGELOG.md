@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-06-27
+
+### Fixed
+- **POM**: Renamed parent artifact from `CoreFx` to `CoreFx-parent` to eliminate a
+  false Maven cycle error when consuming `corefx` as a dependency
+  (`The parents form a cycle: …corefx → CoreFx → CoreFx`).
+
 ## [1.2.0] - 2026-06-14
 
 ### Added
@@ -95,4 +102,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 [unreleased]: #unreleased
+[1.2.1]: #121---2026-06-27
 [1.2.0]: #120---2026-06-14
