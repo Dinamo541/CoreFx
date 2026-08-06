@@ -182,7 +182,60 @@ c.setUser(currentUser);</code></pre>
         <span class="c-icon">⚠️</span>
         <div class="c-body">
           <span class="c-title"><span lang="en">Cached controllers keep state</span><span lang="es">Los controladores cacheados conservan estado</span></span>
-          <p><span lang="en">Because loaders are cached, a view's controller is reused across visits — its fields are not reset for you. If a screen must start clean every time, call <code>removeLoader(name)</code> before navigating, or reset state in the controller.</span><span lang="es">Como los loaders se cachean, el controlador de una vista se reutiliza entre visitas — sus campos no se reinician por ti. Si una pantalla debe empezar limpia cada vez, llama a <code>removeLoader(name)</code> antes de navegar, o reinicia el estado en el controlador.</span></p>
+          <p><span lang="en">Because loaders are cached, a view's controller is reused across visits — its fields are not reset for you. If a screen must start clean every time, call <code>removeLoader(name)</code> before navigating, or — better — extend <a href="controller.html">Controller</a> and let CoreFx re-run <code>initialize()</code> for you on every visit.</span><span lang="es">Como los loaders se cachean, el controlador de una vista se reutiliza entre visitas — sus campos no se reinician por ti. Si una pantalla debe empezar limpia cada vez, llama a <code>removeLoader(name)</code> antes de navegar, o — mejor — extiende <a href="controller.html">Controller</a> y deja que CoreFx vuelva a ejecutar <code>initialize()</code> por ti en cada visita.</span></p>
+        </div>
+      </div>
+
+      <h2 id="controller-integration"><span lang="en">Controller integration</span><span lang="es">Integración con Controller</span></h2>
+      <p>
+        <span lang="en">Caching loaders makes navigation fast, but it means JavaFX calls a
+        controller's <code>initialize()</code> only once — the first time the FXML is read.
+        Come back to that screen later and it still shows the data it loaded originally.
+        <a href="controller.html">Controller</a> is the base class that closes this gap.</span>
+        <span lang="es">Cachear loaders hace la navegación rápida, pero implica que JavaFX llama
+        al <code>initialize()</code> de un controlador una sola vez — la primera vez que se lee
+        el FXML. Si vuelves a esa pantalla más tarde, seguirá mostrando los datos que cargó
+        originalmente. <a href="controller.html">Controller</a> es la clase base que cierra esa
+        brecha.</span>
+      </p>
+      <p>
+        <span lang="en">Whenever a view is loaded or navigated to, <code>FlowController</code>
+        checks with a pattern match whether its controller extends <code>Controller</code>. If
+        it does, three things happen automatically; if it doesn't, nothing does — the base
+        class is entirely opt-in and existing controllers keep working untouched.</span>
+        <span lang="es">Cada vez que una vista se carga o se navega hacia ella,
+        <code>FlowController</code> comprueba con un pattern match si su controlador extiende
+        <code>Controller</code>. Si lo hace, ocurren tres cosas automáticamente; si no, no
+        ocurre nada — la clase base es totalmente opcional y los controladores existentes
+        siguen funcionando sin tocarlos.</span>
+      </p>
+      <table class="tbl">
+        <tr><th><span lang="en">When</span><span lang="es">Cuándo</span></th><th><span lang="en">What CoreFx does</span><span lang="es">Qué hace CoreFx</span></th></tr>
+        <tr><td><span lang="en">Loader is first created</span><span lang="es">El loader se crea por primera vez</span></td><td><span lang="en">Sets <code>viewName</code> to the FXML name, so the controller knows its own identity.</span><span lang="es">Asigna <code>viewName</code> con el nombre del FXML, para que el controlador conozca su propia identidad.</span></td></tr>
+        <tr><td><span lang="en">A <em>cached</em> loader is reused</span><span lang="es">Se reutiliza un loader <em>cacheado</em></span></td><td><span lang="en">Calls <code>initialize()</code> again — the screen refreshes itself.</span><span lang="es">Vuelve a llamar a <code>initialize()</code> — la pantalla se refresca sola.</span></td></tr>
+        <tr><td><span lang="en">Any navigation call</span><span lang="es">Cualquier llamada de navegación</span></td><td><span lang="en">Injects the destination <code>Stage</code>, so <code>getStage()</code> is always current — main window, secondary window or modal.</span><span lang="es">Inyecta el <code>Stage</code> de destino, para que <code>getStage()</code> esté siempre al día — ventana principal, secundaria o modal.</span></td></tr>
+      </table>
+<pre data-lang="java"><code>public class OrdersController extends Controller {
+
+    @FXML private TableView&lt;Order&gt; table;
+
+    @Override
+    public void initialize() {
+        // Runs on first load AND on every navigation back here,
+        // so the table is never stale.
+        TableUtils.setItems(table, orderService.findAll());
+    }
+
+    @FXML
+    private void onClose() {
+        getStage().close();   // no need to dig the window out of a node
+    }
+}</code></pre>
+      <div class="callout note">
+        <span class="c-icon">🔁</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Refresh, don't rebuild</span><span lang="es">Refresca, no reconstruyas</span></span>
+          <p><span lang="en">Since <code>initialize()</code> now fires on every visit, keep it idempotent: reload data and reset fields there, but do one-time wiring (listeners, menu items) in the constructor — otherwise it stacks up on each visit. Full details on the <a href="controller.html">Controller</a> page.</span><span lang="es">Como <code>initialize()</code> ahora se dispara en cada visita, mantenlo idempotente: recarga datos y resetea campos ahí, pero haz el cableado único (listeners, ítems de menú) en el constructor — si no, se acumula en cada visita. Todos los detalles en la página de <a href="controller.html">Controller</a>.</span></p>
         </div>
       </div>
 
@@ -301,7 +354,7 @@ flow.goViewMain("Home"); // re-rendered in the new language</code></pre>
 
       <div class="page-nav">
         <a class="prev" href="../../packages/navigation.html"><div class="pn-label"><span lang="en">Package</span><span lang="es">Paquete</span></div><div class="pn-title"><span lang="en">← Navigation &amp; Flow</span><span lang="es">← Navegación y flujo</span></div></a>
-        <a class="next" href="app-context.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">AppContext →</div></a>
+        <a class="next" href="controller.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">Controller →</div></a>
       </div>
 
     </div></div>

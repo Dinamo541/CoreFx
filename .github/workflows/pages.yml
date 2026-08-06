@@ -1,0 +1,46 @@
+name: Deploy Pages
+
+# The docs site is plain static HTML/CSS/JS in /docs — no build step needed.
+# Only pushes that actually touch the site trigger a deployment, so unrelated
+# commits (pom bumps, source changes) no longer queue pointless Pages builds.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Queue deployments instead of racing them: a new push waits for the in-flight
+# one rather than cancelling it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Upload docs/ as the Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./docs
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
+        with:
+          # Poll for up to 15 min (default 10) — GitHub's Pages service can stall
+          # on status reporting even when the deployment itself succeeds.
+          timeout: 900000

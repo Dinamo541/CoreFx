@@ -16,6 +16,7 @@
       desc: "View loading, scene swapping, windows and shared state.",
       classes: [
         { slug: "flow-controller", name: "FlowController", tag: "Singleton", desc: "Loads & caches FXML views, swaps scenes, opens windows and modals." },
+        { slug: "controller", name: "Controller", tag: "Abstract", desc: "Base class for FXML controllers: injected stage, view name and a re-runnable initialize()." },
         { slug: "app-context", name: "AppContext", tag: "Singleton", desc: "Thread-safe, process-wide key-value store for shared state." },
         { slug: "stage-manager", name: "StageManager", tag: "Singleton", desc: "Named registry and lifecycle control for JavaFX windows." }
       ]

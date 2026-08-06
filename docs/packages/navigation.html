@@ -23,16 +23,18 @@
       <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
       <h1><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></h1>
       <p class="lead">
-        <span lang="en">The three classes that move users through your app and carry shared
+        <span lang="en">The classes that move users through your app and carry shared
         state between screens. They are complementary and commonly used together:
         <code>FlowController</code> loads views and swaps scenes,
+        <code>Controller</code> is the base class it wires your screens through,
         <code>StageManager</code> owns the windows, and <code>AppContext</code>
-        holds the cross-cutting data both need.</span>
-        <span lang="es">Las tres clases que mueven a los usuarios por tu app y transportan estado
+        holds the cross-cutting data they need.</span>
+        <span lang="es">Las clases que mueven a los usuarios por tu app y transportan estado
         compartido entre pantallas. Son complementarias y se usan habitualmente juntas:
         <code>FlowController</code> carga vistas y cambia escenas,
+        <code>Controller</code> es la clase base a través de la cual conecta tus pantallas,
         <code>StageManager</code> administra las ventanas y <code>AppContext</code>
-        guarda los datos transversales que ambas necesitan.</span>
+        guarda los datos transversales que necesitan.</span>
       </p>
 
       <h2><span lang="en">Classes</span><span lang="es">Clases</span></h2>
@@ -40,6 +42,11 @@
         <a class="card" href="../classes/navigation/flow-controller.html">
           <div class="card-title"><code>FlowController</code></div>
           <div class="card-desc"><span lang="en">The heart of the library. Loads &amp; caches FXML views, swaps scenes, opens windows and modals (blocking &amp; non-blocking), drives BorderPane regions, and carries i18n + a typed transfer value.</span><span lang="es">El corazón de la librería. Carga y cachea vistas FXML, cambia escenas, abre ventanas y modales (bloqueantes y no bloqueantes), gobierna regiones de BorderPane y transporta i18n + un valor de transferencia tipado.</span></div>
+          <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
+        </a>
+        <a class="card" href="../classes/navigation/controller.html">
+          <div class="card-title"><code>Controller</code></div>
+          <div class="card-desc"><span lang="en">Optional base class for FXML controllers. FlowController injects the current Stage and view name, and re-runs initialize() every time a cached view is shown again.</span><span lang="es">Clase base opcional para controladores FXML. FlowController inyecta el Stage actual y el nombre de la vista, y vuelve a ejecutar initialize() cada vez que una vista cacheada se muestra de nuevo.</span></div>
           <span class="card-arrow"><span lang="en">Read the docs →</span><span lang="es">Leer la documentación →</span></span>
         </a>
         <a class="card" href="../classes/navigation/app-context.html">
