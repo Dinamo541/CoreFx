@@ -446,6 +446,9 @@ public final class FlowController {
         try {
             FXMLLoader loader = new FXMLLoader(appClass.getResource(baseViewPath + name + ".fxml"), idioma);
             loader.load();
+            if (loader.getController() instanceof Controller controller) {
+                controller.setViewName(name);
+            }
             return loader;
         } catch (IOException | RuntimeException ex) {
             throw new IOException("Error creating loader: [" + name + "].", ex);
@@ -466,9 +469,11 @@ public final class FlowController {
     public FXMLLoader getLoader(String viewName) {
         checkInitialized();
         try {
-            synchronized (initLock) { // ← initLock instead of FlowController.class
+            synchronized (initLock) {
                 FXMLLoader loader = loaders.get(viewName);
-                if (loader == null) {
+                if (loader != null && loader.getController() instanceof Controller existingController) {
+                    existingController.initialize();
+                } else if (loader == null) {
                     loader = createLoaderInstance(viewName);
                     loaders.put(viewName, loader);
                 }
@@ -587,6 +592,7 @@ public final class FlowController {
         }
         node.setOpacity(1.0);
         node.setVisible(true);
+        node.setManaged(true);
         node.setMouseTransparent(false);
         node.setScaleX(1.0);
         node.setScaleY(1.0);
@@ -755,7 +761,12 @@ public final class FlowController {
                 throw new IllegalArgumentException("View name is null or empty");
             }
 
-            Parent root = getLoader(viewName).getRoot();
+            FXMLLoader loader = getLoader(viewName);
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(mainStage);
+            }
+
+            Parent root = loader.getRoot();
             Scene scene = mainStage.getScene();
 
             if (scene == null) {
@@ -788,7 +799,12 @@ public final class FlowController {
                 throw new IllegalArgumentException("View name is null or empty");
             }
 
-            Parent view = getLoader(viewName).getRoot();
+            FXMLLoader loader = getLoader(viewName);
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(mainStage);
+            }
+
+            Parent view = loader.getRoot();
             Scene scene = mainStage.getScene();
 
             if (scene == null) {
@@ -842,6 +858,11 @@ public final class FlowController {
                 stage.getScene().setRoot(new Pane());
             });
             prepareStage(stage, createScene(loader.getRoot()));
+
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(stage);
+            }
+
             stage.show();
         } catch (RuntimeException ex) {
             throw new RuntimeException(ex);
@@ -914,6 +935,9 @@ public final class FlowController {
             stage.setOnHidden((WindowEvent event) -> {
                 stage.getScene().setRoot(new Pane());
             });
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(stage);
+            }
             prepareStage(stage, createScene(loader.getRoot()));
             stage.centerOnScreen();
             stage.show();
@@ -994,6 +1018,9 @@ public final class FlowController {
             stage.setOnHidden((WindowEvent event) -> {
                 stage.getScene().setRoot(new Pane());
             });
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(stage);
+            }
             prepareStage(stage, createScene(loader.getRoot()));
             stage.centerOnScreen();
             stage.showAndWait();
@@ -1020,6 +1047,9 @@ public final class FlowController {
         try {
             FXMLLoader loader = getLoader(viewName);
             prepareStage(stage, createScene(loader.getRoot()));
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage(stage);
+            }
             if (!stage.isShowing()) {
                 stage.show();
             }
@@ -1056,6 +1086,10 @@ public final class FlowController {
         try {
             FXMLLoader loader = getLoader(viewName);
             Node root = scene.getRoot();
+
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage((Stage) scene.getWindow());
+            }
 
             replaceNodeInContainer(root, loader.getRoot(), (fallbackNode) -> {
                 scene.setRoot(loader.getRoot());
@@ -1178,6 +1212,9 @@ public final class FlowController {
         }
         try {
             FXMLLoader loader = getLoader(viewName);
+            if (loader.getController() instanceof Controller controller) {
+                controller.setStage((Stage) borderPane.getScene().getWindow());
+            }
             Parent node = loader.getRoot();
             switch (region) {
                 case "Center" -> replaceNodeInContainer(borderPane.getCenter(), node, borderPane::setCenter);
