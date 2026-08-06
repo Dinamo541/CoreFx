@@ -67,7 +67,7 @@ classes ship with a **47-test JUnit suite**.
 ## 📦 Installation
 
 CoreFx is published to **Maven Central**, so it works out of the box — no extra
-repositories to configure. Use the latest version: **`1.2.1`**.
+repositories to configure. Use the latest version: **`1.3.0`**.
 
 ### Maven
 
@@ -75,7 +75,7 @@ repositories to configure. Use the latest version: **`1.2.1`**.
 <dependency>
   <groupId>io.github.dinamo541</groupId>
   <artifactId>corefx</artifactId>
-  <version>1.2.1</version>
+  <version>1.3.0</version>
 </dependency>
 ```
 
@@ -83,7 +83,7 @@ repositories to configure. Use the latest version: **`1.2.1`**.
 
 ```groovy
 dependencies {
-    implementation 'io.github.dinamo541:corefx:1.2.1'
+    implementation 'io.github.dinamo541:corefx:1.3.0'
 }
 ```
 
@@ -91,7 +91,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("io.github.dinamo541:corefx:1.2.1")
+    implementation("io.github.dinamo541:corefx:1.3.0")
 }
 ```
 
@@ -204,6 +204,7 @@ CoreFx is organized into four packages under `io.github.dinamo541.corefx`.
 | Class                | Responsibility                                                                                                                                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`FlowController`** | The heart of the library. Loads & caches FXML views, swaps scenes, opens windows and modals (blocking & non-blocking), swaps regions of a `BorderPane`, manages full-screen and min-size, and carries i18n + a typed transfer value. |
+| **`Controller`**    | Base class for all controllers in the application. Provides common functionality and lifecycle methods.                                                                                 |
 | **`AppContext`**     | Thread-safe, process-wide key-value store for shared application state. Backed by `ConcurrentHashMap`; keys must be non-blank, values non-null.                                                                                      |
 | **`StageManager`**   | Helpers for creating, configuring, and controlling JavaFX stages and windows.                                                                                                                                                        |
 

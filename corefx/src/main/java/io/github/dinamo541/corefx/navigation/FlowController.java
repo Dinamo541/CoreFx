@@ -544,7 +544,7 @@ public final class FlowController {
      * If no theme applier has been set via setThemeApplier(), the scene is returned
      * unstyled.
      *
-     * @param root the root node of the scene
+     * @param view the root node of the scene
      * @return a Scene with the optional theme applied
      */
     public Scene createScene(Parent view) {

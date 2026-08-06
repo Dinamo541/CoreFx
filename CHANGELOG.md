@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-06
+
+### Added 
+- **Navigation — `Controller`**: New abstract base class for FXML controllers. Exposes
+  `stage`, `action`, and `viewName` metadata through getters/setters, and declares an
+  abstract `initialize()` hook that subclasses implement to react every time their view
+  is shown again.
+- **API — `FlowController`**: Controllers that extend `Controller` are now wired up
+  automatically. `viewName` is set as soon as a loader is created, the current `Stage`
+  is (re-)injected on every navigation call (`goViewMain`, `changeViewInMain`,
+  `goViewInWindow`, `goViewInModal`/`goViewInModalAndWait`, `changeViewInStage`,
+  `changeViewInScene`, and `changeViewInBorderPane`), and `initialize()` is invoked
+  again whenever a cached loader is reused — so controllers can refresh their state
+  without any manual wiring.
+
 ## [1.2.1] - 2026-06-27
 
 ### Fixed
