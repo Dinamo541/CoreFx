@@ -17,7 +17,8 @@ permissions:
   id-token: write
 
 # Queue deployments instead of racing them: a new push waits for the in-flight
-# one rather than cancelling it.
+# one rather than cancelling it (cancelling is what produced the earlier
+# "Deployment cancelled" failures).
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -25,6 +26,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -32,15 +34,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Upload docs/ as the Pages artifact
+      # Stamp the build with the commit SHA so the verify step below can prove
+      # the live site is really serving THIS commit, rather than trusting the
+      # Pages status API (which stalls on this repo — see the verify step).
+      - name: Stage site with a deploy stamp
+        run: |
+          mkdir -p _site
+          cp -R docs/. _site/
+          printf '%s' "$GITHUB_SHA" > _site/deploy-id.txt
+
+      - name: Upload the Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ./docs
+          path: ./_site
 
+      # GitHub's Pages status API frequently never flips this repo's deployment
+      # from "deployment_in_progress" to a terminal state, even though the
+      # content publishes correctly. The action then aborts at its hard 10-minute
+      # cap (the `timeout` input is capped at 600000 ms, so raising it is a no-op).
+      # We let that reporting stall pass and prove success ourselves below.
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         uses: actions/deploy-pages@v5
-        with:
-          # Poll for up to 15 min (default 10) — GitHub's Pages service can stall
-          # on status reporting even when the deployment itself succeeds.
-          timeout: 900000
+
+      # The real pass/fail gate: does the live site actually serve this commit?
+      # Green only when it does, so a genuine deploy failure still fails the run.
+      - name: Verify the live site is serving this commit
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          url="${PAGE_URL:-https://dinamo541.github.io/CoreFx/}"
+          stamp="${url%/}/deploy-id.txt"
+          echo "Checking $stamp for $GITHUB_SHA"
+          for i in $(seq 1 20); do
+            live="$(curl -fsSL --max-time 15 "$stamp" 2>/dev/null | tr -d '[:space:]' || true)"
+            if [ "$live" = "$GITHUB_SHA" ]; then
+              echo "Live site is serving $GITHUB_SHA"
+              exit 0
+            fi
+            echo "  attempt $i/20 — live=${live:-<unreachable>}"
+            sleep 15
+          done
+          echo "Live site never served $GITHUB_SHA after 5 minutes."
+          exit 1

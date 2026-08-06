@@ -15,8 +15,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   old plugin could not deserialize, aborting the deploy goal with
   `UnrecognizedPropertyException: Unrecognized field "warnings"` even though the
   artifacts had already been uploaded. Publishing now completes cleanly.
+- **Pages deployment**: The docs site is now deployed by an explicit
+  `.github/workflows/pages.yml` instead of the auto-generated
+  `pages-build-deployment` workflow. Three problems are addressed:
+  - Deployments were queued for *every* push to `main`, including commits that
+    never touched the site; a `paths: docs/**` filter stops that, which also
+    removes the window in which one deployment cancels another
+    (`Error: Deployment cancelled`).
+  - Concurrent runs now queue (`cancel-in-progress: false`) rather than
+    cancelling each other.
+  - GitHub's Pages status API repeatedly failed to report a terminal state for
+    this repo, leaving `actions/deploy-pages` polling until its hard 10-minute
+    cap and aborting with `Timeout reached, aborting!` — despite the content
+    publishing correctly every time. The workflow now stamps each build with the
+    commit SHA (`deploy-id.txt`) and verifies the live site is serving it, so the
+    run's pass/fail reflects the deployed site rather than the status API. Note
+    the action's `timeout` input is capped at 600000 ms, so raising it is a no-op.
 
 ### Documentation
+- **Docs site — `Controller`**: New page documenting the base class added in
+  1.3.0: the re-runnable `initialize()` contract, the injected `stage`,
+  `viewName` and `action`, `sendTabEvent`, and a table of the `FlowController`
+  hooks that wire it up. Registered in the sidebar, the navigation package card
+  grid, and the prev/next chain.
+- **Docs site — `FlowController`**: Added a "Controller integration" section
+  explaining why cached loaders make JavaFX call `initialize()` only once, and
+  how extending `Controller` restores per-visit refresh. The stale-state callout
+  now points at `Controller` as the built-in fix.
 - **README**: Added a documentation-site badge linking to
   <https://dinamo541.github.io/CoreFx/>, and a `EntityManagerHelper` quick-start
   snippet covering supplier registration, typed retrieval and shutdown.
