@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-08-06
+
+### Fixed
+- **Release pipeline**: Bumped `central-publishing-maven-plugin` from `0.6.0` to
+  `0.11.0`. The Sonatype Central API started returning a `warnings` field that the
+  old plugin could not deserialize, aborting the deploy goal with
+  `UnrecognizedPropertyException: Unrecognized field "warnings"` even though the
+  artifacts had already been uploaded. Publishing now completes cleanly.
+
+### Documentation
+- **README**: Added a documentation-site badge linking to
+  <https://dinamo541.github.io/CoreFx/>, and a `EntityManagerHelper` quick-start
+  snippet covering supplier registration, typed retrieval and shutdown.
+
 ## [1.3.0] - 2026-08-06
 
 ### Added 
