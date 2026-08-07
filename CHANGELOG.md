@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-07
+
+### Added
+- **Navigation — `FlowController`**: `hideMainStage()` and `showMainStage()` for
+  hiding the primary window without destroying it and bringing it back later.
+  Unlike `closeMainStage()` — which typically terminates the application — a
+  hidden stage keeps its scene, size and position, so tray-style apps and
+  splash/login flows can toggle the main window at will. Both validate that the
+  controller has been initialized first.
+- **Utilities — `Answer`**: four new shorthands that remove boilerplate from the
+  most common cases.
+  - `Answer(Boolean state)` — constructor for a bare state with no messages.
+  - `Answer.notOk()` — the failure counterpart to the existing `ok()` ;).
+  - `Answer.success(message, internalMessage, key, result)` and
+    `Answer.failure(message, internalMessage, key, result)` — build a fully
+    populated answer, including its first result entry, in a single call
+    instead of chaining `.with(...)` afterwards. As with `setResult`, `key`
+    must not be `null`.
+
+### Changed
+- **Utilities — `Answer`**: `ok()` now delegates to the new single-argument
+  constructor. Behaviour is unchanged.
+- **Utilities — `Answer` (source compatibility)**: because `Answer(Boolean)` and
+  the copy constructor `Answer(Answer)` both accept a bare `null`, the call
+  `new Answer(null)` is now ambiguous and no longer compiles. Binary
+  compatibility is unaffected — already-compiled code keeps working — but source
+  that used that form must disambiguate with a cast, e.g.
+  `new Answer((Answer) null)`.
+- **Javadoc**: normalized `@version` tags across all thirteen public classes to
+  a three-part `X.Y.Z` form, so class versions read consistently with the
+  project's semantic versioning.
+
+### Documentation
+- **Docs site**: documented the new `FlowController` and `Answer` members, and
+  bumped the install snippets to `1.4.0`.
+
 ## [1.3.1] - 2026-08-06
 
 ### Fixed

@@ -45,7 +45,7 @@ import java.util.regex.Pattern;
  *
  * @author Sem
  * @author Dominique
- * @version 1.1
+ * @version 1.1.0
  * @since 2026/06/10
  */
 public final class Validator {

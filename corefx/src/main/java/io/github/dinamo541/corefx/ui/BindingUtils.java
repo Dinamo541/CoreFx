@@ -24,7 +24,7 @@ import javafx.scene.control.Toggle;
  *
  * @author Carranza
  * @author Dominique
- * @version 2.3
+ * @version 2.3.0
  * @since 2026/06/10
  */
 public final class BindingUtils {

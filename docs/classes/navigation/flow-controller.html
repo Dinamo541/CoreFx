@@ -325,6 +325,7 @@ flow.goViewMain("Home"); // re-rendered in the new language</code></pre>
       <div class="method-list">
         <a href="#stage">setStageMinSize</a><a href="#stage">toggleFullScreen</a>
         <a href="#stage">setFullScreen</a><a href="#stage">closeMainStage</a>
+        <a href="#stage">hideMainStage</a><a href="#stage">showMainStage</a>
         <a href="#stage">setThemeApplier</a><a href="#stage">getMainStage</a>
         <a href="#stage">isInitialized</a><a href="#stage">loadAppIcon</a>
         <a href="#stage">getAppName</a><a href="#stage">getBaseViewPath</a>
@@ -339,7 +340,23 @@ flow.goViewMain("Home"); // re-rendered in the new language</code></pre>
         <tr><td><code>getMainStage()</code></td><td><span lang="en">The primary stage (throws if not initialized).</span><span lang="es">El stage principal (lanza excepción si no está inicializado).</span></td></tr>
         <tr><td><code>isInitialized()</code></td><td><span lang="en"><code>true</code> once <code>initialize</code> has run.</span><span lang="es"><code>true</code> una vez que <code>initialize</code> se ha ejecutado.</span></td></tr>
         <tr><td><code>closeMainStage()</code></td><td><span lang="en">Closes the main stage (usually exits the app).</span><span lang="es">Cierra el stage principal (normalmente termina la app).</span></td></tr>
+        <tr><td><code>hideMainStage()</code> <span class="tag green">1.4.0</span></td><td><span lang="en">Hides the main stage without destroying it — scene, size and position survive.</span><span lang="es">Oculta el stage principal sin destruirlo — escena, tamaño y posición se conservan.</span></td></tr>
+        <tr><td><code>showMainStage()</code> <span class="tag green">1.4.0</span></td><td><span lang="en">Shows the main stage again after <code>hideMainStage()</code>.</span><span lang="es">Vuelve a mostrar el stage principal tras <code>hideMainStage()</code>.</span></td></tr>
       </table>
+
+      <div class="callout note">
+        <span class="c-icon">🆕</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">New in 1.4.0 — hide is not close</span><span lang="es">Nuevo en 1.4.0 — ocultar no es cerrar</span></span>
+          <p><span lang="en"><code>closeMainStage()</code> closes the primary stage, which normally ends the application. <code>hideMainStage()</code> only takes the window off screen: the stage, its scene and its geometry stay alive, so <code>showMainStage()</code> brings back exactly what the user left. That is what you want for tray-resident apps, or for hiding the main window while a login or splash screen is up.</span><span lang="es"><code>closeMainStage()</code> cierra el stage principal, lo que normalmente termina la aplicación. <code>hideMainStage()</code> solo saca la ventana de pantalla: el stage, su escena y su geometría siguen vivos, así que <code>showMainStage()</code> devuelve exactamente lo que el usuario dejó. Es lo que quieres para apps residentes en la bandeja, o para ocultar la ventana principal mientras hay un login o un splash.</span></p>
+<pre data-lang="java"><code>FlowController flow = FlowController.getInstance();
+
+flow.hideMainStage();   // window disappears, state is kept
+// … show a login modal, sit in the system tray, etc.
+flow.showMainStage();   // back exactly as it was</code></pre>
+          <p><span lang="en">Both throw <code>IllegalStateException</code> if the controller has not been initialized yet.</span><span lang="es">Ambos lanzan <code>IllegalStateException</code> si el controlador aún no ha sido inicializado.</span></p>
+        </div>
+      </div>
 
       <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
       <div class="callout tip">

@@ -63,7 +63,7 @@ import java.util.function.Supplier;
  *
  * @author Dominique
  * @author Sem
- * @version 2.0
+ * @version 2.0.0
  * @since 2026/06/10
  */
 public final class EntityManagerHelper {

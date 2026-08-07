@@ -156,6 +156,8 @@ class AnswerTest {
 
     @Test
     void copyConstructorRejectsNull() {
-        assertThrows(NullPointerException.class, () -> new Answer(null));
+        // The cast is required since 1.4.0: Answer(Boolean) and Answer(Answer)
+        // both accept a bare null, so the call would otherwise be ambiguous.
+        assertThrows(NullPointerException.class, () -> new Answer((Answer) null));
     }
 }

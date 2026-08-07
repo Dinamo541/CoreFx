@@ -68,7 +68,7 @@ classes ship with a **47-test JUnit suite**.
 ## 📦 Installation
 
 CoreFx is published to **Maven Central**, so it works out of the box — no extra
-repositories to configure. Use the latest version: **`1.3.1`**.
+repositories to configure. Use the latest version: **`1.4.0`**.
 
 ### Maven
 
@@ -76,7 +76,7 @@ repositories to configure. Use the latest version: **`1.3.1`**.
 <dependency>
   <groupId>io.github.dinamo541</groupId>
   <artifactId>corefx</artifactId>
-  <version>1.3.1</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
@@ -84,7 +84,7 @@ repositories to configure. Use the latest version: **`1.3.1`**.
 
 ```groovy
 dependencies {
-    implementation 'io.github.dinamo541:corefx:1.3.1'
+    implementation 'io.github.dinamo541:corefx:1.4.0'
 }
 ```
 
@@ -92,7 +92,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("io.github.dinamo541:corefx:1.3.1")
+    implementation("io.github.dinamo541:corefx:1.4.0")
 }
 ```
 

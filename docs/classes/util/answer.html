@@ -88,12 +88,39 @@ if (a.isSuccess()) {
       <table class="tbl">
         <tr><th><span lang="en">Factory</span><span lang="es">Fábrica</span></th><th><span lang="en">Produces</span><span lang="es">Produce</span></th></tr>
         <tr><td><code>Answer.ok()</code></td><td><span lang="en">Success, no messages.</span><span lang="es">Éxito, sin mensajes.</span></td></tr>
+        <tr><td><code>Answer.notOk()</code> <span class="tag green">1.4.0</span></td><td><span lang="en">Failure, no messages — the counterpart to <code>ok()</code>.</span><span lang="es">Fallo, sin mensajes — la contraparte de <code>ok()</code>.</span></td></tr>
         <tr><td><code>Answer.success(message)</code></td><td><span lang="en">Success with a user message.</span><span lang="es">Éxito con un mensaje para el usuario.</span></td></tr>
         <tr><td><code>Answer.success(message, internal)</code></td><td><span lang="en">Success with user + internal messages.</span><span lang="es">Éxito con mensajes para el usuario + internos.</span></td></tr>
+        <tr><td><code>Answer.success(message, internal, key, result)</code> <span class="tag green">1.4.0</span></td><td><span lang="en">Success with both messages <em>and</em> a first result entry, in one call.</span><span lang="es">Éxito con ambos mensajes <em>y</em> una primera entrada de resultado, en una sola llamada.</span></td></tr>
         <tr><td><code>Answer.failure(message)</code></td><td><span lang="en">Failure with a user message.</span><span lang="es">Fallo con un mensaje para el usuario.</span></td></tr>
         <tr><td><code>Answer.failure(message, internal)</code></td><td><span lang="en">Failure with user + internal messages.</span><span lang="es">Fallo con mensajes para el usuario + internos.</span></td></tr>
+        <tr><td><code>Answer.failure(message, internal, key, result)</code> <span class="tag green">1.4.0</span></td><td><span lang="en">Failure with both messages <em>and</em> a first result entry, in one call.</span><span lang="es">Fallo con ambos mensajes <em>y</em> una primera entrada de resultado, en una sola llamada.</span></td></tr>
       </table>
-      <p><span lang="en">Constructors are also available: no-arg, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, and a copy constructor <code>Answer(Answer)</code>.</span><span lang="es">También hay constructores disponibles: sin argumentos, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, y un constructor de copia <code>Answer(Answer)</code>.</span></p>
+      <p><span lang="en">Constructors are also available: no-arg, <code>(state)</code>, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, and a copy constructor <code>Answer(Answer)</code>.</span><span lang="es">También hay constructores disponibles: sin argumentos, <code>(state)</code>, <code>(state, message, internal)</code>, <code>(state, message, internal, key, result)</code>, y un constructor de copia <code>Answer(Answer)</code>.</span></p>
+      <div class="callout note">
+        <span class="c-icon">🆕</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">New in 1.4.0 — fewer chained calls</span><span lang="es">Nuevo en 1.4.0 — menos llamadas encadenadas</span></span>
+          <p><span lang="en">The four-argument factories build a fully populated answer in a single expression, so you no longer need to chain <code>.with(...)</code> for the first result. As with <code>setResult</code>, the <code>key</code> must not be <code>null</code> — the value may be.</span><span lang="es">Las fábricas de cuatro argumentos construyen una respuesta completa en una sola expresión, así que ya no necesitas encadenar <code>.with(...)</code> para el primer resultado. Igual que en <code>setResult</code>, la <code>key</code> no puede ser <code>null</code> — el valor sí.</span></p>
+<pre data-lang="java"><code>// Before — factory plus a chained result:
+return Answer.success("Account created", "id=" + id).with("userId", id);
+
+// Since 1.4.0 — one call:
+return Answer.success("Account created", "id=" + id, "userId", id);
+
+// And the failure counterpart to ok():
+return Answer.notOk();</code></pre>
+        </div>
+      </div>
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Upgrading to 1.4.0: <code>new Answer(null)</code> no longer compiles</span><span lang="es">Al actualizar a 1.4.0: <code>new Answer(null)</code> ya no compila</span></span>
+          <p><span lang="en">The new <code>Answer(Boolean)</code> constructor and the copy constructor <code>Answer(Answer)</code> both accept a bare <code>null</code>, so that call is now ambiguous. Already-compiled code is unaffected — this is a source-level change only. If you hit it, add a cast to say which one you meant:</span><span lang="es">El nuevo constructor <code>Answer(Boolean)</code> y el constructor de copia <code>Answer(Answer)</code> aceptan ambos un <code>null</code> pelado, así que esa llamada ahora es ambigua. El código ya compilado no se ve afectado — es un cambio solo a nivel de fuente. Si te topas con esto, añade un cast para indicar cuál querías:</span></p>
+<pre data-lang="java"><code>new Answer((Answer) null);    // copy constructor — throws NullPointerException
+new Answer((Boolean) null);   // state constructor — an answer with null state</code></pre>
+        </div>
+      </div>
 
       <h2 id="state"><span lang="en">State</span><span lang="es">Estado</span></h2>
       <table class="tbl">

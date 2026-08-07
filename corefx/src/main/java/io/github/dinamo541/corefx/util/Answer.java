@@ -44,7 +44,7 @@ import java.util.Objects;
  * @author Sem
  * @author Carranza
  * @author Dominique
- * @version 2.2
+ * @version 2.3.0
  * @since 2026/06/10
  */
 public final class Answer implements java.io.Serializable, Cloneable {
@@ -74,6 +74,15 @@ public final class Answer implements java.io.Serializable, Cloneable {
      * messages, and an empty result map.
      */
     public Answer() {
+    }
+
+    /**
+     * Constructor with state only.
+     *
+     * @param state operation state (may be {@code null})
+     */
+    public Answer(Boolean state) {
+        this(state, null, null);
     }
 
     /**
@@ -134,7 +143,7 @@ public final class Answer implements java.io.Serializable, Cloneable {
      * @return a new {@code Answer} whose state is {@code true}
      */
     public static Answer ok() {
-        return new Answer(Boolean.TRUE, null, null);
+        return new Answer(Boolean.TRUE);
     }
 
     /**
@@ -161,6 +170,33 @@ public final class Answer implements java.io.Serializable, Cloneable {
     }
 
     /**
+     * Creates a successful answer carrying a user-facing message, an internal
+     * message, and a result.
+     *
+     * @param message         message for the user (may be {@code null})
+     * @param internalMessage internal message for logs/debugging (may be
+     *                        {@code null})
+     * @param key             result key (must not be {@code null})
+     * @param result          result value (may be {@code null})
+     * @return a new successful {@code Answer} with the specified message, internal
+     *         message, and result
+     * @throws NullPointerException if {@code key} is {@code null}
+     * @see #setResult(String, Object)
+     */
+    public static Answer success(String message, String internalMessage, String key, Object result) {
+        return new Answer(Boolean.TRUE, message, internalMessage, key, result);
+    }
+
+    /**
+     * Creates a failed answer with no messages.
+     *
+     * @return a new {@code Answer} whose state is {@code false}
+     */
+    public static Answer notOk() {
+        return new Answer(Boolean.FALSE);
+    }
+
+    /**
      * Creates a failed answer carrying a user-facing message.
      *
      * @param message message for the user (may be {@code null})
@@ -180,6 +216,24 @@ public final class Answer implements java.io.Serializable, Cloneable {
      */
     public static Answer failure(String message, String internalMessage) {
         return new Answer(Boolean.FALSE, message, internalMessage);
+    }
+
+    /**
+     * Creates a failed answer carrying a user-facing message, an internal message,
+     * and a result.
+     *
+     * @param message         message for the user (may be {@code null})
+     * @param internalMessage internal message for logs/debugging (may be
+     *                        {@code null})
+     * @param key             result key (must not be {@code null})
+     * @param result          result value (may be {@code null})
+     * @return a new failed {@code Answer} with the specified message, internal
+     *         message, and result
+     * @throws NullPointerException if {@code key} is {@code null}
+     * @see #setResult(String, Object)
+     */
+    public static Answer failure(String message, String internalMessage, String key, Object result) {
+        return new Answer(Boolean.FALSE, message, internalMessage, key, result);
     }
 
     // ---------------------------------------------------------------------

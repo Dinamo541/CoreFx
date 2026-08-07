@@ -70,7 +70,7 @@ import javafx.stage.Window;
  *
  * @author Sem
  * @author Dominique
- * @version 1.2
+ * @version 1.2.0
  * @since 2026/06/10
  */
 public final class AlertUtil {

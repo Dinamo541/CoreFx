@@ -59,7 +59,7 @@ import javafx.stage.WindowEvent;
  * </ul>
  *
  * @author Dominique
- * @version 2.7
+ * @version 2.8.0
  * @since 2026-06-25
  */
 public final class FlowController {
@@ -1325,6 +1325,24 @@ public final class FlowController {
     public void setFullScreen(Stage stage, boolean fullScreen) {
         checkInitialized();
         stage.setFullScreen(fullScreen);
+    }
+
+    /**
+     * Hides the main application stage.
+     * The stage can be shown again later without losing its state.
+     */
+    public void hideMainStage() {
+        checkInitialized();
+        mainStage.hide();
+    }
+
+    /**
+     * Shows the main application stage.
+     * If the stage was previously hidden, it will be made visible again.
+     */
+    public void showMainStage() {
+        checkInitialized();
+        mainStage.show();
     }
 
     /**
