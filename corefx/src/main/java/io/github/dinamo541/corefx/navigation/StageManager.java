@@ -58,7 +58,7 @@ import javafx.stage.Stage;
  *
  * @author Dominique
  * @author Sem
- * @version 1.0
+ * @version 1.0.0
  * @since 2026/06/10
  */
 public final class StageManager {

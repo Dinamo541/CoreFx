@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="assets/img/CoreFXLogo.png" />
+  <title>CoreFx — The foundation layer for JavaFX applications</title>
+  <meta name="description"
+    content="CoreFx is a small, dependency-free library that gives JavaFX apps a navigation engine, shared state, live theming, i18n and battle-tested UI utilities." />
+  <link rel="stylesheet" href="assets/css/style.css?v=14" />
+  <script src="assets/js/theme.js?v=14"></script>
+</head>
+
+<body data-depth="0" data-active="home">
+  <div id="navbar"></div>
+
+  <main id="view">
+    <!-- ============================================================ Hero -->
+    <header class="hero">
+      <div class="hero-inner">
+        <span class="eyebrow"><span lang="en">Open-source · Maven Central</span><span lang="es">Código abierto · Maven
+            Central</span></span>
+        <h1>Core<span class="gradient-text">Fx</span></h1>
+        <p class="hero-tagline"><span lang="en">The foundation layer for JavaFX applications.</span><span lang="es">La
+            capa base para aplicaciones JavaFX.</span></p>
+        <p class="hero-sub">
+          <span lang="en">Navigation, persistence, theming, i18n and UI utilities — wired together
+            so you can ship screens, not boilerplate.</span>
+          <span lang="es">Navegación, persistencia, theming, i18n y utilidades de UI — integradas
+            para que escribas pantallas, no código repetitivo.</span>
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="packages/navigation.html"><span lang="en">Get Started</span><span
+              lang="es">Comenzar</span><span class="arrow-reveal">→</span></a>
+          <a class="btn btn-ghost" href="https://github.com/Dinamo541/CoreFx" target="_blank" rel="noopener"><span
+              class="gh-reveal"><svg viewBox="0 0 16 16" fill="currentColor">
+                <path
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z" />
+              </svg></span><span lang="en">View on GitHub</span><span lang="es">Ver en GitHub</span></a>
+        </div>
+
+        <div class="trust">
+          <div class="stat"><span class="num" data-count="100" data-suffix="%">0%</span><span class="lbl"><span
+                lang="en">Independent</span><span lang="es">Independiente</span></span></div>
+          <div class="stat"><span class="num" data-count="47">0</span><span class="lbl"><span lang="en">JUnit
+                tests</span><span lang="es">Pruebas</span></span></div>
+          <div class="stat"><span class="num" data-count="13">0</span><span class="lbl"><span
+                lang="en">Classes</span><span lang="es">Clases</span></span></div>
+          <div class="stat"><span class="num">MIT</span><span class="lbl"><span lang="en">License</span><span
+                lang="es">Licencia</span></span></div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="window">
+            <div class="tabs win-tabs">
+              <div class="win-bar">
+                <i></i><i></i><i></i>
+                <div class="tab-btns">
+                  <button class="active" type="button">Maven</button>
+                  <button type="button">Gradle Kotlin</button>
+                  <button type="button">Gradle Groovy</button>
+                </div>
+              </div>
+              <div class="tab-panel active">
+                <pre data-lang="xml"><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.github.dinamo541&lt;/groupId&gt;
+  &lt;artifactId&gt;corefx&lt;/artifactId&gt;
+  &lt;version&gt;1.4.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+              </div>
+              <div class="tab-panel">
+                <pre data-lang="kotlin"><code>dependencies {
+    implementation("io.github.dinamo541:corefx:1.4.0")
+}</code></pre>
+              </div>
+              <div class="tab-panel">
+                <pre data-lang="groovy"><code>dependencies {
+    implementation 'io.github.dinamo541:corefx:1.4.0'
+}</code></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="content-inner">
+
+        <!-- JavaFX caveat — shown once, near the install snippets above -->
+        <div class="callout warning">
+          <span class="c-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg></span>
+          <div class="c-body">
+            <span class="c-title"><span lang="en">You must add JavaFX yourself</span><span lang="es">Debes añadir JavaFX
+                por tu cuenta</span></span>
+            <p>
+              <span lang="en">CoreFx declares JavaFX with <code>provided</code> scope — it does
+                <strong>not</strong> bundle a JavaFX runtime, so your app controls the
+                version and OS classifier. Add JavaFX 25 (<code>javafx-controls</code>,
+                <code>javafx-fxml</code>) or you will hit <code>NoClassDefFoundError</code>
+                at runtime.</span>
+              <span lang="es">CoreFx declara JavaFX con scope <code>provided</code> — <strong>no</strong>
+                empaqueta un runtime de JavaFX, así que tu app controla la versión y el
+                classifier del SO. Añade JavaFX 25 (<code>javafx-controls</code>,
+                <code>javafx-fxml</code>) o te encontrarás con <code>NoClassDefFoundError</code>
+                en tiempo de ejecución.</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- ======================================================= What is it -->
+        <div class="sec-head">
+          <span class="eyebrow"><span lang="en">Why CoreFx</span><span lang="es">Por qué CoreFx</span></span>
+          <h2 id="what"><span lang="en">Stop rewriting the same plumbing</span><span lang="es">Deja de reescribir la
+              misma fontanería</span></h2>
+          <p class="sec-sub"><span lang="en">Every JavaFX app re-implements the same wiring. CoreFx is that wiring —
+              done once, done well.</span><span lang="es">Cada app JavaFX reimplementa el mismo cableado. CoreFx es ese
+              cableado — hecho una vez y bien.</span></p>
+        </div>
+        <p>
+          <span lang="en">A singleton to switch screens, a place to stash the logged-in user, helpers to
+            wire up tables, a way to theme scenes, and a validation toolkit. CoreFx is a small,
+            dependency-free library (JavaFX aside) where every class is <code>final</code>, null-safe
+            by contract, and documented. The runtime-free classes ship with a
+            <strong>47-test JUnit suite</strong>.</span>
+          <span lang="es">Un singleton para cambiar de pantalla, un lugar donde guardar el usuario conectado,
+            ayudantes para armar tablas, una forma de aplicar temas y un kit de validación. CoreFx es una
+            librería pequeña y sin dependencias (más allá de JavaFX) donde cada clase es <code>final</code>,
+            null-safe por contrato y está documentada. Las clases sin dependencia del runtime incluyen una
+            <strong>suite JUnit de 47 pruebas</strong>.</span>
+        </p>
+
+        <!-- ======================================================= Features (bento) -->
+        <div class="sec-head">
+          <span class="eyebrow"><span lang="en">Features</span><span lang="es">Características</span></span>
+          <h2><span lang="en">Everything a JavaFX app needs</span><span lang="es">Todo lo que una app JavaFX
+              necesita</span></h2>
+        </div>
+
+        <div class="bento">
+          <div class="feature b-nav">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+              </svg></div>
+            <h3><span lang="en">A navigation engine</span><span lang="es">Un motor de navegación</span></h3>
+            <p><span lang="en">One <code>FlowController</code> to load FXML views, swap scenes, open modals (blocking or
+                not) and manage windows — with a cached loader per view.</span><span lang="es">Un único
+                <code>FlowController</code> para cargar vistas FXML, cambiar escenas, abrir modales (bloqueantes o no) y
+                administrar ventanas — con un loader cacheado por vista.</span></p>
+            <div class="mini-code"><span class="k">flow</span>.goViewMain(<span class="s">"Home"</span>);</div>
+          </div>
+          <div class="feature b-state">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                <polyline points="2 17 12 22 22 17" />
+                <polyline points="2 12 12 17 22 12" />
+              </svg></div>
+            <h3><span lang="en">Shared state</span><span lang="es">Estado compartido</span></h3>
+            <p><span lang="en">A thread-safe <code>AppContext</code> key-value store for the current user, selected
+                records and feature flags.</span><span lang="es">Un almacén clave-valor <code>AppContext</code>
+                thread-safe para el usuario actual, registros y feature flags.</span></p>
+          </div>
+          <div class="feature b-theme">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3s6 5.69 6 10a6 6 0 0 1-12 0c0-4.31 6-10 6-10z" />
+              </svg></div>
+            <h3><span lang="en">Live theming</span><span lang="es">Theming en vivo</span></h3>
+            <p><span lang="en">A <code>ThemeManager</code> that applies named CSS theme sets to any scene and re-applies
+                them on the fly.</span><span lang="es">Un <code>ThemeManager</code> que aplica conjuntos de temas CSS
+                con nombre a cualquier escena y los reaplica al vuelo.</span></p>
+          </div>
+          <div class="feature b-i18n">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M2 12h20" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg></div>
+            <h3><span lang="en">Internationalization</span><span lang="es">Internacionalización</span></h3>
+            <p><span lang="en">Inject a <code>ResourceBundle</code> once and every FXML view loads localized — switch
+                locale at runtime.</span><span lang="es">Inyecta un <code>ResourceBundle</code> una vez y cada vista
+                FXML se carga localizada.</span></p>
+          </div>
+          <div class="feature b-utils">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M14.7 6.3a4 4 0 0 0-5.66 5.66l-6.02 6.02a1.5 1.5 0 0 0 2.12 2.12l6.02-6.02a4 4 0 0 0 5.66-5.66l-2.4 2.4a2 2 0 1 1-2.12-2.12z" />
+              </svg></div>
+            <h3><span lang="en">Tested utilities</span><span lang="es">Utilidades probadas</span></h3>
+            <p><span lang="en">Null-safe <code>Validator</code>, a standardized <code>Answer</code> wrapper, type-safe
+                <code>TableUtils</code>, input filters and more.</span><span lang="es">Un <code>Validator</code>
+                null-safe, un envoltorio <code>Answer</code>, <code>TableUtils</code> con tipos seguros, filtros y
+                más.</span></p>
+          </div>
+          <div class="feature b-persist">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="8" ry="3" />
+                <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+                <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
+              </svg></div>
+            <h3><span lang="en">Agnostic persistence</span><span lang="es">Persistencia agnóstica</span></h3>
+            <p><span lang="en"><code>EntityManagerHelper</code> lazily creates and caches a persistence manager from a
+                supplier you provide.</span><span lang="es"><code>EntityManagerHelper</code> crea y cachea de forma
+                perezosa un gestor de persistencia desde un supplier.</span></p>
+          </div>
+        </div>
+
+        <!-- ======================================================= Quick start -->
+        <div class="sec-head">
+          <span class="eyebrow"><span lang="en">Example</span><span lang="es">Ejemplo</span></span>
+          <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+          <p class="sec-sub"><span lang="en">A complete, minimal JavaFX application backed by CoreFx.</span><span
+              lang="es">Una aplicación JavaFX mínima y completa apoyada en CoreFx.</span></p>
+        </div>
+        <div class="window">
+          <div class="win-bar"><i></i><i></i><i></i><span class="win-title">MyApp.java</span></div>
+          <pre data-lang="java"><code>import io.github.dinamo541.corefx.navigation.FlowController;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+public class MyApp extends Application {
+
+    @Override
+    public void start(Stage stage) {
+        FlowController flow = FlowController.getInstance();
+
+        flow.initialize(
+            stage,                       // the primary stage
+            "My Application",            // window title
+            "/com/example/views/",       // folder holding your .fxml files
+            "/com/example/resources/",   // folder holding other resources
+            "/com/example/icon.png",     // application icon
+            MyApp.class                  // class used to resolve resources
+        );
+
+        // Loads /com/example/views/Home.fxml, builds the scene, and shows it.
+        flow.goViewMain("Home");
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}</code></pre>
+        </div>
+
+        <!-- ======================================================= Modules -->
+        <div class="sec-head">
+          <span class="eyebrow"><span lang="en">Explore</span><span lang="es">Explora</span></span>
+          <h2 id="modules"><span lang="en">The modules</span><span lang="es">Los módulos</span></h2>
+          <p class="sec-sub"><span lang="en">Four packages under <code>io.github.dinamo541.corefx</code>. Pick one to
+              explore its classes in depth.</span><span lang="es">Cuatro paquetes bajo
+              <code>io.github.dinamo541.corefx</code>. Elige uno para explorar sus clases.</span></p>
+        </div>
+
+        <div class="card-grid cols-4">
+          <a class="card" href="packages/navigation.html">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+              </svg></div>
+            <div class="card-title"><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y
+                flujo</span></div>
+            <div class="card-desc"><span lang="en">FlowController, AppContext, StageManager — view loading, scene
+                swapping, windows and shared state.</span><span lang="es">FlowController, AppContext, StageManager —
+                carga de vistas, cambio de escenas, ventanas y estado compartido.</span></div>
+            <span class="card-arrow"><span lang="en">Explore →</span><span lang="es">Explorar →</span></span>
+          </a>
+          <a class="card" href="packages/ui.html">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="9" rx="1" />
+                <rect x="14" y="3" width="7" height="5" rx="1" />
+                <rect x="14" y="12" width="7" height="9" rx="1" />
+                <rect x="3" y="16" width="7" height="5" rx="1" />
+              </svg></div>
+            <div class="card-title"><span lang="en">UI Utilities</span><span lang="es">Utilidades de UI</span></div>
+            <div class="card-desc"><span lang="en">ThemeManager, AlertUtil, Message, TableUtils, Format, BindingUtils,
+                ImageUtil.</span><span lang="es">ThemeManager, AlertUtil, Message, TableUtils, Format, BindingUtils,
+                ImageUtil.</span></div>
+            <span class="card-arrow"><span lang="en">Explore →</span><span lang="es">Explorar →</span></span>
+          </a>
+          <a class="card" href="packages/util.html">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M14.7 6.3a4 4 0 0 0-5.66 5.66l-6.02 6.02a1.5 1.5 0 0 0 2.12 2.12l6.02-6.02a4 4 0 0 0 5.66-5.66l-2.4 2.4a2 2 0 1 1-2.12-2.12z" />
+              </svg></div>
+            <div class="card-title"><span lang="en">General Utilities</span><span lang="es">Utilidades generales</span>
+            </div>
+            <div class="card-desc"><span lang="en">Validator and Answer — validation and a standardized response
+                wrapper.</span><span lang="es">Validator y Answer — validación y un envoltorio de respuesta
+                estandarizado.</span></div>
+            <span class="card-arrow"><span lang="en">Explore →</span><span lang="es">Explorar →</span></span>
+          </a>
+          <a class="card" href="packages/persistence.html">
+            <div class="f-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="8" ry="3" />
+                <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+                <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
+              </svg></div>
+            <div class="card-title"><span lang="en">Persistence</span><span lang="es">Persistencia</span></div>
+            <div class="card-desc"><span lang="en">EntityManagerHelper — a provider-agnostic persistence-context
+                holder.</span><span lang="es">EntityManagerHelper — un contenedor de contexto de persistencia agnóstico
+                al proveedor.</span></div>
+            <span class="card-arrow"><span lang="en">Explore →</span><span lang="es">Explorar →</span></span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer id="footer"></footer>
+  <script src="assets/js/site.js?v=14"></script>
+</body>
+
+</html>

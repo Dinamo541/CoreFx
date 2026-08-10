@@ -44,7 +44,7 @@ import javafx.stage.Window;
  *
  * @author Carranza
  * @author Dominique
- * @version 3.0
+ * @version 3.0.0
  * @since 2026-06-10
  */
 public final class Message {

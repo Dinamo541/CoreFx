@@ -35,7 +35,7 @@ import javafx.scene.control.TextInputControl;
  *
  * @author Carranza
  * @author Dominique
- * @version 2.4
+ * @version 2.4.0
  * @since 2026/06/10
  */
 public final class Format {

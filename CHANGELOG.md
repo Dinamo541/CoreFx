@@ -7,6 +7,103 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-07
+
+### Added
+- **Navigation — `FlowController`**: `hideMainStage()` and `showMainStage()` for
+  hiding the primary window without destroying it and bringing it back later.
+  Unlike `closeMainStage()` — which typically terminates the application — a
+  hidden stage keeps its scene, size and position, so tray-style apps and
+  splash/login flows can toggle the main window at will. Both validate that the
+  controller has been initialized first.
+- **Utilities — `Answer`**: four new shorthands that remove boilerplate from the
+  most common cases.
+  - `Answer(Boolean state)` — constructor for a bare state with no messages.
+  - `Answer.notOk()` — the failure counterpart to the existing `ok()` ;).
+  - `Answer.success(message, internalMessage, key, result)` and
+    `Answer.failure(message, internalMessage, key, result)` — build a fully
+    populated answer, including its first result entry, in a single call
+    instead of chaining `.with(...)` afterwards. As with `setResult`, `key`
+    must not be `null`.
+
+### Changed
+- **Utilities — `Answer`**: `ok()` now delegates to the new single-argument
+  constructor. Behaviour is unchanged.
+- **Utilities — `Answer` (source compatibility)**: because `Answer(Boolean)` and
+  the copy constructor `Answer(Answer)` both accept a bare `null`, the call
+  `new Answer(null)` is now ambiguous and no longer compiles. Binary
+  compatibility is unaffected — already-compiled code keeps working — but source
+  that used that form must disambiguate with a cast, e.g.
+  `new Answer((Answer) null)`.
+- **Javadoc**: normalized `@version` tags across all thirteen public classes to
+  a three-part `X.Y.Z` form, so class versions read consistently with the
+  project's semantic versioning.
+
+### Documentation
+- **Docs site**: documented the new `FlowController` and `Answer` members, and
+  bumped the install snippets to `1.4.0`.
+
+## [1.3.1] - 2026-08-06
+
+### Fixed
+- **Release pipeline**: Bumped `central-publishing-maven-plugin` from `0.6.0` to
+  `0.11.0`. The Sonatype Central API started returning a `warnings` field that the
+  old plugin could not deserialize, aborting the deploy goal with
+  `UnrecognizedPropertyException: Unrecognized field "warnings"` even though the
+  artifacts had already been uploaded. Publishing now completes cleanly.
+- **Pages deployment**: The docs site is now deployed by an explicit
+  `.github/workflows/pages.yml` instead of the auto-generated
+  `pages-build-deployment` workflow. Three problems are addressed:
+  - Deployments were queued for *every* push to `main`, including commits that
+    never touched the site; a `paths: docs/**` filter stops that, which also
+    removes the window in which one deployment cancels another
+    (`Error: Deployment cancelled`).
+  - Concurrent runs now queue (`cancel-in-progress: false`) rather than
+    cancelling each other.
+  - GitHub's Pages status API repeatedly failed to report a terminal state for
+    this repo, leaving `actions/deploy-pages` polling until its hard 10-minute
+    cap and aborting with `Timeout reached, aborting!` — despite the content
+    publishing correctly every time. The workflow now stamps each build with the
+    commit SHA (`deploy-id.txt`) and verifies the live site is serving it, so the
+    run's pass/fail reflects the deployed site rather than the status API. Note
+    the action's `timeout` input is capped at 600000 ms, so raising it is a no-op.
+
+### Documentation
+- **Docs site — `Controller`**: New page documenting the base class added in
+  1.3.0: the re-runnable `initialize()` contract, the injected `stage`,
+  `viewName` and `action`, `sendTabEvent`, and a table of the `FlowController`
+  hooks that wire it up. Registered in the sidebar, the navigation package card
+  grid, and the prev/next chain.
+- **Docs site — `FlowController`**: Added a "Controller integration" section
+  explaining why cached loaders make JavaFX call `initialize()` only once, and
+  how extending `Controller` restores per-visit refresh. The stale-state callout
+  now points at `Controller` as the built-in fix.
+- **README**: Added a documentation-site badge linking to
+  <https://dinamo541.github.io/CoreFx/>, and a `EntityManagerHelper` quick-start
+  snippet covering supplier registration, typed retrieval and shutdown.
+
+## [1.3.0] - 2026-08-06
+
+### Added 
+- **Navigation — `Controller`**: New abstract base class for FXML controllers. Exposes
+  `stage`, `action`, and `viewName` metadata through getters/setters, and declares an
+  abstract `initialize()` hook that subclasses implement to react every time their view
+  is shown again.
+- **API — `FlowController`**: Controllers that extend `Controller` are now wired up
+  automatically. `viewName` is set as soon as a loader is created, the current `Stage`
+  is (re-)injected on every navigation call (`goViewMain`, `changeViewInMain`,
+  `goViewInWindow`, `goViewInModal`/`goViewInModalAndWait`, `changeViewInStage`,
+  `changeViewInScene`, and `changeViewInBorderPane`), and `initialize()` is invoked
+  again whenever a cached loader is reused — so controllers can refresh their state
+  without any manual wiring.
+
+## [1.2.1] - 2026-06-27
+
+### Fixed
+- **POM**: Renamed parent artifact from `CoreFx` to `CoreFx-parent` to eliminate a
+  false Maven cycle error when consuming `corefx` as a dependency
+  (`The parents form a cycle: …corefx → CoreFx → CoreFx`).
+
 ## [1.2.0] - 2026-06-14
 
 ### Added
@@ -95,4 +192,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 [unreleased]: #unreleased
+[1.2.1]: #121---2026-06-27
 [1.2.0]: #120---2026-06-14

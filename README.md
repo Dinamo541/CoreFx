@@ -11,6 +11,7 @@ _Navigation, persistence, theming, i18n, and UI utilities — wired together so 
 
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.dinamo541/corefx?label=Maven%20Central&color=blue)](https://central.sonatype.com/artifact/io.github.dinamo541/corefx)
 [![Build](https://github.com/Dinamo541/CoreFx/actions/workflows/build.yml/badge.svg)](https://github.com/Dinamo541/CoreFx/actions/workflows/build.yml)
+[![Docs](https://img.shields.io/badge/Docs-GitHub%20Pages-1f9bcf)](https://dinamo541.github.io/CoreFx/)
 ![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk&logoColor=white)
 ![JavaFX](https://img.shields.io/badge/JavaFX-25-1f9bcf?logo=openjdk&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-3fb950)
@@ -67,7 +68,7 @@ classes ship with a **47-test JUnit suite**.
 ## 📦 Installation
 
 CoreFx is published to **Maven Central**, so it works out of the box — no extra
-repositories to configure. Use the latest version: **`1.2.0`**.
+repositories to configure. Use the latest version: **`1.4.0`**.
 
 ### Maven
 
@@ -75,7 +76,7 @@ repositories to configure. Use the latest version: **`1.2.0`**.
 <dependency>
   <groupId>io.github.dinamo541</groupId>
   <artifactId>corefx</artifactId>
-  <version>1.2.0</version>
+  <version>1.4.0</version>
 </dependency>
 ```
 
@@ -83,7 +84,7 @@ repositories to configure. Use the latest version: **`1.2.0`**.
 
 ```groovy
 dependencies {
-    implementation 'io.github.dinamo541:corefx:1.2.0'
+    implementation 'io.github.dinamo541:corefx:1.4.0'
 }
 ```
 
@@ -91,7 +92,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("io.github.dinamo541:corefx:1.2.0")
+    implementation("io.github.dinamo541:corefx:1.4.0")
 }
 ```
 
@@ -191,6 +192,28 @@ flow.goViewInModal("EditUser");      // open a non-blocking modal
 flow.goViewInModalAndWait("Confirm");// open a blocking modal, wait for it to close
 ```
 
+If your app uses JPA, wire up `EntityManagerHelper` once at startup:
+
+```java
+import io.github.dinamo541.corefx.persistence.EntityManagerHelper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Persistence;
+
+// Once at startup — register the supplier (lazy, never called until first use):
+EntityManagerHelper.getInstance().initialize(() ->
+        Persistence.createEntityManagerFactory("myUnit")
+                   .createEntityManager());
+
+// Anywhere afterwards — typed, cast-free retrieval:
+EntityManager em = EntityManagerHelper.getInstance().getManager(EntityManager.class);
+em.getTransaction().begin();
+em.persist(entity);
+em.getTransaction().commit();
+
+// On application shutdown:
+EntityManagerHelper.getInstance().close();
+```
+
 ---
 
 ## 🧱 The Modules
@@ -204,6 +227,7 @@ CoreFx is organized into four packages under `io.github.dinamo541.corefx`.
 | Class                | Responsibility                                                                                                                                                                                                                       |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`FlowController`** | The heart of the library. Loads & caches FXML views, swaps scenes, opens windows and modals (blocking & non-blocking), swaps regions of a `BorderPane`, manages full-screen and min-size, and carries i18n + a typed transfer value. |
+| **`Controller`**    | Base class for all controllers in the application. Provides common functionality and lifecycle methods.                                                                                 |
 | **`AppContext`**     | Thread-safe, process-wide key-value store for shared application state. Backed by `ConcurrentHashMap`; keys must be non-blank, values non-null.                                                                                      |
 | **`StageManager`**   | Helpers for creating, configuring, and controlling JavaFX stages and windows.                                                                                                                                                        |
 
@@ -422,5 +446,8 @@ Released under the **MIT License**. See [LICENSE](./LICENSE) for details.
 
 <div align="center">
 <br/>
-Built with care by <a href="https://github.com/Dinamo541">Dominique</a>
+Built with care by 
+<a href="https://github.com/Dinamo541">Dominique</a>
+ & 
+<a href="https://github.com/SemMora">Sem</a>
 </div>

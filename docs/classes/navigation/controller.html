@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="../../assets/img/CoreFXLogo.png" />
+  <title>Controller — CoreFx</title>
+  <meta name="description" content="Controller: abstract base class for FXML controllers, auto-wired by FlowController with stage, view name and a re-runnable initialize() hook." />
+  <link rel="stylesheet" href="../../assets/css/style.css" />
+  <script src="../../assets/js/theme.js"></script>
+</head>
+<body data-depth="2" data-active="controller">
+  <div id="navbar"></div>
+  <div class="layout">
+    <div class="backdrop" data-close-sidebar></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content"><div class="content-inner">
+
+      <nav class="breadcrumb">
+        <a href="../../index.html"><span lang="en">Home</span><span lang="es">Inicio</span></a><span class="sep">/</span>
+        <a href="../../packages/navigation.html"><span lang="en">Navigation &amp; Flow</span><span lang="es">Navegación y flujo</span></a><span class="sep">/</span>
+        <span>Controller</span>
+      </nav>
+
+      <span class="pkg-path">io.github.dinamo541.corefx.navigation</span>
+      <h1>Controller</h1>
+      <div class="tags">
+        <span class="tag accent"><span lang="en">Abstract class</span><span lang="es">Clase abstracta</span></span>
+        <span class="tag java">JavaFX</span>
+        <span class="tag"><span lang="en">optional</span><span lang="es">opcional</span></span>
+        <span class="tag green"><span lang="en">since 1.3.0</span><span lang="es">desde 1.3.0</span></span>
+      </div>
+
+      <p class="lead">
+        <span lang="en">An optional base class for your FXML controllers. Extend it and
+        <a href="flow-controller.html">FlowController</a> starts wiring your controller
+        automatically: it injects the <code>Stage</code> the view is showing on, records
+        the <code>viewName</code> it was loaded from, and — the important part — calls
+        <code>initialize()</code> <strong>again every time a cached view is shown</strong>,
+        so screens can refresh themselves without any manual plumbing.</span>
+        <span lang="es">Una clase base opcional para tus controladores FXML. Extiéndela y
+        <a href="flow-controller.html">FlowController</a> empieza a conectar tu controlador
+        automáticamente: inyecta el <code>Stage</code> en el que se muestra la vista, registra
+        el <code>viewName</code> desde el que se cargó y — lo importante — llama a
+        <code>initialize()</code> <strong>otra vez cada vez que se muestra una vista
+        cacheada</strong>, para que las pantallas puedan refrescarse solas sin ningún
+        cableado manual.</span>
+      </p>
+
+      <h2 id="why"><span lang="en">The problem it solves</span><span lang="es">El problema que resuelve</span></h2>
+      <p>
+        <span lang="en"><code>FlowController</code> caches one <code>FXMLLoader</code> per
+        view, which is what makes navigation fast and keeps controllers reachable. But
+        caching has a catch: JavaFX only calls a controller's <code>initialize()</code>
+        <em>once</em>, when the FXML is first loaded. Navigate away and come back, and the
+        screen still shows whatever it held before — stale totals, an old selection, a form
+        that was never cleared.</span>
+        <span lang="es"><code>FlowController</code> cachea un <code>FXMLLoader</code> por
+        vista, que es lo que hace la navegación rápida y mantiene los controladores
+        accesibles. Pero el caché tiene una trampa: JavaFX solo llama al
+        <code>initialize()</code> de un controlador <em>una vez</em>, cuando el FXML se carga
+        por primera vez. Navegas a otro lado y vuelves, y la pantalla sigue mostrando lo que
+        tenía antes — totales obsoletos, una selección vieja, un formulario que nunca se
+        limpió.</span>
+      </p>
+      <p>
+        <span lang="en">Extending <code>Controller</code> closes that gap. CoreFx detects
+        the base class with a pattern match and re-invokes <code>initialize()</code> on
+        every reuse, so "runs when the view is shown" becomes the contract — not "runs once,
+        ever".</span>
+        <span lang="es">Extender <code>Controller</code> cierra esa brecha. CoreFx detecta la
+        clase base con un pattern match y vuelve a invocar <code>initialize()</code> en cada
+        reutilización, así que "se ejecuta cuando la vista se muestra" pasa a ser el contrato
+        — no "se ejecuta una sola vez, para siempre".</span>
+      </p>
+
+      <h2 id="quickstart"><span lang="en">Quick start</span><span lang="es">Inicio rápido</span></h2>
+<pre data-lang="java"><code>public class DashboardController extends Controller {
+
+    @FXML private Label totalLabel;
+    @FXML private TableView&lt;Order&gt; table;
+
+    // Called by JavaFX on first load, and by CoreFx on every
+    // navigation back to this cached view.
+    @Override
+    public void initialize() {
+        totalLabel.setText(orderService.currentTotal());
+        TableUtils.setItems(table, orderService.findAll());
+    }
+
+    @FXML
+    private void onClose() {
+        getStage().close();          // injected by FlowController
+    }
+}</code></pre>
+
+      <div class="callout note">
+        <span class="c-icon">🔁</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">Who calls initialize(), and when</span><span lang="es">Quién llama a initialize(), y cuándo</span></span>
+          <p><span lang="en">On the <strong>first</strong> load JavaFX itself calls the no-arg <code>initialize()</code>, as it does for any FXML controller. On <strong>every later</strong> navigation to that view, <code>FlowController.getLoader(...)</code> finds the cached loader and calls <code>initialize()</code> again. Same method, two callers — so write it to be safely re-runnable.</span><span lang="es">En la <strong>primera</strong> carga es el propio JavaFX quien llama al <code>initialize()</code> sin argumentos, como hace con cualquier controlador FXML. En <strong>cada navegación posterior</strong> a esa vista, <code>FlowController.getLoader(...)</code> encuentra el loader cacheado y vuelve a llamar a <code>initialize()</code>. El mismo método, dos llamantes — así que escríbelo para que se pueda re-ejecutar sin problemas.</span></p>
+        </div>
+      </div>
+
+      <h2 id="api"><span lang="en">API reference</span><span lang="es">Referencia de API</span></h2>
+      <div class="api-method">
+        <div class="sig">abstract void <span class="m-name">initialize</span>()</div>
+        <div class="desc"><p><span lang="en">The one method you must implement. Put here whatever the screen needs each time it becomes visible: reload data, reset filters, clear a form. Called once by JavaFX at load time and again by CoreFx on every reuse of the cached loader.</span><span lang="es">El único método que debes implementar. Pon aquí lo que la pantalla necesite cada vez que se hace visible: recargar datos, resetear filtros, limpiar un formulario. Lo llama una vez JavaFX al cargar y otra vez CoreFx en cada reutilización del loader cacheado.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">Stage <span class="m-name">getStage</span>() &nbsp;·&nbsp; void <span class="m-name">setStage</span>(Stage stage)</div>
+        <div class="desc"><p><span lang="en">The window this view is currently showing on. <strong>Injected (and re-injected) by <code>FlowController</code> on every navigation call</strong>, so it always points at the right stage — the main stage, a secondary window, or a modal. Use it to close, resize or title the window from inside the controller.</span><span lang="es">La ventana en la que se muestra esta vista actualmente. <strong><code>FlowController</code> lo inyecta (y reinyecta) en cada llamada de navegación</strong>, así que siempre apunta al stage correcto — el principal, una ventana secundaria o un modal. Úsalo para cerrar, redimensionar o titular la ventana desde el propio controlador.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">String <span class="m-name">getViewName</span>() &nbsp;·&nbsp; void <span class="m-name">setViewName</span>(String viewName)</div>
+        <div class="desc"><p><span lang="en">The name the view was loaded under (the FXML file name, without extension). Set by CoreFx the moment the loader is created, so a controller always knows its own identity — handy for logging or for asking <code>FlowController</code> about itself.</span><span lang="es">El nombre con el que se cargó la vista (el nombre del archivo FXML, sin extensión). CoreFx lo asigna en el momento en que se crea el loader, así un controlador siempre conoce su propia identidad — útil para logs o para preguntarle a <code>FlowController</code> por sí mismo.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">String <span class="m-name">getAction</span>() &nbsp;·&nbsp; void <span class="m-name">setAction</span>(String action)</div>
+        <div class="desc"><p><span lang="en">A free-form slot for the intent behind the navigation — <code>"create"</code> vs <code>"edit"</code>, for instance — so one view can serve several modes. CoreFx never writes to it; it is yours to set before navigating and read inside <code>initialize()</code>.</span><span lang="es">Un espacio libre para la intención detrás de la navegación — <code>"create"</code> frente a <code>"edit"</code>, por ejemplo — para que una misma vista sirva varios modos. CoreFx nunca lo escribe; es tuyo para asignarlo antes de navegar y leerlo dentro de <code>initialize()</code>.</span></p></div>
+      </div>
+      <div class="api-method">
+        <div class="sig">void <span class="m-name">sendTabEvent</span>(KeyEvent event)</div>
+        <div class="desc"><p><span lang="en">Consumes the given key event and fires a synthetic <code>TAB</code> at its source — the usual trick for making <kbd>Enter</kbd> advance focus like a data-entry form. The source must be a <code>Control</code>.</span><span lang="es">Consume el evento de teclado dado y dispara un <code>TAB</code> sintético sobre su origen — el truco habitual para que <kbd>Enter</kbd> avance el foco como en un formulario de captura. El origen debe ser un <code>Control</code>.</span></p></div>
+      </div>
+      <p><span lang="en"><code>toString()</code>, <code>equals</code> and <code>hashCode</code> are overridden over the three fields (<code>stage</code>, <code>action</code>, <code>viewName</code>).</span><span lang="es"><code>toString()</code>, <code>equals</code> y <code>hashCode</code> están sobrescritos sobre los tres campos (<code>stage</code>, <code>action</code>, <code>viewName</code>).</span></p>
+
+      <h2 id="injection"><span lang="en">What FlowController injects, and where</span><span lang="es">Qué inyecta FlowController, y dónde</span></h2>
+      <p><span lang="en">Every one of these methods checks whether the loaded controller extends <code>Controller</code> and, if so, injects the stage it is navigating to. Controllers that don't extend it are simply left alone — the base class is entirely opt-in.</span><span lang="es">Cada uno de estos métodos comprueba si el controlador cargado extiende <code>Controller</code> y, en tal caso, le inyecta el stage al que está navegando. Los controladores que no la extienden simplemente se dejan intactos — la clase base es totalmente opcional.</span></p>
+      <table class="tbl">
+        <tr><th><span lang="en">Hook</span><span lang="es">Punto de enganche</span></th><th><span lang="en">What CoreFx sets</span><span lang="es">Qué asigna CoreFx</span></th></tr>
+        <tr><td><code>createLoaderInstance(name)</code></td><td><span lang="en"><code>viewName</code>, once, as the loader is built.</span><span lang="es"><code>viewName</code>, una vez, al construir el loader.</span></td></tr>
+        <tr><td><code>getLoader(viewName)</code></td><td><span lang="en">Calls <code>initialize()</code> when a <em>cached</em> loader is reused.</span><span lang="es">Llama a <code>initialize()</code> cuando se reutiliza un loader <em>cacheado</em>.</span></td></tr>
+        <tr><td><code>goViewMain</code> · <code>changeViewInMain</code></td><td><span lang="en"><code>stage</code> ← the main stage.</span><span lang="es"><code>stage</code> ← el stage principal.</span></td></tr>
+        <tr><td><code>goViewInWindow</code></td><td><span lang="en"><code>stage</code> ← the new window.</span><span lang="es"><code>stage</code> ← la ventana nueva.</span></td></tr>
+        <tr><td><code>goViewInModal</code> · <code>goViewInModalAndWait</code></td><td><span lang="en"><code>stage</code> ← the modal stage.</span><span lang="es"><code>stage</code> ← el stage del modal.</span></td></tr>
+        <tr><td><code>changeViewInStage</code> · <code>changeViewInScene</code></td><td><span lang="en"><code>stage</code> ← the target stage.</span><span lang="es"><code>stage</code> ← el stage de destino.</span></td></tr>
+        <tr><td><code>changeViewInBorderPane</code></td><td><span lang="en"><code>stage</code> ← the stage owning the pane.</span><span lang="es"><code>stage</code> ← el stage dueño del panel.</span></td></tr>
+      </table>
+
+      <div class="callout warning">
+        <span class="c-icon">⚠️</span>
+        <div class="c-body">
+          <span class="c-title"><span lang="en">initialize() must be re-runnable</span><span lang="es">initialize() debe poder re-ejecutarse</span></span>
+          <p><span lang="en">Because it fires on every visit, treat it as "refresh this screen", not "build this screen once". Adding a listener or a menu item there will add it <em>again</em> on the next visit — do that kind of one-time setup in the controller's constructor, or guard it with a flag. Reloading data, resetting fields and re-binding text is exactly what belongs here.</span><span lang="es">Como se dispara en cada visita, trátalo como "refresca esta pantalla", no como "construye esta pantalla una vez". Añadir ahí un listener o un ítem de menú lo añadirá <em>otra vez</em> en la siguiente visita — haz ese tipo de configuración única en el constructor del controlador, o protégela con un flag. Recargar datos, resetear campos y re-enlazar textos es exactamente lo que corresponde aquí.</span></p>
+        </div>
+      </div>
+
+      <h2 id="recommendations"><span lang="en">Recommendations</span><span lang="es">Recomendaciones</span></h2>
+      <div class="callout tip">
+        <span class="c-icon">✅</span>
+        <div class="c-body">
+          <p><span lang="en"><strong>Do</strong> extend <code>Controller</code> for any screen that shows data which can change while the user is elsewhere — lists, dashboards, anything with a total.</span><span lang="es"><strong>Extiende</strong> <code>Controller</code> en cualquier pantalla que muestre datos que puedan cambiar mientras el usuario está en otro lado — listas, dashboards, cualquier cosa con un total.</span></p>
+          <p><span lang="en"><strong>Do</strong> use <code>getStage()</code> instead of digging a window out of a node (<code>node.getScene().getWindow()</code>) — it is already the right stage, and it stays right across modals.</span><span lang="es"><strong>Usa</strong> <code>getStage()</code> en vez de sacar la ventana desde un nodo (<code>node.getScene().getWindow()</code>) — ya es el stage correcto, y sigue siéndolo a través de los modales.</span></p>
+          <p><span lang="en"><strong>Do</strong> pair <code>setAction("edit")</code> with <a href="flow-controller.html">FlowController</a>'s typed transfer value when one view serves both create and edit modes.</span><span lang="es"><strong>Combina</strong> <code>setAction("edit")</code> con el valor de transferencia tipado de <a href="flow-controller.html">FlowController</a> cuando una misma vista sirve para crear y editar.</span></p>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a class="prev" href="flow-controller.html"><div class="pn-label"><span lang="en">Previous class</span><span lang="es">Clase anterior</span></div><div class="pn-title">← FlowController</div></a>
+        <a class="next" href="app-context.html"><div class="pn-label"><span lang="en">Next class</span><span lang="es">Siguiente clase</span></div><div class="pn-title">AppContext →</div></a>
+      </div>
+
+    </div></div>
+  </div>
+  <footer id="footer"></footer>
+  <script src="../../assets/js/site.js"></script>
+</body>
+</html>
