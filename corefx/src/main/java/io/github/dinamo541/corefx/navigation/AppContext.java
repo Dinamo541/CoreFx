@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Carranza
  * @author Dominique
- * @version 3.0.0
+ * @version 3.1.0
  * @since 2026/06/10
  */
 public final class AppContext {
@@ -232,22 +232,24 @@ public final class AppContext {
     }
     
     /**
-     * Temporal patch to load the application configuration file
-     * and stores the configured web sevices base URL
+     * Loads application properties from a configuration file and populates the context.
      * 
+     * @throws RuntimeException if there is an error loading the properties
      */
-       private void loadProperties() {
+    private void loadProperties() {
         try {
             FileInputStream configFile;
             configFile = new FileInputStream("config/properties.ini");
             Properties appProperties = new Properties();
+
             appProperties.load(configFile);
             configFile.close();
+            
             if (appProperties.getProperty("propiedades.resturl") != null) {
                 this.context.put("resturl", appProperties.getProperty("propiedades.resturl"));
             }
         } catch (IOException io) {
-            System.out.println("Configuration file not found");
+            throw new RuntimeException("Error loading application properties: " + io.getMessage(), io);
         }
     }
 
