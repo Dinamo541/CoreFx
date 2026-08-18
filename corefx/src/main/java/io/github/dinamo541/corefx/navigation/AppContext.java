@@ -6,7 +6,10 @@
  */
 package io.github.dinamo541.corefx.navigation;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -69,6 +72,7 @@ public final class AppContext {
      * Private constructor — use {@link #getInstance()} to obtain the singleton.
      */
     private AppContext() {
+        loadProperties();
     }
 
     /**
@@ -224,6 +228,26 @@ public final class AppContext {
     private void validateKey(String key) {
         if (key == null || key.isBlank()) {
             throw new IllegalArgumentException("Context key cannot be null or blank");
+        }
+    }
+    
+    /**
+     * Temporal patch to load the application configuration file
+     * and stores the configured web sevices base URL
+     * 
+     */
+       private void loadProperties() {
+        try {
+            FileInputStream configFile;
+            configFile = new FileInputStream("config/properties.ini");
+            Properties appProperties = new Properties();
+            appProperties.load(configFile);
+            configFile.close();
+            if (appProperties.getProperty("propiedades.resturl") != null) {
+                this.context.put("resturl", appProperties.getProperty("propiedades.resturl"));
+            }
+        } catch (IOException io) {
+            System.out.println("Configuration file not found");
         }
     }
 
